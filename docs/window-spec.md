@@ -24,6 +24,7 @@ Observations from the photos:
 | Sash height (H) | 1325 mm | inside of frame, vertical |
 | Tilt gap at top | 160 mm | distance from frame plane to sash face at full tilt |
 | Turn gap at hinge side (at 90°) | 25 mm | sash-to-frame offset when fully turned |
+| **Sash protrusion past frame face** | **~20 mm** | sash room-side face sits 20 mm forward of the frame's inside face — drives bracket placement (see `docs/mounting-detail.svg`) |
 | Hinge side | right | turn pivot axis = right edge |
 | Handle side | left | mid-height |
 | Tilt stay location | top-left (handle side) | visible in photo; mount clear of this |

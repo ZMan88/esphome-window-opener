@@ -18,7 +18,11 @@ The fixed-end bracket bolts to the **room-side (inside) face of the top frame ra
 
 ![Mounting cross-section](../docs/mounting-detail.svg)
 
-Attachment: M4 self-tapping screws through the bracket mounting plate, plus VHB double-sided tape as a gasket / first-attempt reversible fixing. The sash-end bracket uses the same pattern on the sash's top rail.
+**Constraint — bracket position (y):** The sash protrudes ~20 mm past the frame's inside face, so the bracket's mounting plate must sit **entirely above the sash top level**. If it extends down past the sash top, the bracket arm collides with the protruding sash. This gives the CAD a concrete rule: bracket plate `y_bottom ≤ frame_top − 20 mm` (accounting for gasket clearance).
+
+**Attachment:** M4 self-tapping screws through the bracket mounting plate, plus VHB double-sided tape as a gasket / first-attempt reversible fixing.
+
+**Sash-end bracket:** uses the same pattern but mounts on the **room-side face of the sash top rail** (the surface that's already 20 mm proud of the frame). Its arm extends a shorter distance (~15 mm) because the sash itself already provides 20 mm of "standoff."
 
 ### Why this geometry works for both modes
 
