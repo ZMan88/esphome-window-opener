@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-A DIY ESP32-based opener for a European **tilt-and-turn** window, integrated with Home Assistant via ESPHome. A single actuator is anchored at the **bottom-hinge-side corner** of the window frame — the one point fixed in both tilt and turn modes — and drives the opposite corner of the sash. The user pre-selects the mode via the window handle; the firmware only commands a 0–100% position along the actuator's stroke.
+A DIY ESP32-based opener for a European **tilt-and-turn** window, integrated with Home Assistant via ESPHome. A single actuator is mounted **horizontally across the top**: fixed end at the **top-middle of the frame**, moving end on the **top rail of the sash, 120 mm from the hinge**. Extending the actuator opens the window in whichever mode the handle has selected (tilt or turn).
 
-Full roadmap, phase tracker, and open questions live in `PLAN.md`.
+Target window measurements and derived numbers: `docs/window-spec.md`. Geometry diagram: `docs/geometry.svg`. Full roadmap, phase tracker, and open questions: `PLAN.md`.
 
 ## Common commands
 
@@ -28,11 +28,19 @@ cp firmware/common/secrets.example.yaml firmware/common/secrets.yaml
 
 ### Mounting geometry (load-bearing — read before touching mechanical/CAD)
 
-The device is always anchored at the bottom-hinge-side corner of the frame. The moving end attaches to the opposite corner of the sash. **Both ends must use ball-joint rod ends** so the actuator can swing through the two different arcs (short tilt arc, wide turn arc) without binding. Any CAD change that replaces rod ends with fixed pivots will break turn mode.
+Fixed end at **top-middle of the frame** `(W/2, 0)`. Moving end on the **top rail of the sash, d = 120 mm from the hinge side** `(W - d, 0)`. Both endpoints are **off both pivot axes** (bottom edge = tilt axis, right edge = turn axis), which is what lets one actuator drive both modes. If either endpoint moves onto an axis, that mode stops being driveable — mechanical regressions that shift anchors toward the hinge or the bottom edge will silently break turn or tilt.
+
+**Both ends must use ball-joint rod ends** — the actuator body swings vertically in tilt and horizontally in turn (different planes). Fixed pivots or single-axis hinges will bind in one of the modes.
+
+See `mechanical/README.md` for the full reasoning and `docs/window-spec.md` for the measurements that produced `d = 120 mm`.
 
 ### Priority: tilt > turn
 
 Tilt is the everyday ventilation case. Firmware defaults, calibration, and HA UX favor tilt. A trade-off that improves tilt at the cost of turn-mode precision is usually acceptable. The reverse is not.
+
+### Mode asymmetry (important for HA UX)
+
+Full tilt is only ~26% of the actuator's stroke; full turn is ~78%. So `cover.position = 50` means a very different window angle in the two modes. **The `cover` entity exposes raw stroke %** — it intentionally does not pretend to be symmetric. HA automations and dashboards should translate to "tilt X%" / "turn X%" per mode if needed (see `home-assistant/automations.yaml`). A future handle-position sensor can let firmware remap cleanly per mode — tracked in `PLAN.md`.
 
 ### Dual actuator variants
 

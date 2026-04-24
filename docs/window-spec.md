@@ -1,0 +1,59 @@
+# Target window — physical specification
+
+These measurements drive the actuator sizing and bracket geometry. Re-measure if the build targets a different window.
+
+![Target window in tilt mode](photos/window-tilted.jpeg)
+
+## Measured
+
+| Parameter | Value | Notes |
+|---|---:|---|
+| Sash width (W) | 845 mm | inside of frame, horizontal |
+| Sash height (H) | 1325 mm | inside of frame, vertical |
+| Tilt gap at top | 160 mm | distance from frame plane to sash face at full tilt |
+| Turn gap at hinge side (at 90°) | 25 mm | sash-to-frame offset when fully turned |
+| Hinge side | right | turn pivot axis = right edge |
+| Handle side | left | mid-height |
+| Tilt stay location | top-left (handle side) | visible in photo; mount clear of this |
+| Turn hardstop | >90° | plan for ~100° headroom |
+
+## Derived
+
+| Derived quantity | Value | How |
+|---|---:|---|
+| Max tilt angle (θ_max) | ~7° | `arcsin(160 / 1325)` |
+| Center of sash from turn pivot | 423 mm | `W / 2` |
+| Sash weight (estimated) | 15–25 kg | double-glazed, PVC-framed, typical |
+
+## Design constants used elsewhere in the repo
+
+| Constant | Value | Where used |
+|---|---:|---|
+| `d` (moving-anchor offset from hinge) | 120 mm | `mechanical/README.md`, bracket CAD |
+| Fixed anchor position | `(W/2, 0)` = top-middle of frame | `mechanical/README.md` |
+| Moving anchor position | `(W - d, 0)` = top edge of sash, 120 mm from hinge | `mechanical/README.md` |
+
+## Required actuator spec
+
+| Parameter | Value | Reason |
+|---|---:|---|
+| Stroke | ≥ 160 mm (use 200 mm) | full-turn stroke plus margin |
+| Force | ≥ 500 N | worst-case friction torque / moment arm at `d = 120 mm` |
+| Voltage | 12 V DC | matches PSU choice |
+| Speed | 15–25 mm/s | full stroke in 8–14 s (acceptable) |
+
+## Stroke-to-angle table (for reference)
+
+With `d = 120 mm`:
+
+| Actuator stroke | Tilt angle | Turn angle |
+|---:|---:|---:|
+| 0 mm | 0° (closed) | 0° (closed) |
+| 20 mm | ~5° | ~22° |
+| 40 mm | ~7° (hardstop) | ~37° |
+| 80 mm | — (stalled) | ~64° |
+| 120 mm | — | ~84° |
+| 137 mm | — | 90° |
+| 160 mm | — | ~100° |
+
+**Interpretation:** the same actuator stroke maps to different window angles depending on mode. Firmware exposes raw stroke %; HA automations translate to tilt or turn percentage if needed. See `docs/architecture.md`.

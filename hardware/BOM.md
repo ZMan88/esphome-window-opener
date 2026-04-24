@@ -21,7 +21,7 @@ Prices are rough EU hobbyist-market estimates (AliExpress / local electronics sh
 
 | Qty | Part | Notes | ~EUR |
 |---:|---|---|---:|
-| 1 | 12V DC linear actuator | 150–300mm stroke, 150–300 N force, IP54+ if outdoor-facing | 30–50 |
+| 1 | 12V DC linear actuator | **200 mm stroke, ≥500 N force** (sized for 845×1325 mm sash, d=120 mm — see `docs/window-spec.md`). IP54+ if outdoor-facing. | 35–55 |
 | 1 | BTS7960 H-bridge module (43A) | Overkill on current headroom, but cheap and reliable | 5 |
 | 1 | (optional) 10-turn linear potentiometer | For closed-loop % feedback — omit if you accept time-based | 5 |
 

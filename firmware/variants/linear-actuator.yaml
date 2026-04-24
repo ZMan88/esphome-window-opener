@@ -10,8 +10,10 @@
 # Calibration: docs/calibration.md
 
 substitutions:
-  # Measured stroke time at full PWM. Update after calibration — see docs/calibration.md.
-  full_stroke_seconds: "18s"
+  # Measured stroke time at full PWM — full retract to full extend, under load.
+  # Starting estimate for a 200 mm stroke / 20 mm/s actuator is ~10 s.
+  # Update after first calibration run — see docs/calibration.md.
+  full_stroke_seconds: "10s"
 
 output:
   - platform: ledc
