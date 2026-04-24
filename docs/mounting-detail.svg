@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="12">
   <defs>
-    <pattern id="hatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+    <pattern id="ceiling-hatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
       <line x1="0" y1="0" x2="0" y2="8" stroke="#aaa" stroke-width="1"/>
     </pattern>
-    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+    <marker id="leader-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
       <polygon points="0 0, 10 3, 0 6" fill="#444"/>
     </marker>
     <marker id="dim-start" markerWidth="10" markerHeight="10" refX="1" refY="3" orient="auto">
@@ -20,112 +20,121 @@
 
   <rect width="1000" height="640" fill="#fafafa"/>
 
-  <text x="500" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111">
-    Mounting detail — side cross-section at the fixed anchor
+  <text x="500" y="32" text-anchor="middle" font-size="19" font-weight="700" fill="#111">
+    Mounting detail · fixed anchor (top-middle of frame)
   </text>
-  <text x="500" y="50" text-anchor="middle" font-size="12" fill="#666" font-style="italic">
-    vertical cut through top-middle of the frame · scale 2.5 px / mm · outside ← · → room
+  <text x="500" y="52" text-anchor="middle" font-size="12" fill="#666" font-style="italic">
+    vertical cut at X = W/2 = 422 mm · scale 2.5 px / mm · outside ← · → room
   </text>
 
   <text x="60" y="330" text-anchor="middle" font-size="13" fill="#666" font-style="italic">← outside</text>
   <text x="940" y="330" text-anchor="middle" font-size="13" fill="#666" font-style="italic">room →</text>
 
-  <!-- Scene: 2.5 px / mm -->
   <g transform="translate(180, 75)">
 
-    <!-- Ceiling -->
+    <!-- Ceiling — frame goes right up to it, no air gap -->
     <rect x="0" y="0" width="560" height="25" fill="#e0e0e0" stroke="#888"/>
-    <rect x="0" y="0" width="560" height="25" fill="url(#hatch)"/>
-    <text x="280" y="16" text-anchor="middle" font-size="10" fill="#444">ceiling</text>
+    <rect x="0" y="0" width="560" height="25" fill="url(#ceiling-hatch)"/>
+    <text x="280" y="16" text-anchor="middle" font-size="10" fill="#444">ceiling (concrete slab)</text>
 
-    <!-- FRAME — full top rail, ~80 mm tall. Most of its inside face (x=275) is HIDDEN behind the sash. -->
-    <rect x="100" y="25" width="175" height="200" fill="#7a4f24" stroke="#2a1a08" stroke-width="1.8"/>
-    <text x="175" y="150" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">FRAME</text>
-    <text x="175" y="168" text-anchor="middle" font-size="9" fill="#ddd" font-style="italic">(top rail; most of inside</text>
-    <text x="175" y="181" text-anchor="middle" font-size="9" fill="#ddd" font-style="italic">face hidden by sash below)</text>
+    <!-- FRAME — 80 mm × 80 mm, top touches the ceiling. Mostly hidden behind the sash. -->
+    <rect x="100" y="25" width="200" height="200" fill="#7a4f24" stroke="#2a1a08" stroke-width="1.8"/>
+    <text x="200" y="155" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">FRAME</text>
+    <text x="200" y="173" text-anchor="middle" font-size="10" fill="#ddd" font-style="italic">80 mm deep × 80 mm tall</text>
+    <text x="200" y="187" text-anchor="middle" font-size="10" fill="#ddd" font-style="italic">(top touches ceiling)</text>
 
-    <!-- Frame depth dimension (70 mm = 175 px) -->
+    <!-- Frame depth dimension -->
     <line x1="100" y1="15" x2="100" y2="-5" stroke="#666"/>
-    <line x1="275" y1="15" x2="275" y2="-5" stroke="#666"/>
-    <line x1="100" y1="5" x2="275" y2="5" stroke="#666" marker-start="url(#dim-start)" marker-end="url(#dim-end)"/>
-    <text x="187" y="-8" text-anchor="middle" font-size="11" fill="#444">frame ≈ 70 mm deep</text>
+    <line x1="300" y1="15" x2="300" y2="-5" stroke="#666"/>
+    <line x1="100" y1="5" x2="300" y2="5" stroke="#666" marker-start="url(#dim-start)" marker-end="url(#dim-end)"/>
+    <text x="200" y="-8" text-anchor="middle" font-size="11" fill="#444">80 mm</text>
 
-    <!-- SASH — covers the frame's inside face from 20 mm below the ceiling all the way down.
-         Room-side face at x=325 (20 mm past the frame's inside face at x=275).
-         Top at y=75 (= ceiling + 50 px = 20 mm). -->
-    <rect x="195" y="75" width="130" height="480" fill="#2f6e4a" stroke="#123a26" stroke-width="1.8"/>
-    <text x="260" y="370" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">SASH</text>
-    <text x="260" y="388" text-anchor="middle" font-size="9" fill="#ddd" font-style="italic">(face is 20 mm forward</text>
-    <text x="260" y="400" text-anchor="middle" font-size="9" fill="#ddd" font-style="italic">of the frame's inside face)</text>
+    <!-- SASH — top at 20 mm below ceiling. Room face at x=350 (20 mm past frame face at x=300). -->
+    <rect x="150" y="75" width="200" height="485" fill="#2f6e4a" stroke="#123a26" stroke-width="1.8"/>
+    <text x="250" y="360" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">SASH</text>
+    <text x="250" y="378" text-anchor="middle" font-size="10" fill="#ddd" font-style="italic">80 mm thick</text>
+    <text x="250" y="391" text-anchor="middle" font-size="10" fill="#ddd" font-style="italic">covers frame face below</text>
+    <text x="250" y="404" text-anchor="middle" font-size="10" fill="#ddd" font-style="italic">the 20 mm strip</text>
 
-    <!-- Glass schematic below sash top rail -->
-    <line x1="220" y1="555" x2="220" y2="575" stroke="#99c" stroke-width="2.5"/>
-    <line x1="300" y1="555" x2="300" y2="575" stroke="#99c" stroke-width="2.5"/>
-    <text x="260" y="591" text-anchor="middle" font-size="10" fill="#667" font-style="italic">↓ double glass</text>
+    <!-- Visible frame strip callout -->
+    <line x1="300" y1="25" x2="300" y2="75" stroke="#c0392b" stroke-width="1.5"/>
+    <line x1="285" y1="25" x2="315" y2="25" stroke="#c0392b" stroke-width="1.5"/>
+    <line x1="285" y1="75" x2="315" y2="75" stroke="#c0392b" stroke-width="1.5"/>
+    <path d="M 270 50 L 355 50" fill="none" stroke="#c0392b" stroke-width="1.2" marker-end="url(#red-arrow)"/>
+    <text x="363" y="47" font-size="11" fill="#c0392b" font-weight="700">only 20 mm of frame face</text>
+    <text x="363" y="62" font-size="11" fill="#c0392b" font-weight="700">accessible for mounting</text>
 
-    <!-- Callout: only 20 mm of frame visible -->
-    <line x1="275" y1="25" x2="275" y2="75" stroke="#c0392b" stroke-width="1.5"/>
-    <line x1="260" y1="25" x2="290" y2="25" stroke="#c0392b" stroke-width="1.5"/>
-    <line x1="260" y1="75" x2="290" y2="75" stroke="#c0392b" stroke-width="1.5"/>
-    <path d="M 270 50 L 350 50" fill="none" stroke="#c0392b" stroke-width="1.2" marker-end="url(#red-arrow)"/>
-    <text x="358" y="47" font-size="11" fill="#c0392b" font-weight="700">only 20 mm of frame</text>
-    <text x="358" y="62" font-size="11" fill="#c0392b" font-weight="700">accessible for mounting</text>
+    <!-- Sash lip dimension -->
+    <line x1="300" y1="590" x2="300" y2="608" stroke="#c0392b" stroke-width="1.2"/>
+    <line x1="350" y1="590" x2="350" y2="608" stroke="#c0392b" stroke-width="1.2"/>
+    <line x1="300" y1="600" x2="350" y2="600" stroke="#c0392b" stroke-width="1.2" marker-start="url(#dim-start)" marker-end="url(#dim-end)"/>
+    <text x="325" y="622" text-anchor="middle" font-size="11" fill="#c0392b" font-weight="700">sash lip 20 mm</text>
 
-    <!-- Sash protrusion dimension (20 mm) -->
-    <line x1="275" y1="585" x2="275" y2="605" stroke="#c0392b" stroke-width="1.2"/>
-    <line x1="325" y1="585" x2="325" y2="605" stroke="#c0392b" stroke-width="1.2"/>
-    <line x1="275" y1="597" x2="325" y2="597" stroke="#c0392b" stroke-width="1.2" marker-start="url(#dim-start)" marker-end="url(#dim-end)"/>
-    <text x="300" y="618" text-anchor="middle" font-size="11" fill="#c0392b" font-weight="700">sash protrudes 20 mm</text>
+    <!-- Glass schematic -->
+    <line x1="220" y1="560" x2="220" y2="578" stroke="#99c" stroke-width="2.5"/>
+    <line x1="300" y1="560" x2="300" y2="578" stroke="#99c" stroke-width="2.5"/>
+    <text x="260" y="550" text-anchor="middle" font-size="9" fill="#667" font-style="italic">↓ double glass</text>
 
-    <!-- BRACKET — fits in the 20 mm gap between ceiling and sash top.
-         Plate: x=245-275 (30 px = 12 mm wide), y=28-72 (44 px = ~18 mm, fits in the 20 mm with a tiny gasket margin).
-         Includes a HOOK OVER THE TOP EDGE of the frame for mechanical load-path redundancy. -->
+    <!-- BRACKET — plate fills the full 20 mm strip (x=274-300 × y=27-73), with a compressible TAB at the top pressing against the ceiling. -->
     <g>
-      <!-- Vertical mounting plate against frame face -->
-      <rect x="245" y="28" width="30" height="44" fill="#b92c2c" stroke="#5a0d0d" stroke-width="1.2" rx="1.5"/>
-      <!-- Hook over the top of the frame (extends INTO the ceiling gap) -->
-      <rect x="245" y="21" width="55" height="7" fill="#b92c2c" stroke="#5a0d0d" stroke-width="1.2"/>
-      <!-- Arm extending into room, CLEARS the sash (sash top is at y=75; arm is at y=38-58) -->
-      <rect x="275" y="38" width="68" height="22" fill="#b92c2c" stroke="#5a0d0d" stroke-width="1.2" rx="1.5"/>
+      <!-- Vertical mounting plate -->
+      <rect x="274" y="27" width="26" height="46" fill="#b92c2c" stroke="#5a0d0d" stroke-width="1.2" rx="1.5"/>
+      <!-- Compressible ceiling tab (foam/rubber pad) -->
+      <rect x="274" y="21" width="26" height="6" fill="#6a1818" stroke="#300" stroke-width="0.8"/>
+      <!-- Arm extending into the room -->
+      <rect x="300" y="38" width="65" height="22" fill="#b92c2c" stroke="#5a0d0d" stroke-width="1.2" rx="1.5"/>
       <!-- M4 screws through the mounting plate -->
-      <circle cx="260" cy="40" r="2.5" fill="#111"/>
-      <circle cx="260" cy="60" r="2.5" fill="#111"/>
-      <text x="300" y="24" font-size="10" fill="#b92c2c" font-weight="700">BRACKET</text>
+      <circle cx="287" cy="38" r="2.5" fill="#111"/>
+      <circle cx="287" cy="62" r="2.5" fill="#111"/>
+      <text x="310" y="24" font-size="10" fill="#b92c2c" font-weight="700">BRACKET</text>
     </g>
 
-    <!-- Hook annotation -->
-    <path d="M 260 18 L 180 -20 L 90 -20" fill="none" stroke="#555" stroke-width="1" marker-end="url(#arrow-end)"/>
-    <text x="-15" y="-34" font-size="10" fill="#555">hook sits in ceiling</text>
-    <text x="-15" y="-20" font-size="10" fill="#555">gap — mechanical</text>
-    <text x="-15" y="-6" font-size="10" fill="#555">load-path backup</text>
+    <!-- Annotation: ceiling-jam tab -->
+    <path d="M 285 19 L 200 -25 L 90 -25" fill="none" stroke="#555" stroke-width="1" marker-end="url(#leader-arrow)"/>
+    <text x="-15" y="-40" font-size="10" fill="#555">compressible tab</text>
+    <text x="-15" y="-26" font-size="10" fill="#555">wedges against ceiling —</text>
+    <text x="-15" y="-12" font-size="10" fill="#555">mechanical peel-resist</text>
+
+    <!-- Annotation: plate on 20 mm strip -->
+    <path d="M 274 50 L 200 110 L 90 110" fill="none" stroke="#555" stroke-width="1" marker-end="url(#leader-arrow)"/>
+    <text x="-15" y="97" font-size="10" fill="#555">plate: 190 × ~18 mm</text>
+    <text x="-15" y="111" font-size="10" fill="#555">VHB + 2× M4 self-tappers</text>
 
     <!-- Bracket protrusion dimension -->
-    <line x1="275" y1="85" x2="275" y2="105" stroke="#666"/>
-    <line x1="343" y1="85" x2="343" y2="105" stroke="#666"/>
-    <line x1="275" y1="98" x2="343" y2="98" stroke="#666" marker-start="url(#dim-start)" marker-end="url(#dim-end)"/>
-    <text x="309" y="119" text-anchor="middle" font-size="10" fill="#444">~27 mm</text>
+    <line x1="300" y1="85" x2="300" y2="105" stroke="#666"/>
+    <line x1="365" y1="85" x2="365" y2="105" stroke="#666"/>
+    <line x1="300" y1="97" x2="365" y2="97" stroke="#666" marker-start="url(#dim-start)" marker-end="url(#dim-end)"/>
+    <text x="332" y="118" text-anchor="middle" font-size="10" fill="#444">~26 mm arm</text>
 
-    <!-- Rod-end (ball joint) at the end of the bracket arm -->
-    <circle cx="365" cy="49" r="16" fill="#fff" stroke="#222" stroke-width="2"/>
-    <circle cx="365" cy="49" r="6" fill="#333"/>
-    <line x1="365" y1="33" x2="365" y2="65" stroke="#222" stroke-width="2"/>
-    <text x="365" y="24" text-anchor="middle" font-size="10" fill="#222" font-weight="700">rod-end</text>
+    <!-- Rod-end -->
+    <circle cx="388" cy="49" r="16" fill="#fff" stroke="#222" stroke-width="2"/>
+    <circle cx="388" cy="49" r="6" fill="#333"/>
+    <line x1="388" y1="33" x2="388" y2="65" stroke="#222" stroke-width="2"/>
+    <text x="388" y="24" text-anchor="middle" font-size="10" fill="#222" font-weight="700">rod-end</text>
 
-    <!-- ACTUATOR BODY — end-on, going toward hinge side -->
+    <!-- Actuator body — end-on, extending INTO the page (toward hinge/right) -->
     <g>
-      <ellipse cx="415" cy="49" rx="20" ry="22" fill="#555" stroke="#222" stroke-width="1.5"/>
-      <path d="M 415 27 L 605 27 L 605 71 L 415 71 Z" fill="#555" stroke="#222" stroke-width="1.5"/>
-      <ellipse cx="605" cy="49" rx="7" ry="22" fill="#3a3a3a" stroke="#111" stroke-width="1" opacity="0.6"/>
-      <text x="638" y="55" font-size="26" fill="#333" font-weight="700">…</text>
-      <text x="510" y="22" text-anchor="middle" font-size="11" fill="#fff" font-weight="700">ACTUATOR BODY</text>
-      <text x="510" y="93" text-anchor="middle" font-size="10" fill="#666" font-style="italic">runs horizontally toward hinge side</text>
+      <ellipse cx="435" cy="49" rx="20" ry="22" fill="#555" stroke="#222" stroke-width="1.5"/>
+      <path d="M 435 27 L 615 27 L 615 71 L 435 71 Z" fill="#555" stroke="#222" stroke-width="1.5"/>
+      <ellipse cx="615" cy="49" rx="7" ry="22" fill="#3a3a3a" stroke="#111" stroke-width="1" opacity="0.6"/>
+      <text x="648" y="55" font-size="26" fill="#333" font-weight="700">…</text>
+      <text x="525" y="22" text-anchor="middle" font-size="11" fill="#fff" font-weight="700">ACTUATOR BODY</text>
+      <text x="525" y="94" text-anchor="middle" font-size="10" fill="#666" font-style="italic">runs toward hinge (into page)</text>
     </g>
 
     <!-- Sash top reference line -->
-    <line x1="-5" y1="75" x2="195" y2="75" stroke="#c0392b" stroke-dasharray="4,3" stroke-width="1"/>
+    <line x1="-5" y1="75" x2="150" y2="75" stroke="#c0392b" stroke-dasharray="4,3" stroke-width="1"/>
     <text x="-12" y="79" text-anchor="end" font-size="9" fill="#c0392b" font-style="italic">sash top</text>
-    <line x1="-5" y1="25" x2="100" y2="25" stroke="#888" stroke-dasharray="3,2" stroke-width="1"/>
-    <text x="-12" y="29" text-anchor="end" font-size="9" fill="#888" font-style="italic">ceiling</text>
+
+    <!-- Load analysis box -->
+    <g transform="translate(400, 380)">
+      <rect x="0" y="0" width="275" height="80" fill="#fff8e6" stroke="#c99b2b" stroke-width="1" rx="3"/>
+      <text x="137" y="18" text-anchor="middle" font-size="11" fill="#744" font-weight="700">load path (tight margin at stall)</text>
+      <text x="10" y="36" font-size="10" fill="#555">plate area: 190 × 18 mm ≈ 3400 mm²</text>
+      <text x="10" y="50" font-size="10" fill="#555">stall-force peel stress ≈ 1 MPa</text>
+      <text x="10" y="64" font-size="10" fill="#555">→ use premium VHB (3M 5952) + tab</text>
+      <text x="10" y="76" font-size="10" fill="#555">    + enable actuator stall detection</text>
+    </g>
 
   </g>
 
@@ -134,19 +143,19 @@
     <rect x="0" y="-14" width="16" height="12" fill="#7a4f24" stroke="#2a1a08"/>
     <text x="22" y="-4" font-size="11" fill="#333">frame (mostly hidden)</text>
 
-    <rect x="160" y="-14" width="16" height="12" fill="#2f6e4a" stroke="#123a26"/>
-    <text x="182" y="-4" font-size="11" fill="#333">sash</text>
+    <rect x="150" y="-14" width="16" height="12" fill="#2f6e4a" stroke="#123a26"/>
+    <text x="172" y="-4" font-size="11" fill="#333">sash</text>
 
-    <rect x="240" y="-14" width="16" height="12" fill="#b92c2c" stroke="#5a0d0d"/>
-    <text x="262" y="-4" font-size="11" fill="#333">3D-printed bracket (hook + plate)</text>
+    <rect x="225" y="-14" width="16" height="12" fill="#b92c2c" stroke="#5a0d0d"/>
+    <text x="247" y="-4" font-size="11" fill="#333">bracket (plate + ceiling tab)</text>
 
-    <circle cx="450" cy="-8" r="7" fill="#fff" stroke="#222" stroke-width="1.5"/>
-    <text x="462" y="-4" font-size="11" fill="#333">M6 rod-end</text>
+    <circle cx="425" cy="-8" r="7" fill="#fff" stroke="#222" stroke-width="1.5"/>
+    <text x="437" y="-4" font-size="11" fill="#333">M6 rod-end</text>
 
-    <rect x="545" y="-14" width="16" height="12" fill="#555" stroke="#222"/>
-    <text x="567" y="-4" font-size="11" fill="#333">actuator body</text>
+    <rect x="525" y="-14" width="16" height="12" fill="#555" stroke="#222"/>
+    <text x="547" y="-4" font-size="11" fill="#333">actuator body</text>
 
-    <rect x="685" y="-14" width="16" height="12" fill="#e0e0e0" stroke="#888"/>
-    <text x="707" y="-4" font-size="11" fill="#333">ceiling</text>
+    <rect x="665" y="-14" width="16" height="12" fill="#e0e0e0" stroke="#888"/>
+    <text x="687" y="-4" font-size="11" fill="#333">ceiling</text>
   </g>
 </svg>

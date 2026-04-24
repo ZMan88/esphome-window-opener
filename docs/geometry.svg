@@ -1,185 +1,200 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="13">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="12">
   <defs>
-    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+    <marker id="motion-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
       <polygon points="0 0, 10 3, 0 6" fill="#1976d2"/>
+    </marker>
+    <marker id="dim-start" markerWidth="10" markerHeight="10" refX="1" refY="3" orient="auto">
+      <polygon points="10 0, 0 3, 10 6" fill="#666"/>
+    </marker>
+    <marker id="dim-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#666"/>
     </marker>
   </defs>
 
   <rect width="1200" height="700" fill="#fafafa"/>
 
-  <text x="600" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#111">
-    Window Opener — mounting geometry (W=845 · H=1325 · d=120 mm)
+  <text x="600" y="32" text-anchor="middle" font-size="19" font-weight="700" fill="#111">
+    Window Opener — mounting geometry
   </text>
-  <text x="600" y="50" text-anchor="middle" font-size="13" fill="#666" font-style="italic">
-    Fixed end at top-middle of frame. Moving end on top edge of sash, 120 mm from the hinge.
+  <text x="600" y="52" text-anchor="middle" font-size="12" fill="#666" font-style="italic">
+    W = 845 · H = 1325 · d = 120 mm · hinge on right · fixed anchor at top-middle of frame
   </text>
 
-  <!-- ============================ PANEL 1: Front view ============================ -->
-  <g transform="translate(20, 70)">
-    <rect x="0" y="0" width="380" height="570" fill="#fff" stroke="#ddd" stroke-width="1"/>
-    <text x="190" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#111">1 · Front view (closed)</text>
-    <text x="190" y="40" text-anchor="middle" font-size="11" fill="#888" font-style="italic">from inside the room · hinges on right · handle on left</text>
+  <!-- ===================== PANEL 1: Front view ===================== -->
+  <g transform="translate(20, 75)">
+    <rect x="0" y="0" width="380" height="560" fill="#fff" stroke="#ddd" stroke-width="1" rx="4"/>
+    <text x="190" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#111">1 · Front view (closed)</text>
+    <text x="190" y="42" text-anchor="middle" font-size="11" fill="#888" font-style="italic">from inside the room</text>
 
     <!-- Frame -->
-    <rect x="50" y="55" width="280" height="460" fill="#e8e4dc" stroke="#333" stroke-width="2"/>
+    <rect x="55" y="60" width="280" height="455" fill="#e8e4dc" stroke="#3a2510" stroke-width="2"/>
     <!-- Sash -->
-    <rect x="70" y="75" width="240" height="420" fill="#c9e0e8" stroke="#2a7a4a" stroke-width="1.5"/>
+    <rect x="75" y="80" width="240" height="415" fill="#c9e0e8" stroke="#2f6e4a" stroke-width="1.5"/>
     <!-- Glass -->
-    <rect x="85" y="90" width="210" height="390" fill="#e5f3f7" stroke="#99a" stroke-width="0.5"/>
+    <rect x="90" y="95" width="210" height="385" fill="#e5f3f7" stroke="#99a" stroke-width="0.5"/>
 
-    <!-- Turn hinges on RIGHT edge -->
-    <circle cx="330" cy="100" r="6" fill="#c33"/>
-    <circle cx="330" cy="470" r="6" fill="#c33"/>
-    <text x="340" y="105" font-size="11" fill="#c33" font-style="italic">turn hinge</text>
-    <text x="340" y="475" font-size="11" fill="#c33" font-style="italic">turn hinge</text>
+    <!-- Turn hinges (right edge) -->
+    <circle cx="335" cy="105" r="6" fill="#c33"/>
+    <circle cx="335" cy="470" r="6" fill="#c33"/>
+    <text x="345" y="109" font-size="11" fill="#c33" font-style="italic">turn hinge</text>
+    <text x="345" y="475" font-size="11" fill="#c33" font-style="italic">turn hinge</text>
 
-    <!-- Tilt pivot (bottom edge, dashed red) -->
-    <line x1="55" y1="515" x2="325" y2="515" stroke="#c33" stroke-width="3" stroke-dasharray="4,3"/>
-    <text x="190" y="533" text-anchor="middle" font-size="11" fill="#c33" font-style="italic">tilt pivot (bottom edge)</text>
+    <!-- Tilt pivot (bottom) -->
+    <line x1="60" y1="515" x2="330" y2="515" stroke="#c33" stroke-width="3" stroke-dasharray="4,3"/>
+    <text x="195" y="533" text-anchor="middle" font-size="11" fill="#c33" font-style="italic">tilt pivot (bottom edge)</text>
 
-    <!-- Handle on LEFT middle -->
-    <rect x="52" y="265" width="18" height="40" fill="#444" stroke="#222"/>
-    <text x="75" y="288" font-size="11" fill="#555">handle</text>
+    <!-- Handle (left middle) -->
+    <rect x="57" y="270" width="18" height="40" fill="#444" stroke="#222"/>
+    <text x="80" y="294" font-size="11" fill="#555">handle</text>
 
-    <!-- Tilt scissor stay (top-left, on the handle side — matches the photo) -->
-    <line x1="100" y1="75" x2="130" y2="55" stroke="#bbb" stroke-width="3"/>
-    <circle cx="100" cy="75" r="3" fill="#888"/>
-    <circle cx="130" cy="55" r="3" fill="#888"/>
-    <text x="135" y="52" font-size="9" fill="#888" font-style="italic">tilt stay</text>
+    <!-- Tilt stay (top-left, on handle side - matches user's window) -->
+    <line x1="108" y1="80" x2="136" y2="60" stroke="#bbb" stroke-width="3"/>
+    <circle cx="108" cy="80" r="3" fill="#888"/>
+    <circle cx="136" cy="60" r="3" fill="#888"/>
+    <text x="140" y="58" font-size="9" fill="#888" font-style="italic">tilt stay</text>
 
-    <!-- Actuator: horizontal along the top, fixed at top-middle of frame, moving end 120 mm (≈ 34 px on this 280-px-wide frame) from the hinge -->
-    <!-- Fixed: (190, 55). Moving on top edge of sash, d=120 mm from hinge (x=310 in sash coords). 120/845 * 240 = 34 px. So moving at x = 310 - 34 = 276, y = 75 -->
-    <line x1="190" y1="55" x2="276" y2="75" stroke="#444" stroke-width="7" stroke-linecap="round" opacity="0.85"/>
-    <circle cx="190" cy="55" r="10" fill="#c0392b" stroke="#611" stroke-width="2"/>
-    <circle cx="276" cy="75" r="9" fill="#fff" stroke="#222" stroke-width="2"/>
+    <!-- Actuator: horizontal along the top -->
+    <!-- Fixed at W/2 (screen x = 55+140 = 195), on frame's inner face (y=60).
+         Moving on top of sash (y=80), d=120 mm from hinge = 240*(120/845) = 34 px from right sash edge (x=315) → x = 315-34 = 281. -->
+    <line x1="195" y1="60" x2="281" y2="80" stroke="#4a4a4a" stroke-width="7" stroke-linecap="round" opacity="0.9"/>
+    <circle cx="195" cy="60" r="10" fill="#c0392b" stroke="#611" stroke-width="2"/>
+    <circle cx="281" cy="80" r="9" fill="#fff" stroke="#222" stroke-width="2"/>
 
-    <!-- Dimension line showing d -->
-    <line x1="276" y1="90" x2="310" y2="90" stroke="#888" stroke-width="1" stroke-dasharray="3,2"/>
-    <text x="293" y="104" text-anchor="middle" font-size="10" fill="#666">d = 120 mm</text>
+    <!-- d dimension -->
+    <line x1="281" y1="95" x2="315" y2="95" stroke="#666" stroke-width="1" stroke-dasharray="3,2"/>
+    <text x="298" y="110" text-anchor="middle" font-size="10" fill="#555">d = 120 mm</text>
 
-    <!-- Labels -->
-    <text x="190" y="45" text-anchor="middle" font-size="11" fill="#c0392b" font-weight="700">FIXED (top-middle)</text>
-    <text x="276" y="62" text-anchor="middle" font-size="11" fill="#222" font-weight="700">moving</text>
+    <!-- Anchor labels -->
+    <text x="195" y="50" text-anchor="middle" font-size="10" fill="#c0392b" font-weight="700">FIXED</text>
+    <text x="281" y="70" text-anchor="middle" font-size="10" fill="#222" font-weight="700">moving</text>
 
-    <!-- ESP32 box near fixed anchor -->
-    <rect x="210" y="15" width="44" height="22" fill="#2a7a4a" stroke="#184a28"/>
-    <text x="232" y="30" text-anchor="middle" font-size="9" fill="#fff" font-weight="700">ESP32</text>
+    <!-- ESP32 enclosure schematic, near fixed anchor -->
+    <rect x="215" y="20" width="40" height="22" fill="#2a7a4a" stroke="#184a28"/>
+    <text x="235" y="35" text-anchor="middle" font-size="9" fill="#fff" font-weight="700">ESP32</text>
 
-    <!-- Dimension labels -->
-    <text x="190" y="552" text-anchor="middle" font-size="11" fill="#666">W = 845 mm</text>
+    <!-- W dimension -->
+    <line x1="55" y1="545" x2="55" y2="535" stroke="#666"/>
+    <line x1="335" y1="545" x2="335" y2="535" stroke="#666"/>
+    <line x1="55" y1="540" x2="335" y2="540" stroke="#666" marker-start="url(#dim-start)" marker-end="url(#dim-end)"/>
+    <text x="195" y="556" text-anchor="middle" font-size="11" fill="#444">W = 845 mm</text>
   </g>
 
-  <!-- ============================ PANEL 2: Tilt cross-section ============================ -->
-  <g transform="translate(410, 70)">
-    <rect x="0" y="0" width="380" height="570" fill="#fff" stroke="#ddd" stroke-width="1"/>
-    <text x="190" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#111">2 · Tilt mode (side cross-section)</text>
-    <text x="190" y="40" text-anchor="middle" font-size="11" fill="#888" font-style="italic">outside ← wall · frame · sash → room (right) — θ ≈ 7°</text>
+  <!-- ===================== PANEL 2: Tilt side cross-section ===================== -->
+  <g transform="translate(410, 75)">
+    <rect x="0" y="0" width="380" height="560" fill="#fff" stroke="#ddd" stroke-width="1" rx="4"/>
+    <text x="190" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#111">2 · Tilt mode (side cross-section)</text>
+    <text x="190" y="42" text-anchor="middle" font-size="11" fill="#888" font-style="italic">sash rotates around bottom edge · θ ≈ 7° at the scissor stop</text>
 
     <!-- Wall -->
-    <rect x="15" y="80" width="70" height="440" fill="#d8cfbf" stroke="#444" stroke-width="1.5"/>
+    <rect x="15" y="75" width="70" height="450" fill="#d8cfbf" stroke="#444" stroke-width="1.5"/>
     <text x="50" y="300" text-anchor="middle" font-size="11" fill="#666" transform="rotate(-90, 50, 300)">wall</text>
 
-    <!-- Frame top + bottom rails -->
-    <rect x="85" y="80" width="100" height="30" fill="#e8e4dc" stroke="#333"/>
-    <rect x="85" y="490" width="100" height="30" fill="#e8e4dc" stroke="#333"/>
+    <!-- Frame top and bottom rails -->
+    <rect x="85" y="75" width="125" height="30" fill="#e8e4dc" stroke="#3a2510"/>
+    <rect x="85" y="495" width="125" height="30" fill="#e8e4dc" stroke="#3a2510"/>
 
     <!-- Sash closed (faint) -->
-    <rect x="125" y="110" width="20" height="380" fill="#c9e0e8" stroke="#2a7a4a" opacity="0.2"/>
-    <text x="155" y="300" font-size="10" fill="#999" font-style="italic">(closed)</text>
+    <rect x="135" y="105" width="20" height="390" fill="#c9e0e8" stroke="#2f6e4a" opacity="0.18"/>
+    <text x="170" y="305" font-size="10" fill="#aaa" font-style="italic">(closed)</text>
 
-    <!-- Sash tilted 7° around bottom pivot at (135, 490) — a bit exaggerated to 15° visually for legibility -->
-    <g transform="rotate(15, 135, 490)">
-      <rect x="125" y="110" width="20" height="380" fill="#c9e0e8" stroke="#2a7a4a" stroke-width="1.5"/>
+    <!-- Sash tilted (visually exaggerated to ~15° for legibility; reality is 7°) -->
+    <g transform="rotate(15, 145, 495)">
+      <rect x="135" y="105" width="20" height="390" fill="#c9e0e8" stroke="#2f6e4a" stroke-width="1.5"/>
     </g>
-    <text x="250" y="120" font-size="10" fill="#666" font-style="italic">(exaggerated for clarity)</text>
+    <text x="280" y="120" font-size="10" fill="#888" font-style="italic">(tilt angle exaggerated</text>
+    <text x="280" y="133" font-size="10" fill="#888" font-style="italic">for clarity; real θ ≈ 7°)</text>
 
     <!-- Tilt pivot -->
-    <circle cx="135" cy="490" r="6" fill="#c33"/>
-    <text x="135" y="545" text-anchor="middle" font-size="11" fill="#c33" font-style="italic">tilt pivot</text>
+    <circle cx="145" cy="495" r="6" fill="#c33"/>
+    <text x="145" y="545" text-anchor="middle" font-size="11" fill="#c33" font-style="italic">tilt pivot</text>
 
-    <!-- Actuator: fixed at top-middle of frame (approx top, center — project as above the frame top) -->
-    <!-- Fixed ≈ (135, 95) and moving ≈ top of tilted sash ≈ rotate (135, 110) around (135, 490) by 15° → (135 + 380*sin15°, 490 - 380*cos15°) ≈ (233, 123) -->
-    <line x1="135" y1="80" x2="233" y2="123" stroke="#444" stroke-width="7" stroke-linecap="round" opacity="0.85"/>
-    <circle cx="135" cy="80" r="10" fill="#c0392b" stroke="#611" stroke-width="2"/>
-    <circle cx="233" cy="123" r="9" fill="#fff" stroke="#222" stroke-width="2"/>
+    <!-- Actuator: fixed at top-middle of frame (schematic). Sash top, after 15° tilt: (145 + 390·sin15°, 105 + 390·(1 − cos15°)) = (246, 118.3) -->
+    <line x1="145" y1="90" x2="246" y2="118" stroke="#4a4a4a" stroke-width="7" stroke-linecap="round" opacity="0.9"/>
+    <circle cx="145" cy="90" r="10" fill="#c0392b" stroke="#611" stroke-width="2"/>
+    <circle cx="246" cy="118" r="9" fill="#fff" stroke="#222" stroke-width="2"/>
 
-    <text x="135" y="70" text-anchor="middle" font-size="11" fill="#c0392b" font-weight="700">FIXED</text>
+    <text x="145" y="80" text-anchor="middle" font-size="10" fill="#c0392b" font-weight="700">FIXED</text>
 
-    <!-- Tilt arrow -->
-    <path d="M 230 200 Q 270 180, 295 170" fill="none" stroke="#1976d2" stroke-width="2.5" marker-end="url(#arrowhead)"/>
-    <text x="300" y="165" font-size="12" fill="#1976d2" font-weight="700">tilt · 160 mm gap</text>
+    <!-- Tilt motion arrow -->
+    <path d="M 244 200 Q 280 180, 305 170" fill="none" stroke="#1976d2" stroke-width="2.5" marker-end="url(#motion-arrow)"/>
+    <text x="310" y="165" font-size="12" fill="#1976d2" font-weight="700">tilt · 160 mm gap</text>
 
-    <!-- Stroke info -->
-    <g transform="translate(20, 540)">
-      <text x="0" y="0" font-size="11" fill="#222" font-weight="700">Stroke @ full tilt: 41 mm</text>
+    <!-- Numbers box -->
+    <g transform="translate(20, 470)">
+      <rect x="0" y="0" width="175" height="68" fill="#fff8e6" stroke="#c99b2b" stroke-width="1" rx="3"/>
+      <text x="10" y="18" font-size="11" fill="#744" font-weight="700">Stroke @ full tilt (7°):</text>
+      <text x="10" y="35" font-size="12" fill="#222" font-weight="700">41 mm</text>
+      <text x="10" y="55" font-size="10" fill="#555">(from 302 mm closed → 343 mm)</text>
     </g>
   </g>
 
-  <!-- ============================ PANEL 3: Turn top-down ============================ -->
-  <g transform="translate(800, 70)">
-    <rect x="0" y="0" width="380" height="570" fill="#fff" stroke="#ddd" stroke-width="1"/>
-    <text x="190" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#111">3 · Turn mode (top-down view)</text>
-    <text x="190" y="40" text-anchor="middle" font-size="11" fill="#888" font-style="italic">looking down · hinge on right · swung inward to 90°</text>
+  <!-- ===================== PANEL 3: Turn top-down view ===================== -->
+  <g transform="translate(800, 75)">
+    <rect x="0" y="0" width="380" height="560" fill="#fff" stroke="#ddd" stroke-width="1" rx="4"/>
+    <text x="190" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#111">3 · Turn mode (top-down view)</text>
+    <text x="190" y="42" text-anchor="middle" font-size="11" fill="#888" font-style="italic">sash rotates around right edge · 90°+ hardstop into reveal</text>
 
-    <!-- Wall (two segments, opening in middle) -->
-    <rect x="15" y="90" width="85" height="60" fill="#d8cfbf" stroke="#444" stroke-width="1.5"/>
-    <rect x="300" y="90" width="65" height="60" fill="#d8cfbf" stroke="#444" stroke-width="1.5"/>
-    <text x="57" y="75" text-anchor="middle" font-size="11" fill="#666">wall</text>
-    <text x="332" y="75" text-anchor="middle" font-size="11" fill="#666">wall</text>
+    <!-- Wall segments with window opening between -->
+    <rect x="15" y="95" width="90" height="60" fill="#d8cfbf" stroke="#444" stroke-width="1.5"/>
+    <rect x="295" y="95" width="70" height="60" fill="#d8cfbf" stroke="#444" stroke-width="1.5"/>
+    <text x="60" y="82" text-anchor="middle" font-size="11" fill="#666">wall</text>
+    <text x="330" y="82" text-anchor="middle" font-size="11" fill="#666">wall</text>
 
     <!-- Frame jambs -->
-    <rect x="100" y="90" width="12" height="60" fill="#e8e4dc" stroke="#333"/>
-    <rect x="288" y="90" width="12" height="60" fill="#e8e4dc" stroke="#333"/>
+    <rect x="105" y="95" width="12" height="60" fill="#e8e4dc" stroke="#3a2510"/>
+    <rect x="283" y="95" width="12" height="60" fill="#e8e4dc" stroke="#3a2510"/>
 
     <!-- Sash closed (faint) -->
-    <rect x="112" y="115" width="176" height="10" fill="#c9e0e8" stroke="#2a7a4a" opacity="0.25"/>
-    <text x="200" y="109" text-anchor="middle" font-size="10" fill="#999" font-style="italic">(closed)</text>
+    <rect x="117" y="120" width="166" height="10" fill="#c9e0e8" stroke="#2f6e4a" opacity="0.25"/>
+    <text x="200" y="112" text-anchor="middle" font-size="10" fill="#aaa" font-style="italic">(closed)</text>
 
-    <!-- Sash turned 90° around right jamb (pivot at x=288, y=120) -->
-    <g transform="rotate(90, 288, 120)">
-      <rect x="112" y="115" width="176" height="10" fill="#c9e0e8" stroke="#2a7a4a" stroke-width="1.5"/>
+    <!-- Sash turned 90° around right jamb (pivot at x=283, y=125) -->
+    <g transform="rotate(90, 283, 125)">
+      <rect x="117" y="120" width="166" height="10" fill="#c9e0e8" stroke="#2f6e4a" stroke-width="1.5"/>
     </g>
 
-    <!-- Turn pivot on right -->
-    <circle cx="288" cy="120" r="6" fill="#c33"/>
-    <text x="305" y="105" font-size="11" fill="#c33" font-style="italic">turn pivot</text>
+    <!-- Turn pivot -->
+    <circle cx="283" cy="125" r="6" fill="#c33"/>
+    <text x="300" y="110" font-size="11" fill="#c33" font-style="italic">turn pivot</text>
 
-    <!-- Fixed actuator end: top-middle of frame (x=200 in top-down, y=120 at frame plane) — in top-down view this projects to x=200, y=~95 (top of frame) -->
-    <circle cx="200" cy="120" r="10" fill="#c0392b" stroke="#611" stroke-width="2"/>
-    <text x="200" y="108" text-anchor="middle" font-size="11" fill="#c0392b" font-weight="700">FIXED</text>
+    <!-- Fixed anchor: at top-middle of frame in real world; in this top-down view, at x=194 (midway between jambs), y=125 (frame plane) -->
+    <circle cx="194" cy="125" r="10" fill="#c0392b" stroke="#611" stroke-width="2"/>
+    <text x="194" y="113" text-anchor="middle" font-size="10" fill="#c0392b" font-weight="700">FIXED</text>
 
-    <!-- Moving anchor on sash (d=120 mm from pivot). After 90° turn, moving anchor is at (pivot_x, pivot_y + d_px) where d in px scale: 176 px = 845 mm, so 120 mm ≈ 25 px.
-         At 90° turn: moving starts at (288-25, 120) and rotates 90° around (288, 120) → (288, 120 + 25) = (288, 145) -->
-    <circle cx="288" cy="145" r="9" fill="#fff" stroke="#222" stroke-width="2"/>
+    <!-- Moving anchor: d=120 mm from pivot. Closed: (283−d_px, 125). 166 px = 845 mm → 120 mm = 23.6 px. At 90° turn, the moving anchor rotates 90° around (283,125), ending at (283, 125+23.6) = (283, 148.6) -->
+    <circle cx="283" cy="149" r="9" fill="#fff" stroke="#222" stroke-width="2"/>
 
-    <!-- Actuator line -->
-    <line x1="200" y1="120" x2="288" y2="145" stroke="#444" stroke-width="7" stroke-linecap="round" opacity="0.85"/>
+    <!-- Actuator line (at 90° turn) -->
+    <line x1="194" y1="125" x2="283" y2="149" stroke="#4a4a4a" stroke-width="7" stroke-linecap="round" opacity="0.9"/>
 
-    <!-- Turn arrow -->
-    <path d="M 180 190 Q 230 270, 260 300" fill="none" stroke="#1976d2" stroke-width="2.5" marker-end="url(#arrowhead)"/>
-    <text x="130" y="280" font-size="12" fill="#1976d2" font-weight="700">turn · 90°+</text>
+    <!-- Turn motion arrow -->
+    <path d="M 175 190 Q 225 270, 260 300" fill="none" stroke="#1976d2" stroke-width="2.5" marker-end="url(#motion-arrow)"/>
+    <text x="115" y="270" font-size="12" fill="#1976d2" font-weight="700">turn · 90°+</text>
 
-    <text x="190" y="420" text-anchor="middle" font-size="11" fill="#888" font-style="italic">(room)</text>
+    <text x="190" y="430" text-anchor="middle" font-size="11" fill="#888" font-style="italic">(room)</text>
 
-    <!-- Stroke info -->
-    <g transform="translate(20, 540)">
-      <text x="0" y="0" font-size="11" fill="#222" font-weight="700">Stroke @ 90° turn: 137 mm · @ 100°: 156 mm</text>
+    <!-- Numbers box -->
+    <g transform="translate(20, 470)">
+      <rect x="0" y="0" width="220" height="68" fill="#fff8e6" stroke="#c99b2b" stroke-width="1" rx="3"/>
+      <text x="10" y="18" font-size="11" fill="#744" font-weight="700">Stroke @ turn:</text>
+      <text x="10" y="35" font-size="12" fill="#222" font-weight="700">90° → 137 mm   ·   100° → 156 mm</text>
+      <text x="10" y="55" font-size="10" fill="#555">actuator sized 200 mm / ≥500 N</text>
     </g>
   </g>
 
-  <!-- ============================ Legend ============================ -->
-  <g transform="translate(30, 670)">
+  <!-- ===================== Legend ===================== -->
+  <g transform="translate(30, 665)">
     <circle cx="8" cy="0" r="7" fill="#c0392b" stroke="#611" stroke-width="2"/>
-    <text x="22" y="4" font-size="12">fixed anchor (rod-end on frame, top-middle)</text>
+    <text x="22" y="4" font-size="12" fill="#333">fixed anchor (rod-end on frame, top-middle)</text>
 
     <circle cx="298" cy="0" r="7" fill="#fff" stroke="#222" stroke-width="2"/>
-    <text x="312" y="4" font-size="12">moving anchor (rod-end on sash, 120 mm from hinge)</text>
+    <text x="312" y="4" font-size="12" fill="#333">moving anchor (rod-end on sash, 120 mm from hinge)</text>
 
-    <circle cx="640" cy="0" r="5" fill="#c33"/>
-    <text x="653" y="4" font-size="12">window hinge / pivot</text>
+    <circle cx="650" cy="0" r="5" fill="#c33"/>
+    <text x="663" y="4" font-size="12" fill="#333">window hinge / pivot</text>
 
-    <line x1="810" y1="0" x2="850" y2="0" stroke="#444" stroke-width="7" stroke-linecap="round" opacity="0.85"/>
-    <text x="860" y="4" font-size="12">200 mm linear actuator, ≥500 N</text>
+    <line x1="820" y1="0" x2="860" y2="0" stroke="#4a4a4a" stroke-width="7" stroke-linecap="round" opacity="0.9"/>
+    <text x="870" y="4" font-size="12" fill="#333">200 mm linear actuator, ≥500 N</text>
   </g>
 </svg>

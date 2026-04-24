@@ -24,10 +24,12 @@ Both brackets are **190 mm wide** along the window length (into the page of the 
 **Fixed-end bracket (top-middle of frame):**
 
 - Hard constraint — only 20 mm of frame face is accessible. The sash covers the frame's inside face everywhere except a 20 mm strip between the sash top and the ceiling.
-- Plate is therefore 190 × ~18 mm (~3400 mm²). Under the 500 N stall case, tensile stress at the top edge is ~1 MPa — above VHB's ~500 kPa tensile limit. Relying on screws + VHB alone is marginal.
-- **Solution:** the bracket adds a hook that extends over the top edge of the frame into the ~20 mm gap to the ceiling (see `docs/mounting-detail.svg`). The hook is a passive mechanical catch — it doesn't have to attach to the ceiling, it just prevents the bracket from rotating out if the VHB peels.
-- Load path: VHB (primary, shear + tension) → 2× M4 self-tappers into PVC (backup) → frame-top hook (failsafe).
-- Install: slide the hook into the ceiling gap from the side, then screw in from the room side.
+- The **frame top touches the ceiling** (no air gap above the frame), so there is nowhere to hook over. Mounting has to live in the 20 mm strip itself.
+- Plate is 190 × ~18 mm (~3400 mm²). Under the 500 N stall case, peel stress at the top edge is ~1 MPa — above standard VHB's ~500 kPa limit. Need **premium VHB (3M 5952)** which is ~700 kPa, plus a ceiling-jam tab for mechanical peel resistance.
+- **Ceiling-jam tab:** a thin compressible pad (EPDM foam or silicone rubber) bonded to the top edge of the plate, slightly taller than the 20 mm strip. When installed, the tab compresses against the ceiling, putting the plate in pre-load. If the VHB starts to peel at the top edge, the tab grabs harder against the ceiling — passive peel-resist.
+- Load path: VHB (primary) → 2× M4 self-tappers into PVC (backup) → ceiling-jam tab (peel-resist failsafe).
+- **Software backup:** firmware stall detection should stop the actuator quickly at >400 N so the stall-case load is transient, not sustained.
+- Install: press-fit the plate into the 20 mm strip (compressible tab compresses slightly), screw in from the room side.
 
 **Sash-end (moving) bracket — `docs/mounting-detail-sash.svg`:**
 
