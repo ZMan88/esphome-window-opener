@@ -12,6 +12,14 @@ The target window (see `docs/window-spec.md`) is a European tilt-and-turn, 845 �
 
 ![Geometry — front, tilt, turn views](../docs/geometry.svg)
 
+### Fixed-end mounting detail
+
+The fixed-end bracket bolts to the **room-side (inside) face of the top frame rail**, not above the frame. The actuator body hangs in the room at roughly the height of the top of the window, with no interference from the ~20 mm ceiling gap above the frame.
+
+![Mounting cross-section](../docs/mounting-detail.svg)
+
+Attachment: M4 self-tapping screws through the bracket mounting plate, plus VHB double-sided tape as a gasket / first-attempt reversible fixing. The sash-end bracket uses the same pattern on the sash's top rail.
+
 ### Why this geometry works for both modes
 
 For an actuator to drive a rotation, neither endpoint can sit on the rotation axis — otherwise the distance between the two endpoints stays constant during rotation, and the actuator can't change the angle.

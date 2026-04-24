@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="12">
+  <defs>
+    <pattern id="hatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#aaa" stroke-width="1"/>
+    </pattern>
+    <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#444"/>
+    </marker>
+    <marker id="dim-start" markerWidth="10" markerHeight="10" refX="1" refY="3" orient="auto">
+      <polygon points="10 0, 0 3, 10 6" fill="#666"/>
+    </marker>
+    <marker id="dim-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#666"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="600" fill="#fafafa"/>
+
+  <text x="500" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#111">
+    Mounting detail — side cross-section at the fixed anchor
+  </text>
+  <text x="500" y="50" text-anchor="middle" font-size="12" fill="#666" font-style="italic">
+    vertical cut through top-middle of the frame · scale 2.5 px / mm · outside ← · → room
+  </text>
+
+  <!-- Side labels -->
+  <text x="60" y="310" text-anchor="middle" font-size="13" fill="#666" font-style="italic">← outside</text>
+  <text x="940" y="310" text-anchor="middle" font-size="13" fill="#666" font-style="italic">room →</text>
+
+  <!-- Scene: 2.5 px / mm. 70 mm frame depth = 175 px. -->
+  <g transform="translate(180, 90)">
+
+    <!-- Ceiling slab -->
+    <rect x="0" y="0" width="560" height="30" fill="#e0e0e0" stroke="#888"/>
+    <rect x="0" y="0" width="560" height="30" fill="url(#hatch)"/>
+    <text x="280" y="20" text-anchor="middle" font-size="10" fill="#444">ceiling</text>
+
+    <!-- 20 mm gap between ceiling and top of frame -->
+    <line x1="260" y1="30" x2="260" y2="80" stroke="#666" stroke-dasharray="3,2"/>
+    <line x1="250" y1="30" x2="270" y2="30" stroke="#666"/>
+    <line x1="250" y1="80" x2="270" y2="80" stroke="#666"/>
+    <text x="290" y="58" font-size="11" fill="#666">20 mm (unused)</text>
+
+    <!-- FRAME top rail cross-section.
+         Size: 70 mm wide (175 px) × ~100 mm tall (250 px).
+         Profile: stepped — rebate on the bottom-right for the sash to engage. -->
+    <path d="M 100 80
+             L 275 80
+             L 275 250
+             L 220 250
+             L 220 305
+             L 275 305
+             L 275 330
+             L 100 330
+             Z"
+          fill="#7a4f24" stroke="#2a1a08" stroke-width="1.8"/>
+    <text x="170" y="155" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">FRAME</text>
+    <text x="170" y="173" text-anchor="middle" font-size="10" fill="#eee" font-style="italic">top rail (PVC)</text>
+
+    <!-- Frame depth dimension -->
+    <line x1="100" y1="345" x2="100" y2="365" stroke="#666"/>
+    <line x1="275" y1="345" x2="275" y2="365" stroke="#666"/>
+    <line x1="100" y1="358" x2="275" y2="358" stroke="#666" marker-start="url(#dim-start)" marker-end="url(#dim-end)"/>
+    <text x="187" y="378" text-anchor="middle" font-size="11" fill="#444">frame depth ≈ 70 mm</text>
+
+    <!-- Rebate seal (schematic) -->
+    <rect x="215" y="246" width="10" height="8" fill="#222" opacity="0.6"/>
+
+    <!-- SASH top rail — engages the frame rebate, extends downward. -->
+    <path d="M 220 250
+             L 270 250
+             L 270 455
+             L 110 455
+             L 110 330
+             L 220 330
+             Z"
+          fill="#2f6e4a" stroke="#123a26" stroke-width="1.8"/>
+    <text x="190" y="395" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">SASH</text>
+    <text x="190" y="412" text-anchor="middle" font-size="10" fill="#eee" font-style="italic">top rail</text>
+
+    <!-- Glass schematic continuation below -->
+    <line x1="175" y1="455" x2="175" y2="475" stroke="#99c" stroke-width="2.5"/>
+    <line x1="205" y1="455" x2="205" y2="475" stroke="#99c" stroke-width="2.5"/>
+    <text x="190" y="490" text-anchor="middle" font-size="10" fill="#667" font-style="italic">↓ double glass</text>
+
+    <!-- BRACKET — bolted to the room-side face of the frame (x = 275). -->
+    <g>
+      <!-- Mounting plate against frame face -->
+      <rect x="252" y="170" width="28" height="100" fill="#b92c2c" stroke="#5a0d0d" stroke-width="1.5" rx="2"/>
+      <!-- Arm extending into the room -->
+      <rect x="275" y="205" width="65" height="30" fill="#b92c2c" stroke="#5a0d0d" stroke-width="1.5" rx="2"/>
+      <!-- M4 screws -->
+      <circle cx="266" cy="188" r="3" fill="#111"/>
+      <circle cx="266" cy="252" r="3" fill="#111"/>
+      <text x="300" y="197" font-size="10" fill="#b92c2c" font-weight="700">BRACKET</text>
+    </g>
+
+    <!-- Bracket protrusion dimension -->
+    <line x1="275" y1="285" x2="275" y2="303" stroke="#666"/>
+    <line x1="340" y1="285" x2="340" y2="303" stroke="#666"/>
+    <line x1="275" y1="296" x2="340" y2="296" stroke="#666" marker-start="url(#dim-start)" marker-end="url(#dim-end)"/>
+    <text x="307" y="317" text-anchor="middle" font-size="10" fill="#444">~25 mm</text>
+
+    <!-- Rod-end (ball joint) at the end of the bracket arm -->
+    <circle cx="360" cy="220" r="18" fill="#fff" stroke="#222" stroke-width="2"/>
+    <circle cx="360" cy="220" r="7" fill="#333"/>
+    <line x1="360" y1="203" x2="360" y2="237" stroke="#222" stroke-width="2"/>
+    <text x="360" y="197" text-anchor="middle" font-size="10" fill="#222" font-weight="700">rod-end</text>
+
+    <!-- ACTUATOR BODY — seen end-on, extending "out of page" (toward the hinge side). -->
+    <g>
+      <!-- Cylindrical body, perspective-suggesting -->
+      <ellipse cx="410" cy="220" rx="22" ry="24" fill="#555" stroke="#222" stroke-width="1.5"/>
+      <path d="M 410 196 L 600 196 L 600 244 L 410 244 Z" fill="#555" stroke="#222" stroke-width="1.5"/>
+      <ellipse cx="600" cy="220" rx="8" ry="24" fill="#3a3a3a" stroke="#111" stroke-width="1" opacity="0.6"/>
+      <!-- "Continues…" indication -->
+      <text x="635" y="226" font-size="26" fill="#333" font-weight="700">…</text>
+      <text x="505" y="192" text-anchor="middle" font-size="11" fill="#fff" font-weight="700">ACTUATOR BODY</text>
+      <text x="505" y="267" text-anchor="middle" font-size="10" fill="#666" font-style="italic">runs horizontally toward hinge side (along top of window)</text>
+    </g>
+
+    <!-- Annotation: VHB / M4 screws -->
+    <path d="M 252 220 L 180 135 L 90 135" fill="none" stroke="#555" stroke-width="1" marker-end="url(#arrow-end)"/>
+    <text x="-15" y="120" font-size="10" fill="#555">VHB tape + M4 self-</text>
+    <text x="-15" y="134" font-size="10" fill="#555">tappers into the frame's</text>
+    <text x="-15" y="148" font-size="10" fill="#555">inside face</text>
+
+  </g>
+
+  <!-- Legend / key -->
+  <g transform="translate(60, 550)">
+    <rect x="0" y="-12" width="16" height="12" fill="#7a4f24" stroke="#2a1a08"/>
+    <text x="22" y="-2" font-size="11" fill="#333">frame (PVC profile)</text>
+
+    <rect x="160" y="-12" width="16" height="12" fill="#2f6e4a" stroke="#123a26"/>
+    <text x="182" y="-2" font-size="11" fill="#333">sash</text>
+
+    <rect x="240" y="-12" width="16" height="12" fill="#b92c2c" stroke="#5a0d0d"/>
+    <text x="262" y="-2" font-size="11" fill="#333">3D-printed bracket</text>
+
+    <circle cx="400" cy="-6" r="7" fill="#fff" stroke="#222" stroke-width="1.5"/>
+    <text x="412" y="-2" font-size="11" fill="#333">M6 rod-end (ball joint)</text>
+
+    <rect x="555" y="-12" width="16" height="12" fill="#555" stroke="#222"/>
+    <text x="577" y="-2" font-size="11" fill="#333">linear actuator body</text>
+
+    <rect x="725" y="-12" width="16" height="12" fill="#e0e0e0" stroke="#888"/>
+    <text x="747" y="-2" font-size="11" fill="#333">ceiling / wall (hatched)</text>
+  </g>
+</svg>
