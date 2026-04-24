@@ -12,20 +12,7 @@ The device is designed around that insight:
 - **Moving end** attaches to the opposite corner of the sash — diagonally opposite the fixed end (`cad/sash-bracket.FCStd`).
 - Extending the actuator pushes the opposite sash corner away from the frame; in tilt mode it opens the top, in turn mode it swings the sash inward. The firmware does not know or care which mode the handle is in.
 
-```
-  Frame (top-left corner)            Sash moving end
-   ┌─────────────────────────────────┐ ← sash bracket attaches here
-   │                               ╱ │
-   │                         ╱       │
-   │                   ╱             │
-   │             ╱                   │
-   │       ╱       ← actuator        │
-   │ ╱                               │
-   └─────────────────────────────────┘
-   ↑
-   Fixed end: bottom-hinge corner of the frame
-   (same corner is the shared pivot for tilt + turn)
-```
+![Geometry — front, tilt, turn views](../docs/geometry.svg)
 
 ## Ball-joint rod ends are required
 

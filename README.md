@@ -4,6 +4,8 @@ A DIY ESP32-based device that opens and closes a European tilt-and-turn window, 
 
 **Status:** scaffolding (Phase 0). No hardware built yet. See `PLAN.md`.
 
+![Mounting geometry — front view, tilt mode, turn mode](docs/geometry.svg)
+
 ## How it works
 
 A tilt-and-turn window has one corner — the bottom-hinge-side corner — that stays fixed in both tilt mode (short inward tilt from the top) and turn mode (full inward swing like a door). Anchoring one end of a linear actuator at that fixed corner and the other end at the opposite sash corner means the same stroke drives both modes. The user picks the mode on the window handle; the firmware only commands position.
