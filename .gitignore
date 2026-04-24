@@ -1,0 +1,29 @@
+# Secrets
+firmware/common/secrets.yaml
+**/secrets.yaml
+
+# ESPHome build output
+.esphome/
+firmware/.esphome/
+
+# PlatformIO (if ever used alongside)
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# FreeCAD
+*.FCBak
+*~
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp

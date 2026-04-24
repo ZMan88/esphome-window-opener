@@ -1,0 +1,6 @@
+# The ESPHome integration auto-discovers `cover.window_opener` — you should
+# NOT need a manual `cover:` definition in your HA config.
+#
+# Keep this file as a placeholder in case you ever want to override the
+# entity name, add a template wrapper, or group multiple window openers.
+# If/when that happens, the override goes here.

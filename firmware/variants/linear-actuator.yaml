@@ -1,0 +1,58 @@
+# Variant: 12V DC linear actuator + BTS7960 H-bridge.
+#
+# Position: time-based over a calibrated full-stroke duration. ESPHome's
+# `cover.time_based` platform handles the state machine and interpolation.
+# If you add a 10-turn feedback pot on the actuator rod, uncomment the `sensor`
+# block below and switch the cover to `template` with `has_position: true` +
+# a `lambda` returning the ADC-derived fraction.
+#
+# Pin map: hardware/wiring/linear-actuator.md
+# Calibration: docs/calibration.md
+
+substitutions:
+  # Measured stroke time at full PWM. Update after calibration — see docs/calibration.md.
+  full_stroke_seconds: "18s"
+
+output:
+  - platform: ledc
+    id: motor_forward
+    pin: GPIO25
+    frequency: 20000 Hz
+  - platform: ledc
+    id: motor_reverse
+    pin: GPIO26
+    frequency: 20000 Hz
+
+# Optional feedback pot — wire the wiper to GPIO35, ends to 3V3 and GND.
+# sensor:
+#   - platform: adc
+#     pin: GPIO35
+#     id: position_pot
+#     attenuation: 12db
+#     update_interval: 200ms
+#     filters:
+#       - median:
+#           window_size: 5
+#           send_every: 5
+
+cover:
+  - platform: time_based
+    name: "Window"
+    id: window_cover
+    device_class: window
+    has_built_in_endstop: true
+    open_action:
+      - output.turn_off: motor_reverse
+      - output.set_level:
+          id: motor_forward
+          level: 100%
+    open_duration: ${full_stroke_seconds}
+    close_action:
+      - output.turn_off: motor_forward
+      - output.set_level:
+          id: motor_reverse
+          level: 100%
+    close_duration: ${full_stroke_seconds}
+    stop_action:
+      - output.turn_off: motor_forward
+      - output.turn_off: motor_reverse

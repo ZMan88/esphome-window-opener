@@ -1,0 +1,50 @@
+# Example automations for the window opener. Paste into your HA
+# automations.yaml (or adapt into the UI). Adjust entity IDs to match
+# your install — the opener itself is discovered as `cover.window_opener`.
+
+- id: window_close_on_rain
+  alias: Close window when rain is detected
+  description: >
+    Close immediately when local weather shows rain. Requires a weather or
+    precipitation sensor — substitute your own.
+  trigger:
+    - platform: state
+      entity_id: sensor.local_precipitation
+      to: "raining"
+  condition:
+    - condition: numeric_state
+      entity_id: cover.window_opener
+      attribute: current_position
+      above: 0
+  action:
+    - service: cover.close_cover
+      target:
+        entity_id: cover.window_opener
+
+- id: window_morning_ventilation
+  alias: Morning ventilation
+  description: Tilt the window to 30% each morning for a 20-minute air-out.
+  trigger:
+    - platform: time
+      at: "07:30:00"
+  action:
+    - service: cover.set_cover_position
+      target:
+        entity_id: cover.window_opener
+      data:
+        position: 30
+    - delay: "00:20:00"
+    - service: cover.close_cover
+      target:
+        entity_id: cover.window_opener
+
+- id: window_close_when_away
+  alias: Close window when leaving home
+  trigger:
+    - platform: state
+      entity_id: person.me
+      to: "not_home"
+  action:
+    - service: cover.close_cover
+      target:
+        entity_id: cover.window_opener

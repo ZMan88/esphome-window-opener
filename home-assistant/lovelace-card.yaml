@@ -1,0 +1,41 @@
+# Lovelace card snippet for the window opener.
+# Paste into an existing view under `cards:` or use directly in YAML mode.
+
+type: entities
+title: Window
+entities:
+  - entity: cover.window_opener
+    name: Position
+    secondary_info: last-changed
+  - type: attribute
+    entity: cover.window_opener
+    attribute: current_position
+    name: Current %
+    suffix: "%"
+  - entity: sensor.window_opener_uptime
+    name: Device uptime
+footer:
+  type: buttons
+  entities:
+    - entity: cover.window_opener
+      name: Close
+      tap_action:
+        action: call-service
+        service: cover.close_cover
+        service_data:
+          entity_id: cover.window_opener
+    - entity: cover.window_opener
+      name: Tilt 30%
+      tap_action:
+        action: call-service
+        service: cover.set_cover_position
+        service_data:
+          entity_id: cover.window_opener
+          position: 30
+    - entity: cover.window_opener
+      name: Open
+      tap_action:
+        action: call-service
+        service: cover.open_cover
+        service_data:
+          entity_id: cover.window_opener

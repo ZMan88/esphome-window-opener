@@ -1,0 +1,27 @@
+# Window Opener — entry-point ESPHome config.
+#
+# Selects the actuator variant via `packages:` below. Swap the `variant:` line
+# between `variants/linear-actuator.yaml` and `variants/stepper.yaml` to switch
+# hardware paths. All shared Wi-Fi / API / OTA lives in common/base.yaml.
+#
+# See CLAUDE.md for the architecture overview and PLAN.md for the roadmap.
+
+substitutions:
+  device_name: window-opener
+  device_friendly: "Window Opener"
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${device_friendly}
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+packages:
+  base: !include common/base.yaml
+
+  # Active variant — keep exactly one of these uncommented.
+  variant: !include variants/linear-actuator.yaml
+  # variant: !include variants/stepper.yaml
