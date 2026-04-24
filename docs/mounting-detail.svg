@@ -128,12 +128,12 @@
 
     <!-- Load analysis box -->
     <g transform="translate(400, 380)">
-      <rect x="0" y="0" width="275" height="80" fill="#fff8e6" stroke="#c99b2b" stroke-width="1" rx="3"/>
-      <text x="137" y="18" text-anchor="middle" font-size="11" fill="#744" font-weight="700">load path (tight margin at stall)</text>
-      <text x="10" y="36" font-size="10" fill="#555">plate area: 190 × 18 mm ≈ 3400 mm²</text>
-      <text x="10" y="50" font-size="10" fill="#555">stall-force peel stress ≈ 1 MPa</text>
-      <text x="10" y="64" font-size="10" fill="#555">→ use premium VHB (3M 5952) + tab</text>
-      <text x="10" y="76" font-size="10" fill="#555">    + enable actuator stall detection</text>
+      <rect x="0" y="0" width="275" height="80" fill="#e8f6ea" stroke="#2f8f47" stroke-width="1" rx="3"/>
+      <text x="137" y="18" text-anchor="middle" font-size="11" fill="#264" font-weight="700">load path (comfortable)</text>
+      <text x="10" y="36" font-size="10" fill="#333">actuator force is along window width</text>
+      <text x="10" y="50" font-size="10" fill="#333">peel bends about the vertical axis, 190 mm wide</text>
+      <text x="10" y="64" font-size="10" fill="#333">stall-force peel stress ≈ 140 kPa</text>
+      <text x="10" y="76" font-size="10" fill="#333">standard VHB 500 kPa → ~3× margin</text>
     </g>
 
   </g>

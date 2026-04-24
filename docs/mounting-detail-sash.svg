@@ -117,11 +117,11 @@
     <!-- Load analysis box -->
     <g transform="translate(430, 390)">
       <rect x="0" y="0" width="260" height="80" fill="#e8f6ea" stroke="#2f8f47" stroke-width="1" rx="3"/>
-      <text x="130" y="18" text-anchor="middle" font-size="11" fill="#264" font-weight="700">load path (comfortable margin)</text>
-      <text x="10" y="36" font-size="10" fill="#333">plate area: 190 × ~105 mm ≈ 20 000 mm²</text>
-      <text x="10" y="50" font-size="10" fill="#333">stall-force peel stress ≈ 60 kPa</text>
-      <text x="10" y="64" font-size="10" fill="#333">standard VHB limit 500 kPa → ~8× margin</text>
-      <text x="10" y="76" font-size="10" fill="#333">no hook or tab needed</text>
+      <text x="130" y="18" text-anchor="middle" font-size="11" fill="#264" font-weight="700">load path (comfortable)</text>
+      <text x="10" y="36" font-size="10" fill="#333">actuator force is along window width</text>
+      <text x="10" y="50" font-size="10" fill="#333">peel bends about the vertical axis, 190 mm wide</text>
+      <text x="10" y="64" font-size="10" fill="#333">stall-force peel stress ≈ 26 kPa</text>
+      <text x="10" y="76" font-size="10" fill="#333">standard VHB 500 kPa → ~20× margin</text>
     </g>
 
     <!-- Sash top reference line -->
