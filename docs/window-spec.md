@@ -2,7 +2,19 @@
 
 These measurements drive the actuator sizing and bracket geometry. Re-measure if the build targets a different window.
 
-![Target window in tilt mode](photos/window-tilted.jpeg)
+| Reference | Photo |
+|---|---|
+| Front view, tilted | [`photos/window-tilted.jpeg`](photos/window-tilted.jpeg) |
+| Looking up at the tilted gap | [`photos/bottom_up_view.jpeg`](photos/bottom_up_view.jpeg) |
+| Right-side profile (hinge side, showing reveal) | [`photos/side_view.jpeg`](photos/side_view.jpeg) |
+
+Observations from the photos:
+
+- Frame profile is ~70 mm deep; room-side face is clean and accessible for bracket mounting.
+- Wall reveal on the hinge side is ~15–20 cm — the sash has ample clearance to swing past 90° into the reveal in turn mode.
+- Fly screen is on the **outside** of the sash; it does not constrain room-side mounting.
+- Top-of-frame to ceiling gap is ~20 mm — irrelevant because the actuator mounts on the frame's room-side face, not above it.
+- No tilt-stay (scissor) at the top-middle; the tilt limit is set by the hinges, leaving the top-middle clear for the fixed-end bracket.
 
 ## Measured
 
