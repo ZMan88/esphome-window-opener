@@ -18,11 +18,13 @@ The fixed-end bracket bolts to the **room-side (inside) face of the top frame ra
 
 ![Mounting cross-section](../docs/mounting-detail.svg)
 
-**Constraint — bracket position (y):** The sash protrudes ~20 mm past the frame's inside face, so the bracket's mounting plate must sit **entirely above the sash top level**. If it extends down past the sash top, the bracket arm collides with the protruding sash. This gives the CAD a concrete rule: bracket plate `y_bottom ≤ frame_top − 20 mm` (accounting for gasket clearance).
+**Hard constraint — only 20 mm of frame face is accessible.** The sash covers the frame's inside face everywhere except a 20 mm strip between the sash top and the ceiling. That's the entire mounting surface.
 
-**Attachment:** M4 self-tapping screws through the bracket mounting plate, plus VHB double-sided tape as a gasket / first-attempt reversible fixing.
+**Bracket design consequence:** the mounting plate is small (~18 mm tall × 80–100 mm wide along the frame), so relying on screws + VHB alone in the stall-force case is marginal. The bracket adds a **hook that extends over the top edge of the frame** into the ~20 mm gap to the ceiling — see `docs/mounting-detail.svg`. The hook doesn't have to attach to the ceiling; it just mechanically prevents the bracket from rotating out if the VHB peels. Load path: VHB (primary) → M4 self-tappers (backup) → frame-top hook (failsafe).
 
-**Sash-end bracket:** uses the same pattern but mounts on the **room-side face of the sash top rail** (the surface that's already 20 mm proud of the frame). Its arm extends a shorter distance (~15 mm) because the sash itself already provides 20 mm of "standoff."
+**Attachment:** 2× M4 self-tapping screws through the mounting plate into the PVC frame, plus VHB double-sided tape full-contact behind the plate. The hook over the frame top is a passive mechanical catch — no additional fixings.
+
+**Sash-end bracket:** uses the same pattern but mounts on the **room-side face of the sash top rail** (which is already 20 mm proud of the frame, so there is plenty of accessible sash face to work with). Its arm extends a shorter distance (~10–15 mm) because the sash itself already provides the 20 mm of standoff.
 
 ### Why this geometry works for both modes
 
