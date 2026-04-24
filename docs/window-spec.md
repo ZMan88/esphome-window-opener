@@ -24,7 +24,10 @@ Observations from the photos:
 | Sash height (H) | 1325 mm | inside of frame, vertical |
 | Tilt gap at top | 160 mm | distance from frame plane to sash face at full tilt |
 | Turn gap at hinge side (at 90°) | 25 mm | sash-to-frame offset when fully turned |
-| **Sash protrusion past frame face** | **~20 mm** | sash room-side face sits 20 mm forward of the frame's inside face |
+| **Sash lip (room-side protrusion past frame)** | **20 mm** | the sash's room-side face sits 20 mm forward of the frame's inside face |
+| **Sash thickness** | **80 mm** | full depth of the sash profile (outside face to room-side face) |
+| **Frame depth** | **80 mm** | full depth of the frame profile |
+| **Frame rail width (top, visible-plus-hidden)** | **80 mm** | total top-rail height from the outer edge to the inner edge; the sash covers 60 mm of this |
 | **Frame face visible above sash** | **20 mm** | the sash covers the rest of the frame's inside face; bracket must fit in this 20 mm strip between sash top and ceiling |
 | Hinge side | right | turn pivot axis = right edge |
 | Handle side | left | mid-height |
@@ -46,6 +49,7 @@ Observations from the photos:
 | `d` (moving-anchor offset from hinge) | 120 mm | `mechanical/README.md`, bracket CAD |
 | Fixed anchor position | `(W/2, 0)` = top-middle of frame | `mechanical/README.md` |
 | Moving anchor position | `(W - d, 0)` = top edge of sash, 120 mm from hinge | `mechanical/README.md` |
+| Bracket width (both brackets) | 190 mm | along the window length, limits torque on mounting |
 
 ## Required actuator spec
 

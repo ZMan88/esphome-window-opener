@@ -16,15 +16,26 @@ The target window (see `docs/window-spec.md`) is a European tilt-and-turn, 845 �
 
 The fixed-end bracket bolts to the **room-side (inside) face of the top frame rail**, not above the frame. The actuator body hangs in the room at roughly the height of the top of the window, with no interference from the ~20 mm ceiling gap above the frame.
 
-![Mounting cross-section](../docs/mounting-detail.svg)
+![Mounting cross-section — fixed end](../docs/mounting-detail.svg)
+![Mounting cross-section — sash end](../docs/mounting-detail-sash.svg)
 
-**Hard constraint — only 20 mm of frame face is accessible.** The sash covers the frame's inside face everywhere except a 20 mm strip between the sash top and the ceiling. That's the entire mounting surface.
+Both brackets are **190 mm wide** along the window length (into the page of the side cross-sections). That width sets the VHB + screw area available to resist torque from the actuator.
 
-**Bracket design consequence:** the mounting plate is small (~18 mm tall × 80–100 mm wide along the frame), so relying on screws + VHB alone in the stall-force case is marginal. The bracket adds a **hook that extends over the top edge of the frame** into the ~20 mm gap to the ceiling — see `docs/mounting-detail.svg`. The hook doesn't have to attach to the ceiling; it just mechanically prevents the bracket from rotating out if the VHB peels. Load path: VHB (primary) → M4 self-tappers (backup) → frame-top hook (failsafe).
+**Fixed-end bracket (top-middle of frame):**
 
-**Attachment:** 2× M4 self-tapping screws through the mounting plate into the PVC frame, plus VHB double-sided tape full-contact behind the plate. The hook over the frame top is a passive mechanical catch — no additional fixings.
+- Hard constraint — only 20 mm of frame face is accessible. The sash covers the frame's inside face everywhere except a 20 mm strip between the sash top and the ceiling.
+- Plate is therefore 190 × ~18 mm (~3400 mm²). Under the 500 N stall case, tensile stress at the top edge is ~1 MPa — above VHB's ~500 kPa tensile limit. Relying on screws + VHB alone is marginal.
+- **Solution:** the bracket adds a hook that extends over the top edge of the frame into the ~20 mm gap to the ceiling (see `docs/mounting-detail.svg`). The hook is a passive mechanical catch — it doesn't have to attach to the ceiling, it just prevents the bracket from rotating out if the VHB peels.
+- Load path: VHB (primary, shear + tension) → 2× M4 self-tappers into PVC (backup) → frame-top hook (failsafe).
+- Install: slide the hook into the ceiling gap from the side, then screw in from the room side.
 
-**Sash-end bracket:** uses the same pattern but mounts on the **room-side face of the sash top rail** (which is already 20 mm proud of the frame, so there is plenty of accessible sash face to work with). Its arm extends a shorter distance (~10–15 mm) because the sash itself already provides the 20 mm of standoff.
+**Sash-end (moving) bracket — `docs/mounting-detail-sash.svg`:**
+
+- The sash's room-side face is 20 mm proud of the frame, so the *entire* sash top rail is accessible.
+- Plate is 190 × ~42 mm (~8000 mm²). Stall-force tensile stress ~160 kPa — 3× margin below VHB's limit. **No hook needed.**
+- The 20 mm sash lip already provides most of the standoff the fixed-end bracket gets from its arm. The M6 rod-end shank threads directly through the plate; a nut on the sash side locks it. No separate arm geometry.
+- Load path: VHB (primary) → 3× M4 self-tappers into the sash top rail.
+- Install: peel-off VHB backing, press on, screw in. Much simpler than the fixed end.
 
 ### Why this geometry works for both modes
 
