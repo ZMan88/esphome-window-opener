@@ -4,6 +4,9 @@ A DIY ESP32-based device that opens and closes a European tilt-and-turn window, 
 
 **Status:** scaffolding (Phase 0). No hardware built yet. See `PLAN.md`.
 
+If you're trying to understand what this thing physically *looks like*, start with [`docs/how-it-works.md`](docs/how-it-works.md) — plain-language walkthrough plus an annotated 3D overview.
+
+![Assembly overview — installed mechanism](docs/assembly-isometric.svg)
 ![Mounting geometry — front view, tilt mode, turn mode](docs/geometry.svg)
 
 ## How it works

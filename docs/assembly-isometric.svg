@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="12">
+  <defs>
+    <marker id="leader-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#444"/>
+    </marker>
+    <linearGradient id="actuator-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#777"/>
+      <stop offset="50%" stop-color="#444"/>
+      <stop offset="100%" stop-color="#222"/>
+    </linearGradient>
+    <linearGradient id="frame-front" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8a5e34"/>
+      <stop offset="100%" stop-color="#5a3a1a"/>
+    </linearGradient>
+    <linearGradient id="sash-front" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3a8a5a"/>
+      <stop offset="100%" stop-color="#1f5236"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="900" height="700" fill="#fafafa"/>
+
+  <text x="450" y="32" text-anchor="middle" font-size="19" font-weight="700" fill="#111">
+    Assembly overview — installed mechanism (closed window)
+  </text>
+  <text x="450" y="52" text-anchor="middle" font-size="12" fill="#666" font-style="italic">
+    looking at the window from inside the room, slightly above and to the right
+  </text>
+
+  <!--
+    Pseudo-isometric projection. Real-world dims (X=width, Y=height, Z=depth):
+      window 845 × 1325 × 80 mm  →  scaled to 280 × 280 × 30 SVG units.
+    Projection: screen_x = X + 0.5*Z,  screen_y = -Y - 0.25*Z   (Z+ = toward viewer)
+    Origin moved to (200, 580) so the bottom-front-left of the frame sits there.
+  -->
+
+  <g transform="translate(200, 580)">
+
+    <!-- ===== WALL behind the window ===== -->
+    <!-- Wall back face (a large polygon receding from the frame's back plane) -->
+    <polygon points="-150,80 -150,-380 430,-380 430,80" fill="#ede5d4" stroke="#bbaa88" stroke-width="1"/>
+    <text x="-100" y="60" font-size="11" fill="#998" font-style="italic">interior wall</text>
+
+    <!-- ===== FRAME (3 visible faces: front, top, right) ===== -->
+    <!-- Frame back face is hidden behind the wall.
+         Frame depth = 30 SVG units. Z=0 is back (in wall), Z=30 is front (room side). -->
+
+    <!-- Right face of frame (the right jamb's outer surface, visible because camera is to the right) -->
+    <!-- Vertices (X=280 always): (W, 0, 0), (W, H, 0), (W, H, D), (W, 0, D)  → projected -->
+    <polygon points="280,0 280,-280 295,-287.5 295,-7.5" fill="#604024" stroke="#2a1a08" stroke-width="1.2"/>
+
+    <!-- Top face of frame (visible from above) -->
+    <!-- Vertices (Y=280): (0, H, 0), (W, H, 0), (W, H, D), (0, H, D)  → projected -->
+    <polygon points="0,-280 280,-280 295,-287.5 15,-287.5" fill="#6f4928" stroke="#2a1a08" stroke-width="1.2"/>
+
+    <!-- Front face of frame (the "picture-frame" border facing the room) -->
+    <!-- Outer border 280 × 280 at Z=30 → screen offset (15, -7.5).
+         Inner opening starts ~25 in on each side. -->
+    <path d="M 15,-7.5
+             L 295,-7.5
+             L 295,-287.5
+             L 15,-287.5
+             Z
+             M 40,-32.5
+             L 40,-262.5
+             L 270,-262.5
+             L 270,-32.5
+             Z"
+          fill="url(#frame-front)" fill-rule="evenodd" stroke="#2a1a08" stroke-width="1.4"/>
+
+    <!-- ===== SASH (inside the frame opening, with 20 mm room-side lip) ===== -->
+    <!-- Sash 80 mm thick → 30 SVG units. Sash front face protrudes 20 mm = 7.5 SVG units past frame's z=30, so sash front is at z = 37.5.
+         Sash inner XY: 40..270 horizontal, 32.5..262.5 vertical.
+         Project sash front face with offset (37.5*0.5, -37.5*0.25) = (18.75, -9.375)  → roughly (19, -9). -->
+
+    <!-- Sash front face (the part visible through and around the glass) -->
+    <polygon points="59,-41.875 289,-41.875 289,-271.875 59,-271.875"
+             fill="url(#sash-front)" stroke="#1f5236" stroke-width="1.2"/>
+    <!-- Sash glass area (inset within sash frame) -->
+    <polygon points="74,-56.875 274,-56.875 274,-256.875 74,-256.875"
+             fill="#dde8ed" stroke="#7a8" stroke-width="0.5"/>
+
+    <!-- Sash top face (the top edge of the sash protruding toward the room) -->
+    <!-- Between (40, 262.5, 30) front-top inside the frame opening and (59, -271.875) at z=37.5 -->
+    <polygon points="40,-262.5 270,-262.5 289,-271.875 59,-271.875"
+             fill="#286b46" stroke="#0e3220" stroke-width="0.9"/>
+
+    <!-- Sash right edge face (visible because camera is to the right) -->
+    <polygon points="270,-32.5 270,-262.5 289,-271.875 289,-41.875"
+             fill="#1f5e3d" stroke="#0e3220" stroke-width="0.9"/>
+
+    <!-- ===== Hinges on the right edge of the sash ===== -->
+    <circle cx="289" cy="-65" r="5" fill="#933" stroke="#511" stroke-width="1"/>
+    <circle cx="289" cy="-250" r="5" fill="#933" stroke="#511" stroke-width="1"/>
+
+    <!-- ===== Handle on the left middle ===== -->
+    <rect x="59" y="-160" width="6" height="35" fill="#222"/>
+
+    <!-- ===== Tilt stay (top-left, on handle side) ===== -->
+    <line x1="80" y1="-272" x2="105" y2="-289" stroke="#bbb" stroke-width="2.5"/>
+    <circle cx="80" cy="-272" r="2.5" fill="#888"/>
+    <circle cx="105" cy="-289" r="2.5" fill="#888"/>
+
+    <!-- ===== FRAME BRACKET (fixed end) — top-middle of frame, in the 20 mm strip ===== -->
+    <!-- Plate hugs the front face of the frame top rail, just above the sash protrusion.
+         Plate: 95 SVG units wide (≈190 mm at our scale), short vertical extent. -->
+    <g>
+      <!-- Plate body, on the frame's front face (z=30) -->
+      <rect x="100" y="-22" width="95" height="12" fill="#b92c2c" stroke="#5a0d0d" stroke-width="1"/>
+      <!-- Slight perspective top (the depth of the plate) -->
+      <polygon points="100,-22 195,-22 200,-25 105,-25" fill="#8a1c1c" stroke="#5a0d0d" stroke-width="0.6"/>
+      <!-- Arm extending into the room (Z direction → up-right in the projection) -->
+      <polygon points="135,-16 160,-16 174,-23 149,-23" fill="#b92c2c" stroke="#5a0d0d" stroke-width="0.8"/>
+      <polygon points="160,-16 160,-12 174,-19 174,-23" fill="#7a1818" stroke="#5a0d0d" stroke-width="0.8"/>
+    </g>
+
+    <!-- Rod-end on the frame bracket -->
+    <circle cx="174" cy="-21" r="6" fill="#fff" stroke="#222" stroke-width="1.5"/>
+    <circle cx="174" cy="-21" r="2.5" fill="#222"/>
+
+    <!-- ===== SASH BRACKET (moving end) — on the sash, near the right (hinge) edge ===== -->
+    <!-- d = 120 mm from hinge ≈ 40 SVG units inboard from the right sash edge.
+         Sash right edge is at x=270 (back) / 289 (front face). So bracket centre at x ≈ 289 - 40 = 249. -->
+    <g>
+      <!-- Plate on sash front face -->
+      <rect x="225" y="-58" width="55" height="22" fill="#b92c2c" stroke="#5a0d0d" stroke-width="1"/>
+      <polygon points="225,-58 280,-58 285,-61 230,-61" fill="#8a1c1c" stroke="#5a0d0d" stroke-width="0.6"/>
+    </g>
+
+    <!-- Rod-end on the sash bracket -->
+    <circle cx="252" cy="-47" r="6" fill="#fff" stroke="#222" stroke-width="1.5"/>
+    <circle cx="252" cy="-47" r="2.5" fill="#222"/>
+
+    <!-- ===== ACTUATOR ===== -->
+    <!-- Cylinder running roughly horizontally between the two rod-ends.
+         For a 3D effect, draw as a horizontal capsule with shading. -->
+    <line x1="174" y1="-21" x2="252" y2="-47" stroke="url(#actuator-grad)" stroke-width="14" stroke-linecap="round"/>
+    <line x1="174" y1="-21" x2="252" y2="-47" stroke="#888" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+    <!-- Highlight along the top of the actuator -->
+    <line x1="178" y1="-26" x2="248" y2="-52" stroke="#aaa" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+
+    <!-- ===== ESP32 enclosure on the wall above the frame bracket ===== -->
+    <g>
+      <rect x="105" y="-310" width="55" height="20" fill="#2a7a4a" stroke="#0e3a20" stroke-width="1"/>
+      <polygon points="105,-310 160,-310 165,-313 110,-313" fill="#1f5e3d" stroke="#0e3a20" stroke-width="0.6"/>
+      <text x="132" y="-296" text-anchor="middle" font-size="9" fill="#fff" font-weight="700">ESP32 + driver</text>
+    </g>
+    <!-- Wire from ESP32 to actuator -->
+    <path d="M 132 -290 Q 152 -250, 174 -25" fill="none" stroke="#444" stroke-width="1" stroke-dasharray="2,2"/>
+
+  </g>
+
+  <!-- ===== Annotations / leaders (outside the scene) ===== -->
+
+  <!-- Frame label -->
+  <path d="M 40 130 L 100 130 L 200 540" fill="none" stroke="#444" stroke-width="0.8" marker-end="url(#leader-arrow)"/>
+  <text x="32" y="125" text-anchor="end" font-size="12" fill="#222" font-weight="700">FRAME</text>
+  <text x="32" y="139" text-anchor="end" font-size="10" fill="#666">stays put · 80 mm deep</text>
+
+  <!-- Sash label -->
+  <path d="M 40 250 L 100 250 L 280 380" fill="none" stroke="#444" stroke-width="0.8" marker-end="url(#leader-arrow)"/>
+  <text x="32" y="245" text-anchor="end" font-size="12" fill="#222" font-weight="700">SASH</text>
+  <text x="32" y="259" text-anchor="end" font-size="10" fill="#666">moves · holds the glass</text>
+
+  <!-- Frame bracket label -->
+  <path d="M 200 80 L 270 100 L 360 545" fill="none" stroke="#b92c2c" stroke-width="0.8" marker-end="url(#leader-arrow)"/>
+  <text x="195" y="75" text-anchor="end" font-size="12" fill="#b92c2c" font-weight="700">FRAME BRACKET (fixed)</text>
+  <text x="195" y="89" text-anchor="end" font-size="10" fill="#a44">on the 20 mm frame strip</text>
+
+  <!-- Actuator label -->
+  <path d="M 800 100 L 720 110 L 405 543" fill="none" stroke="#444" stroke-width="0.8" marker-end="url(#leader-arrow)"/>
+  <text x="805" y="95" text-anchor="start" font-size="12" fill="#222" font-weight="700">ACTUATOR (200 mm)</text>
+  <text x="805" y="109" text-anchor="start" font-size="10" fill="#666">extends to push the sash open</text>
+
+  <!-- Sash bracket label -->
+  <path d="M 800 220 L 720 240 L 460 525" fill="none" stroke="#b92c2c" stroke-width="0.8" marker-end="url(#leader-arrow)"/>
+  <text x="805" y="215" text-anchor="start" font-size="12" fill="#b92c2c" font-weight="700">SASH BRACKET (moving)</text>
+  <text x="805" y="229" text-anchor="start" font-size="10" fill="#a44">120 mm from the hinge</text>
+
+  <!-- Rod-end label -->
+  <path d="M 800 340 L 720 350 L 480 535" fill="none" stroke="#444" stroke-width="0.8" marker-end="url(#leader-arrow)"/>
+  <text x="805" y="335" text-anchor="start" font-size="12" fill="#222" font-weight="700">M6 ROD-ENDS</text>
+  <text x="805" y="349" text-anchor="start" font-size="10" fill="#666">ball joints — let the actuator</text>
+  <text x="805" y="361" text-anchor="start" font-size="10" fill="#666">swing freely as the sash moves</text>
+
+  <!-- Hinges label -->
+  <path d="M 800 470 L 720 490 L 510 530" fill="none" stroke="#933" stroke-width="0.8" marker-end="url(#leader-arrow)"/>
+  <text x="805" y="465" text-anchor="start" font-size="12" fill="#933" font-weight="700">HINGES</text>
+  <text x="805" y="479" text-anchor="start" font-size="10" fill="#a55">turn pivots (right edge)</text>
+
+  <!-- Handle label -->
+  <path d="M 40 480 L 200 460" fill="none" stroke="#222" stroke-width="0.8" marker-end="url(#leader-arrow)"/>
+  <text x="32" y="475" text-anchor="end" font-size="12" fill="#222" font-weight="700">HANDLE</text>
+  <text x="32" y="489" text-anchor="end" font-size="10" fill="#666">user picks tilt / turn / closed</text>
+
+  <!-- ESP32 label -->
+  <path d="M 800 590 L 700 580 L 360 295" fill="none" stroke="#2a7a4a" stroke-width="0.8" marker-end="url(#leader-arrow)"/>
+  <text x="805" y="585" text-anchor="start" font-size="12" fill="#2a7a4a" font-weight="700">ESP32 + DRIVER</text>
+  <text x="805" y="599" text-anchor="start" font-size="10" fill="#264">talks to Home Assistant</text>
+
+  <!-- Bottom note -->
+  <g transform="translate(60, 660)">
+    <rect x="-10" y="-15" width="800" height="30" fill="#fff8e6" stroke="#c99b2b" stroke-width="1" rx="3"/>
+    <text x="0" y="6" font-size="11" fill="#744"><tspan font-weight="700">How it moves:</tspan> the actuator extends → it pushes the sash bracket away from the frame bracket → because the sash is hinged (top-edge for tilt, right-edge for turn), this <tspan font-style="italic">opens</tspan> the window in whichever mode the handle has selected.</text>
+  </g>
+</svg>
