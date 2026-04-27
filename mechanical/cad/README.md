@@ -34,12 +34,39 @@ sources as the source of truth, STLs as artefacts.
 - Layer: 0.2 mm.
 - Walls: 4 perimeters.
 - Infill: 40 % gyroid.
-- Orientation: flat on the bed, VHB side down. No supports needed.
+
+### Orientation
+
+- **`frame-bracket.scad`** — flat on the bed, **back face (VHB side) down**.
+  The arm prints upward, no supports needed.
+- **`sash-bracket.scad`** — flat on the bed, **back face UP**.
+  The hex pocket for the M6 nut is on the back face; printing back-up
+  means the pocket prints as a clean cavity. The M4 holes go all the
+  way through, so orientation does not affect them.
 
 ## Post-print
 
-- **Tap both rod-end holes with an M6 tap.** The holes are printed at
-  tap-drill size (5.0 mm), not clearance — this gives clean threads
-  instead of relying on printed threads, which are weak.
-- Apply VHB tape (3M 4950 or 5952) to the back face before installing.
+- **Frame bracket:** tap the M6 hole at the end of the arm with an M6 ×
+  1.0 hand tap. The hole is printed at 5.0 mm (tap-drill size).
+- **Sash bracket:** *no tapping*. The M6 hole is a clearance through-hole
+  (6.5 mm). The rod-end shank passes through and is locked with an M6
+  nut sitting flush in the hex pocket on the back face.
+- Apply VHB tape (3M 4950 or 5952) to the back face of both brackets
+  before installing.
 - Attach with M4 × 16 self-tappers into the PVC after positioning.
+
+### Sash bracket — rod-end mounting in detail
+
+Standard M6 male rod-ends usually have a 30 mm threaded shank. After:
+
+1. drop the M6 nut into the hex pocket on the bracket's back face,
+2. pass the rod-end shank through from the front,
+3. thread it down into the nut and tighten,
+
+…the tail of the shank will protrude ~20 mm past the back of the bracket.
+You'll need to **drill a Ø6.5 × 25 mm pilot hole into the sash top rail**
+where the shank tail will sit. PVC sash profiles have hollow chambers
+inside, so you're drilling into air — no problem.
+
+If you'd rather avoid drilling the sash, source a **short-shank rod-end**
+(15–20 mm thread) instead; the tail then ends inside the bracket plate.
