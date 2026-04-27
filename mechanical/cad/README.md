@@ -19,13 +19,28 @@ macOS: `brew install --cask openscad`  ·  [download page](https://openscad.org/
 
 ```
 cd mechanical/cad
-openscad -o sash-bracket.stl  sash-bracket.scad
-openscad -o frame-bracket.stl frame-bracket.scad
+openscad --export-format binstl -o ../stl/sash-bracket.stl  sash-bracket.scad
+openscad --export-format binstl -o ../stl/frame-bracket.stl frame-bracket.scad
 ```
 
-STL output lands in `../stl/` (or just alongside the `.scad` — move to
-`../stl/` when ready to print). `.stl` is binary; commit the `.scad`
-sources as the source of truth, STLs as artefacts.
+`--export-format binstl` emits binary STL (`~30–130 KB`) instead of
+ASCII (`~10× larger`). Sliced STLs from the same `.scad` will be
+identical between machines.
+
+Optional preview render (PNG, no slicer needed):
+
+```
+openscad --colorscheme=Nature --imgsize=900,600 -o ../stl/sash-bracket.png  sash-bracket.scad
+openscad --colorscheme=Nature --imgsize=900,600 -o ../stl/frame-bracket.png frame-bracket.scad
+```
+
+The repo ships with the current STLs and PNGs in `mechanical/stl/`;
+re-render after any change to the `.scad` sources.
+
+> **macOS note:** the default `brew install --cask openscad` ships an
+> Intel-only build that fails Gatekeeper on Apple Silicon. Use
+> `brew install --cask openscad@snapshot` instead — it's the
+> dev/nightly build with native Apple Silicon support.
 
 ## Print settings (starting point)
 

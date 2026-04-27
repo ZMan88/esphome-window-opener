@@ -82,6 +82,14 @@ In tilt mode the moving end traces a short arc around the bottom edge. In turn m
 - `cad/sash-bracket.scad` — moving-end bracket, 120 mm from the hinge on the sash top rail.
 - `cad/frame-bracket.scad` — fixed-end bracket, top-middle of the frame.
 - `cad/README.md` — install / render / print instructions.
-- `stl/` — exported printable STLs. Re-export after any `.scad` change.
+- `stl/sash-bracket.stl`, `stl/frame-bracket.stl` — exported printable STLs.
+- `stl/sash-bracket.png`, `stl/frame-bracket.png` — quick preview renders.
+
+| Bracket | Preview |
+|---|---|
+| Sash bracket (flat plate, 4 corner M4 + central M6 + back-face hex pocket) | ![sash bracket](stl/sash-bracket.png) |
+| Frame bracket (plate + arm + ceiling-jam tab) | ![frame bracket](stl/frame-bracket.png) |
+
+Re-render after any `.scad` change — see `cad/README.md`.
 
 Enclosure (`cad/esp32-enclosure.scad`) is not yet modelled — comes after the electronics bring-up in Phase 1.
