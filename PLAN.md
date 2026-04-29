@@ -16,7 +16,7 @@ DIY opener for a European tilt-and-turn window, ESP32 + ESPHome + Home Assistant
 ## Phases
 
 - [x] **Phase 0 — Scaffolding.** Repo structure, docs, base firmware YAML, BOM, wiring templates. (This PR.)
-- [ ] **Phase 1 — Bench prototype.** ESP32 + one driver + actuator on a bench jig. Home Assistant discovers `cover.window_opener`. % travel works against a dummy load, no window yet.
+- [ ] **Phase 1 — Bench prototype.** ESP32 + one driver + actuator on a bench jig. Home Assistant discovers `cover.window_opener`. % travel works against a dummy load, no window yet. **See `docs/bench-test.md` for the wiring + test procedure.**
 - [ ] **Phase 2 — Tilt on real window.** Print brackets, mount on the frame, tune stroke calibration for tilt. Stall detection dialed in.
 - [ ] **Phase 3 — Turn validation.** Verify the same mount drives turn mode without binding; measure max stroke actually used.
 - [ ] **Phase 4 — Polish.** Safety edge cases, HA automations, Lovelace card, enclosure, OTA workflow.
