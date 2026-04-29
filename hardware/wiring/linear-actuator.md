@@ -2,18 +2,18 @@
 
 12V DC linear actuator driven by a BTS7960 H-bridge, controlled by an ESP32.
 
-## Pin map
+## Pin map (ESP32-C6 DevKitC-1)
 
-| ESP32 GPIO | Goes to | Notes |
+| ESP32-C6 GPIO | Goes to | Notes |
 |---|---|---|
-| GPIO25 | BTS7960 `RPWM` | Forward PWM (extend) |
-| GPIO26 | BTS7960 `LPWM` | Reverse PWM (retract) |
+| GPIO4 | BTS7960 `RPWM` | Forward PWM (extend) |
+| GPIO5 | BTS7960 `LPWM` | Reverse PWM (retract) |
 | 3V3 | BTS7960 `R_EN` + `L_EN` | Tie both enables high |
 | GND | BTS7960 `GND` | Common ground |
-| (optional) GPIO35 | 10-turn pot wiper | ADC1_CH7, safe with Wi-Fi |
+| (optional) GPIO0 | 10-turn pot wiper | ADC1_CH0 on the C6 |
 | (optional) 3V3 / GND | Pot ends | Orient so extend = higher voltage |
 
-**Do not use GPIO34/35/36/39 as outputs** — they are input-only on ESP32.
+**Avoid GPIOs 8, 9, 15** (strapping pins) and **GPIOs 12, 13** (USB-Serial-JTAG) on the C6.
 
 ## Power
 
@@ -47,8 +47,8 @@ If reversed, swap `M+` / `M−` at the driver (easier than editing firmware).
      +12V PSU− ──┴─────────────── BTS7960 B−─┤
                                               └─ common GND
 
-    ESP32 GPIO25 ──── BTS7960 RPWM            BTS7960 M+ ── Actuator +
-    ESP32 GPIO26 ──── BTS7960 LPWM            BTS7960 M− ── Actuator −
-    ESP32 3V3    ─┬── BTS7960 R_EN                     (TVS 1.5KE18CA across M+/M−)
-                  └── BTS7960 L_EN
+    ESP32-C6 GPIO4 ── BTS7960 RPWM            BTS7960 M+ ── Actuator +
+    ESP32-C6 GPIO5 ── BTS7960 LPWM            BTS7960 M− ── Actuator −
+    ESP32-C6 3V3   ─┬─ BTS7960 R_EN                     (TVS 1.5KE18CA across M+/M−)
+                    └─ BTS7960 L_EN
 ```

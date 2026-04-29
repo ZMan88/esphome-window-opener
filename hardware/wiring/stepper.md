@@ -2,18 +2,18 @@
 
 NEMA17 stepper driven by a TMC2209 in STEP/DIR mode, controlled by an ESP32.
 
-## Pin map
+## Pin map (ESP32-C6 DevKitC-1)
 
-| ESP32 GPIO | Goes to | Notes |
+| ESP32-C6 GPIO | Goes to | Notes |
 |---|---|---|
-| GPIO25 | TMC2209 `STEP` | |
-| GPIO26 | TMC2209 `DIR` | |
-| GPIO27 | TMC2209 `EN` | Active-low; firmware inverts |
-| GPIO34 | Endstop switch | Other side of switch to GND; ESP32 uses internal pull-up |
+| GPIO4 | TMC2209 `STEP` | |
+| GPIO5 | TMC2209 `DIR` | |
+| GPIO6 | TMC2209 `EN` | Active-low; firmware inverts |
+| GPIO7 | Endstop switch | Other side of switch to GND; firmware uses internal pull-up |
 | 3V3 | TMC2209 `VIO` | Logic supply |
 | GND | TMC2209 `GND` | Common ground |
 
-**Do not use GPIO34/35/36/39 as outputs** — they are input-only.
+**Avoid GPIOs 8, 9, 15** (strapping pins) and **GPIOs 12, 13** (USB-Serial-JTAG) on the C6. GPIOs 24-30 are typically reserved for SPI flash. The pins above (4-7) are all safe general-purpose I/O.
 
 ## Power
 
@@ -57,9 +57,9 @@ If reversed, swap one coil pair (e.g. A1 ↔ A2) at the driver.
      +12V PSU− ──┴─────────────── TMC2209 GND┤             │
                                               └──── common GND
 
-    ESP32 GPIO25 ── TMC2209 STEP           TMC2209 A1/A2 ── motor coil A
-    ESP32 GPIO26 ── TMC2209 DIR            TMC2209 B1/B2 ── motor coil B
-    ESP32 GPIO27 ── TMC2209 EN
-    ESP32 3V3    ── TMC2209 VIO
-    ESP32 GPIO34 ── endstop ── GND
+    ESP32-C6 GPIO4 ── TMC2209 STEP        TMC2209 A1/A2 ── motor coil A
+    ESP32-C6 GPIO5 ── TMC2209 DIR         TMC2209 B1/B2 ── motor coil B
+    ESP32-C6 GPIO6 ── TMC2209 EN
+    ESP32-C6 3V3   ── TMC2209 VIO
+    ESP32-C6 GPIO7 ── endstop ── GND
 ```

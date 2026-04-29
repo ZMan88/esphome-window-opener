@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-A DIY ESP32-based opener for a European **tilt-and-turn** window, integrated with Home Assistant via ESPHome. A single actuator is mounted **horizontally across the top**: fixed end at the **top-middle of the frame**, moving end on the **top rail of the sash, 120 mm from the hinge**. Extending the actuator opens the window in whichever mode the handle has selected (tilt or turn).
+A DIY ESP32-C6-based opener for a European **tilt-and-turn** window, integrated with Home Assistant via ESPHome (and Matter / Thread later if we want it — the C6 supports both). A single actuator is mounted **horizontally across the top**: fixed end at the **top-middle of the frame**, moving end on the **top rail of the sash, 120 mm from the hinge**. Extending the actuator opens the window in whichever mode the handle has selected (tilt or turn).
 
 Target window measurements and derived numbers: `docs/window-spec.md`. Geometry diagram: `docs/geometry.svg`. Full roadmap, phase tracker, and open questions: `PLAN.md`.
 

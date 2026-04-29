@@ -48,11 +48,16 @@ Tracks parts ordered, prices paid, and assembly progress. The repo's `hardware/B
 - Power: **37.48 RON**
 - (Spares: 9.06 RON not counted)
 
+### Already on hand (drawer)
+
+| Part | Note |
+|---|---|
+| ESP32-C6 DevKitC-1 | User has spares from prior projects. Chosen over classic ESP32 to keep Matter/Thread on the table for the future. Firmware uses ESP-IDF framework + GPIO 4/5/6/7. |
+
 ### Still to order
 
 Open shopping list — see `hardware/BOM.md` for sources:
 
-- [ ] ESP32 DevKit V1
 - [ ] 12 V / 5 A AC-DC PSU
 - [ ] **1× LH M6 nut** for the LH rod-end (rulmentika.ro or specialty fasteners — needed because standard RH nuts won't thread onto the CSL10's left-hand shank). *Or* skip the LH rod-end and buy a 2nd RH (CS10) instead.
 - [ ] 100 µF / 25 V electrolytic cap (TMC2209 motor supply — *required*, snubs voltage spikes; without it the driver dies)

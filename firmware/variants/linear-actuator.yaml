@@ -18,17 +18,18 @@ substitutions:
 output:
   - platform: ledc
     id: motor_forward
-    pin: GPIO25
+    pin: GPIO4
     frequency: 20000 Hz
   - platform: ledc
     id: motor_reverse
-    pin: GPIO26
+    pin: GPIO5
     frequency: 20000 Hz
 
-# Optional feedback pot — wire the wiper to GPIO35, ends to 3V3 and GND.
+# Optional feedback pot — wire the wiper to GPIO0 (ADC1_CH0 on ESP32-C6),
+# ends to 3V3 and GND.
 # sensor:
 #   - platform: adc
-#     pin: GPIO35
+#     pin: GPIO0
 #     id: position_pot
 #     attenuation: 12db
 #     update_interval: 200ms

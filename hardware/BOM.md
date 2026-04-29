@@ -8,7 +8,7 @@ Pick **one** actuator track (Variant A or B), then add the common parts and the 
 
 | Qty | Part | Source | ~RON | ~EUR |
 |---:|---|---|---:|---:|
-| 1 | ESP32 DevKit V1 (ESP-WROOM-32, 30-pin) | [optimusdigital.ro](https://www.optimusdigital.ro/en/wifi-boards/3053-placa-de-dezvoltare-esp32-cu-wifi-si-bluetooth.html) · [sigmanortec.ro](https://sigmanortec.ro/en/esp32-development-board-esp-wroom-32-wifi-and-bluetooth-ble-dual-core) | 35–55 | 7–11 |
+| 1 | **ESP32-C6 DevKitC-1** (Wi-Fi 6, BT 5 LE, Thread/Zigbee) | [optimusdigital.ro ESP32 boards](https://www.optimusdigital.ro/358-placi-cu-esp32) · AliExpress / Amazon for the official Espressif kit | 50–80 | 10–16 |
 | 1 | 12V DC power supply, 60W / 5A, plastic case | [webled.ro YDS 60W](https://webled.ro/sursa-alimentare-yds-12v-5a-60w-cu-fir-carcasa-plastic/) · [led-box.ro 60W](https://led-box.ro/products/sursa-alimentare-5a-60w-12v) | 60–100 | 12–20 |
 | 1 | LM2596 buck module 12V → 5V (3A or 5A) | [optimusdigital.ro 5A](https://www.optimusdigital.ro/en/adjustable-step-down-power-supplies/1109-lm2596-dc-dc-step-down-module-5a.html) · [optimusdigital.ro w/ voltmeter](https://www.optimusdigital.ro/ro/surse-coboratoare-reglabile/805-modul-dc-dc-lm2596-cu-afisaj-de-tensiune.html) | 10–20 | 2–4 |
 | 1 | Inline blade fuse holder + 5A fuse | [optimusdigital.ro fuse holders](https://www.optimusdigital.ro/ro/sigurante-fuzibile/) · auto parts shop | 10–15 | 2–3 |
