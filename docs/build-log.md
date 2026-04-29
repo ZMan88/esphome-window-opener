@@ -16,30 +16,51 @@ Tracks parts ordered, prices paid, and assembly progress. The repo's `hardware/B
 | Prusa MK3 brass nut, Tr8x8 | TBD | 18.12 | ✅ |
 | Generic Tr8x8 trapezoidal nut × 2 | TBD | 29.00 (set) | ✅ |
 | KP08 pillow-block bearing × 2 | TBD | 24.00 (set) | ✅ |
-| **Subtotal** | | **106.11** | |
+| Rod-end M6 RH (CS10, MGK) | [rulmentika.ro](https://www.rulmentika.ro/) | 14.00 | ✅ |
+| Rod-end M6 LH (CSL10, MGK) | [rulmentika.ro](https://www.rulmentika.ro/) | 14.00 | ✅ |
+| **Subtotal** | | **134.11** | |
 
 ### Stepper
 
 | Part | Vendor | Price (RON) | Status |
 |---|---|---:|---|
 | LDO-42STH48-1684MAC NEMA17 (0.9°, 1.68 A) | TBD | TBD | ✅ |
+| Flexible coupler 5 mm → 8 mm × 2 (1 spare) | TBD | 21.42 | ✅ |
+| BIGTREETECH TMC2209 V1.3 × 2 (1 spare) | TBD | 73.98 | ✅ |
+| Creality mechanical endstop × 2 (1 spare) | TBD | TBD | ✅ |
+
+### Power & support
+
+| Part | Vendor | Price (RON) | Status |
+|---|---|---:|---|
+| LM2596 DC-DC step-down regulator × 4 (3 spare) | TBD | 37.48 | ✅ |
+
+### Spares / parts ordered but not used in this build
+
+| Part | Vendor | Price (RON) | Note |
+|---|---|---:|---|
+| Flexible coupler 5 mm → 5 mm | TBD | 9.06 | Doesn't fit this build (motor shaft is 5 mm but lead screw is 8 mm). Save for a future project. |
+
+### Running totals
+
+- Mechanical (lead-screw + nuts + bearings + rod-ends): **134.11 RON**
+- Stepper + coupler + driver + endstops: motor TBD + endstops TBD + **95.40 RON**
+- Power: **37.48 RON**
+- (Spares: 9.06 RON not counted)
 
 ### Still to order
 
 Open shopping list — see `hardware/BOM.md` for sources:
 
-- [ ] TMC2209 stepper driver (with heatsink)
 - [ ] ESP32 DevKit V1
-- [ ] Flexible coupler 5 mm → 8 mm
 - [ ] 12 V / 5 A AC-DC PSU
-- [ ] LM2596 buck converter (12 V → 5 V)
-- [ ] M6 rod-ends, male, **short-shank ≤ 20 mm preferred** (2 pcs)
-- [ ] Endstop micro-switch or magnetic reed
-- [ ] 100 µF / 25 V electrolytic cap (TMC2209 motor supply)
+- [ ] **1× LH M6 nut** for the LH rod-end (rulmentika.ro or specialty fasteners — needed because standard RH nuts won't thread onto the CSL10's left-hand shank). *Or* skip the LH rod-end and buy a 2nd RH (CS10) instead.
+- [ ] 100 µF / 25 V electrolytic cap (TMC2209 motor supply — *required*, snubs voltage spikes; without it the driver dies)
 - [ ] 3M VHB 4950 / 5952, 19 mm × ~1 m
-- [ ] M4 × 16 self-tapping screws (8 pcs)
+- [ ] M4 × 16 self-tapping screws (~8 pcs)
 - [ ] Inline 5 A blade fuse holder + fuses
-- [ ] Filament for 3D-printed brackets (PETG or ABS)
+- [ ] Filament for 3D-printed brackets (PETG or ABS, ~50 g total)
+- [ ] Hookup wire (silicone, 18-22 AWG) for motor + endstop runs
 
 ## Sanity-check on what was bought
 
