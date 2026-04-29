@@ -7,10 +7,15 @@
 # Calibration: docs/calibration.md
 
 substitutions:
-  # Steps from fully closed to fully open. Depends on lead-screw pitch and
-  # microstepping — calibrate empirically. Example: 8mm-pitch screw, 150mm
-  # stroke, 1/16 microstepping, 200 steps/rev => 60000 steps.
-  steps_full_stroke: "40000"
+  # Calibrated for the parts actually purchased:
+  #   - LDO-42STH48-1684MAC stepper, 0.9° / step → 400 full steps/rev
+  #   - TMC2209 default microstepping: 1/16 → 6400 microsteps/rev
+  #   - Tr8x8 lead screw → 8 mm linear travel per revolution
+  #   - Microsteps per mm = 6400 / 8 = 800
+  #
+  # Default: 180 mm usable stroke (160 mm needed for 90° turn + 20 mm headroom)
+  #   180 mm × 800 microsteps/mm = 144 000 microsteps
+  steps_full_stroke: "144000"
 
 stepper:
   - platform: a4988

@@ -8,8 +8,8 @@ DIY opener for a European tilt-and-turn window, ESP32 + ESPHome + Home Assistant
 
 - **MCU:** ESP32 (DevKit V1)
 - **HA integration:** ESPHome, one `cover` entity with position 0–100
-- **Mounting:** fixed end on frame at bottom-hinge corner, moving end on opposite sash corner, ball-joint rod ends both sides
-- **Actuator:** dual-track — 12V linear actuator **or** NEMA17 + lead screw, pick at build time
+- **Mounting:** fixed end at top-middle of frame, moving end on top edge of sash 120 mm from hinge, ball-joint rod ends at both ends
+- **Actuator:** **stepper + lead screw** (Variant B) — committed late April 2026; parts ordered, see `docs/build-log.md`
 - **Power:** 12V mains PSU → buck to 5V for the ESP32; no battery backup in v1
 - **Manual override:** window handle (no device buttons in v1)
 
