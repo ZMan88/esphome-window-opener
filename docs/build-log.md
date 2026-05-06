@@ -53,19 +53,24 @@ Tracks parts ordered, prices paid, and assembly progress. The repo's `hardware/B
 | Part | Note |
 |---|---|
 | ESP32-C6 DevKitC-1 | User has spares from prior projects. Chosen over classic ESP32 to keep Matter/Thread on the table for the future. Firmware uses ESP-IDF framework + GPIO 4/5/6/7. |
+| Configurable bench PSU | Used for Phase 1 bench testing instead of a fixed AC-DC brick. Set 12 V, 1 A limit for first power-on, 3 A limit for normal operation. A dedicated 12 V / 5 A AC-DC brick can wait until Phase 2 (window install). |
+| 470 µF / 35 V electrolytic cap | Used in place of the 100 µF / 25 V called out in the wiring docs. Higher capacitance + higher voltage rating = more headroom; common 3D-printer modding upgrade. ≥100 µF is the spec, more is better. |
+| Hookup wire | Mixed lengths / colours of 22 AWG silicone wire. Sufficient for bench + window runs. |
+| Motor pigtail | The LDO motor shipped with a JST-XH 4-wire pigtail. Either cut the connector off and screw bare wires into the TMC2209, or use an XH-to-XH cable. |
 
-### Still to order
+### Phase 1 bench-test readiness
 
-Open shopping list — see `hardware/BOM.md` for sources:
+✅ **Ready to bench-test.** All Phase 1 parts on hand (motor, driver, cap, ESP32-C6, PSU, wires). Follow `docs/bench-test.md`.
 
-- [ ] 12 V / 5 A AC-DC PSU
+### Still to order — for Phase 2 (window install)
+
 - [ ] **1× LH M6 nut** for the LH rod-end (rulmentika.ro or specialty fasteners — needed because standard RH nuts won't thread onto the CSL10's left-hand shank). *Or* skip the LH rod-end and buy a 2nd RH (CS10) instead.
-- [ ] 100 µF / 25 V electrolytic cap (TMC2209 motor supply — *required*, snubs voltage spikes; without it the driver dies)
+- [ ] **Dedicated 12 V / 5 A AC-DC PSU** (for permanent install — once the bench test passes and the rig is going onto the window).
 - [ ] 3M VHB 4950 / 5952, 19 mm × ~1 m
 - [ ] M4 × 16 self-tapping screws (~8 pcs)
-- [ ] Inline 5 A blade fuse holder + fuses
-- [ ] Filament for 3D-printed brackets (PETG or ABS, ~50 g total)
-- [ ] Hookup wire (silicone, 18-22 AWG) for motor + endstop runs
+- [ ] Inline 5 A blade fuse holder + fuses (for the permanent install)
+- [ ] Filament for 3D-printed brackets + lead-screw rig (PETG or ABS, ~250 g total)
+- [ ] (optional) 8 mm smooth steel rod for carriage anti-rotation (~150 mm length, will source after rig CAD is finalised)
 
 ## Sanity-check on what was bought
 

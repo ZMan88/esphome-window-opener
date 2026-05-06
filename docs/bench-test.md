@@ -19,13 +19,15 @@ No window. No brackets. No lead screw yet. **Just a bare motor on the desk** mov
 - ESP32-C6 DevKitC-1 + USB-C cable
 - TMC2209 V1.3 (with stick-on heatsink)
 - LDO 42STH48-1684MAC stepper motor
-- **100 µF / ≥ 25 V electrolytic capacitor** ← non-negotiable, see `mechanical/README.md` "Why the cap"
-- 12 V / 5 A PSU
-- LM2596 buck (12 V → 5 V) — *or* power the ESP32 from USB during bench testing
+- **≥ 100 µF / ≥ 25 V electrolytic capacitor** — non-negotiable, see "Why the cap" below. 470 µF / 35 V is a fine upgrade.
+- 12 V supply: a configurable bench PSU (set 12.0 V, current limit 1 A for first power-on, raise to 3 A once moving cleanly) or a fixed 12 V / 5 A AC-DC brick.
+- ESP32 power: USB during bench testing — no need for the LM2596 buck yet.
 - Creality endstop microswitch (optional for steps 1-4, required for step 5)
 - 8-10 jumper wires (Dupont female-to-female / female-to-male)
 - A breadboard or just twisted/soldered wire splices
 - Multimeter (for setting Vref)
+
+> **Why the cap:** stepper coils are inductors. Every microstep, the TMC2209 switches coil current off; the inductor's stored energy creates a voltage spike on `VM`. Without a local cap to absorb those spikes, they exceed the IC's 28 V rating and silicon-erode the FETs until one shorts. ≥100 µF / ≥25 V electrolytic, mounted *within a few cm of the chip's VM/GND pins*, polarity-correct (white stripe to GND). The cap at the PSU end of the wires is *not* a substitute — wire inductance is what makes the cap-at-the-driver mandatory.
 
 ## Wiring — do this with everything powered off
 
