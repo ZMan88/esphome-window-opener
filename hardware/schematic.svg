@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 800" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="12">
+  <defs>
+    <marker id="dot" markerWidth="6" markerHeight="6" refX="3" refY="3">
+      <circle cx="3" cy="3" r="2.5" fill="#222"/>
+    </marker>
+  </defs>
+
+  <!-- background and title -->
+  <rect width="1100" height="800" fill="#fafafa"/>
+  <text x="550" y="30" text-anchor="middle" font-size="20" font-weight="700" fill="#111">
+    Window Opener — wiring schematic
+  </text>
+  <text x="550" y="50" text-anchor="middle" font-size="12" fill="#666" font-style="italic">
+    ESP32-C6 + TMC2209 + LDO NEMA17 + LM2596 + 12 V supply
+  </text>
+
+  <!-- legend -->
+  <g transform="translate(820, 70)">
+    <rect x="0" y="0" width="260" height="120" fill="#fff" stroke="#ccc" rx="3"/>
+    <text x="10" y="18" font-weight="700">Wire colour key</text>
+    <line x1="10" y1="34" x2="50" y2="34" stroke="#c0392b" stroke-width="3"/>
+    <text x="56" y="38">+12 V (PSU)</text>
+    <line x1="10" y1="52" x2="50" y2="52" stroke="#e67e22" stroke-width="3"/>
+    <text x="56" y="56">+5 V (buck out)</text>
+    <line x1="10" y1="70" x2="50" y2="70" stroke="#2980b9" stroke-width="3"/>
+    <text x="56" y="74">+3.3 V (ESP32)</text>
+    <line x1="10" y1="88" x2="50" y2="88" stroke="#222" stroke-width="3"/>
+    <text x="56" y="92">GND (common)</text>
+    <line x1="10" y1="106" x2="50" y2="106" stroke="#7f8c8d" stroke-width="2.5"/>
+    <text x="56" y="110">logic / signal</text>
+  </g>
+
+  <!-- =========== POWER INPUT (top-left) =========== -->
+  <g>
+    <!-- 12 V PSU label -->
+    <rect x="40" y="80" width="120" height="60" rx="4" fill="#fff" stroke="#222" stroke-width="1.5"/>
+    <text x="100" y="100" text-anchor="middle" font-weight="700">12 V PSU</text>
+    <text x="100" y="115" text-anchor="middle" font-size="10" fill="#666">5 A min</text>
+    <text x="60" y="135" font-size="10" fill="#c0392b">+</text>
+    <text x="135" y="135" font-size="10" fill="#222">−</text>
+
+    <!-- + leg -->
+    <line x1="65" y1="140" x2="65" y2="180" stroke="#c0392b" stroke-width="3"/>
+    <!-- fuse -->
+    <rect x="50" y="180" width="30" height="18" fill="#fff" stroke="#222" stroke-width="1.2"/>
+    <text x="65" y="193" text-anchor="middle" font-size="10">5 A</text>
+    <line x1="65" y1="198" x2="65" y2="240" stroke="#c0392b" stroke-width="3"/>
+    <!-- horizontal red bus to TMC2209 / LM2596 -->
+    <line x1="65" y1="240" x2="540" y2="240" stroke="#c0392b" stroke-width="3"/>
+    <text x="100" y="232" font-size="10" fill="#c0392b">+12 V (after fuse)</text>
+
+    <!-- − leg (GND) -->
+    <line x1="135" y1="140" x2="135" y2="710" stroke="#222" stroke-width="3"/>
+    <!-- horizontal GND bus -->
+    <line x1="135" y1="710" x2="980" y2="710" stroke="#222" stroke-width="3"/>
+    <text x="200" y="704" font-size="10" fill="#222">GND bus</text>
+  </g>
+
+  <!-- =========== LM2596 BUCK (left) =========== -->
+  <g>
+    <rect x="190" y="280" width="200" height="120" rx="4" fill="#fff" stroke="#222" stroke-width="1.5"/>
+    <text x="290" y="302" text-anchor="middle" font-weight="700">LM2596 buck</text>
+    <text x="290" y="318" text-anchor="middle" font-size="10" fill="#666">12 V → 5 V (set with pot)</text>
+
+    <!-- pins -->
+    <text x="200" y="345" font-size="10">IN+</text>
+    <text x="200" y="365" font-size="10">IN−</text>
+    <text x="350" y="345" font-size="10" text-anchor="end">OUT+</text>
+    <text x="350" y="365" font-size="10" text-anchor="end">OUT−</text>
+
+    <!-- IN+: tap from +12V bus -->
+    <line x1="240" y1="240" x2="240" y2="345" stroke="#c0392b" stroke-width="3"/>
+    <circle cx="240" cy="240" r="3" fill="#c0392b"/>
+    <line x1="240" y1="345" x2="200" y2="345" stroke="#c0392b" stroke-width="3"/>
+
+    <!-- IN−: down to GND bus -->
+    <line x1="200" y1="365" x2="180" y2="365" stroke="#222" stroke-width="3"/>
+    <line x1="180" y1="365" x2="180" y2="710" stroke="#222" stroke-width="3"/>
+    <circle cx="180" cy="710" r="3" fill="#222"/>
+
+    <!-- OUT+ (5V) goes right to ESP32 -->
+    <line x1="350" y1="345" x2="430" y2="345" stroke="#e67e22" stroke-width="3"/>
+    <text x="395" y="338" font-size="10" fill="#e67e22">+5 V</text>
+
+    <!-- OUT− to GND bus -->
+    <line x1="350" y1="365" x2="370" y2="365" stroke="#222" stroke-width="3"/>
+    <line x1="370" y1="365" x2="370" y2="710" stroke="#222" stroke-width="3"/>
+    <circle cx="370" cy="710" r="3" fill="#222"/>
+  </g>
+
+  <!-- =========== ESP32-C6 (centre) =========== -->
+  <g>
+    <rect x="430" y="270" width="220" height="220" rx="4" fill="#fff" stroke="#2a7a4a" stroke-width="2"/>
+    <text x="540" y="293" text-anchor="middle" font-weight="700" fill="#2a7a4a">ESP32-C6 DevKitC-1</text>
+    <text x="540" y="308" text-anchor="middle" font-size="10" fill="#264">(USB-C for first flash, then OTA)</text>
+
+    <!-- left side pins -->
+    <text x="440" y="345" font-size="11">5V</text>
+    <text x="440" y="370" font-size="11">GND</text>
+    <text x="440" y="395" font-size="11">3V3</text>
+
+    <!-- right side pins -->
+    <text x="640" y="345" font-size="11" text-anchor="end">GPIO4</text>
+    <text x="640" y="370" font-size="11" text-anchor="end">GPIO5</text>
+    <text x="640" y="395" font-size="11" text-anchor="end">GPIO6</text>
+    <text x="640" y="420" font-size="11" text-anchor="end">GPIO7</text>
+    <text x="640" y="445" font-size="11" text-anchor="end">GND</text>
+
+    <!-- 5V from buck -->
+    <line x1="430" y1="345" x2="395" y2="345" stroke="#e67e22" stroke-width="3"/>
+    <!-- GND to bus -->
+    <line x1="430" y1="370" x2="410" y2="370" stroke="#222" stroke-width="3"/>
+    <line x1="410" y1="370" x2="410" y2="710" stroke="#222" stroke-width="3"/>
+    <circle cx="410" cy="710" r="3" fill="#222"/>
+    <!-- ESP32 GND (second pin) - just label -->
+    <line x1="650" y1="445" x2="660" y2="445" stroke="#222" stroke-width="3"/>
+    <line x1="660" y1="445" x2="660" y2="710" stroke="#222" stroke-width="3"/>
+    <circle cx="660" cy="710" r="3" fill="#222"/>
+  </g>
+
+  <!-- =========== 470 µF CAP =========== -->
+  <g>
+    <rect x="690" y="200" width="80" height="40" rx="3" fill="#fff8e6" stroke="#c99b2b"/>
+    <text x="730" y="220" text-anchor="middle" font-size="11" font-weight="700">470 µF</text>
+    <text x="730" y="234" text-anchor="middle" font-size="10">35 V</text>
+    <!-- Cap goes between +12V and GND right next to TMC2209 VM/GND -->
+    <line x1="700" y1="240" x2="700" y2="200" stroke="#c0392b" stroke-width="3"/>
+    <line x1="700" y1="240" x2="540" y2="240" stroke="#c0392b" stroke-width="0"/>
+    <circle cx="700" cy="240" r="3" fill="#c0392b"/>
+    <line x1="760" y1="200" x2="760" y2="240" stroke="#222" stroke-width="3"/>
+    <line x1="760" y1="240" x2="760" y2="710" stroke="#222" stroke-width="3"/>
+    <circle cx="760" cy="710" r="3" fill="#222"/>
+    <text x="660" y="195" font-size="9" fill="#744" font-style="italic">close to TMC2209 VM/GND</text>
+  </g>
+
+  <!-- =========== TMC2209 (right) =========== -->
+  <g>
+    <rect x="690" y="270" width="200" height="220" rx="4" fill="#fff" stroke="#222" stroke-width="2"/>
+    <text x="790" y="293" text-anchor="middle" font-weight="700">TMC2209 V1.3</text>
+    <text x="790" y="308" text-anchor="middle" font-size="10" fill="#666">STEP/DIR · 1/16 microsteps</text>
+
+    <!-- left side: VM, GND (top); STEP, DIR, EN, VIO, GND (logic) -->
+    <text x="700" y="345" font-size="11">VM</text>
+    <text x="700" y="370" font-size="11">GND</text>
+    <text x="700" y="395" font-size="11">STEP</text>
+    <text x="700" y="420" font-size="11">DIR</text>
+    <text x="700" y="445" font-size="11">EN</text>
+    <text x="700" y="470" font-size="11">VIO</text>
+    <text x="700" y="490" font-size="11">GND</text>
+
+    <!-- right side: motor coils -->
+    <text x="880" y="345" font-size="11" text-anchor="end">A1</text>
+    <text x="880" y="370" font-size="11" text-anchor="end">A2</text>
+    <text x="880" y="395" font-size="11" text-anchor="end">B1</text>
+    <text x="880" y="420" font-size="11" text-anchor="end">B2</text>
+
+    <!-- VM gets +12V from bus (after fuse) -->
+    <line x1="690" y1="345" x2="675" y2="345" stroke="#c0392b" stroke-width="3"/>
+    <line x1="675" y1="345" x2="675" y2="240" stroke="#c0392b" stroke-width="3"/>
+    <circle cx="675" cy="240" r="3" fill="#c0392b"/>
+
+    <!-- GND -->
+    <line x1="690" y1="370" x2="680" y2="370" stroke="#222" stroke-width="3"/>
+    <line x1="680" y1="370" x2="680" y2="710" stroke="#222" stroke-width="3"/>
+    <circle cx="680" cy="710" r="3" fill="#222"/>
+
+    <!-- STEP from GPIO4 -->
+    <line x1="650" y1="345" x2="690" y2="395" stroke="#7f8c8d" stroke-width="2.5"/>
+    <text x="668" y="365" font-size="9" fill="#555">STEP</text>
+
+    <!-- DIR from GPIO5 -->
+    <line x1="650" y1="370" x2="690" y2="420" stroke="#7f8c8d" stroke-width="2.5"/>
+    <text x="668" y="390" font-size="9" fill="#555">DIR</text>
+
+    <!-- EN from GPIO6 -->
+    <line x1="650" y1="395" x2="690" y2="445" stroke="#7f8c8d" stroke-width="2.5"/>
+    <text x="668" y="418" font-size="9" fill="#555">EN</text>
+
+    <!-- VIO from 3V3 -->
+    <line x1="430" y1="395" x2="420" y2="395" stroke="#2980b9" stroke-width="2.5"/>
+    <line x1="420" y1="395" x2="420" y2="470" stroke="#2980b9" stroke-width="2.5"/>
+    <line x1="420" y1="470" x2="690" y2="470" stroke="#2980b9" stroke-width="2.5"/>
+    <text x="500" y="464" font-size="10" fill="#2980b9">+3.3 V</text>
+
+    <!-- second GND from TMC2209 -->
+    <line x1="690" y1="490" x2="685" y2="490" stroke="#222" stroke-width="3"/>
+    <line x1="685" y1="490" x2="685" y2="710" stroke="#222" stroke-width="3"/>
+    <circle cx="685" cy="710" r="3" fill="#222"/>
+  </g>
+
+  <!-- =========== MOTOR (right) =========== -->
+  <g>
+    <rect x="940" y="280" width="120" height="160" rx="4" fill="#fff" stroke="#222" stroke-width="1.5"/>
+    <text x="1000" y="305" text-anchor="middle" font-weight="700">LDO NEMA17</text>
+    <text x="1000" y="320" text-anchor="middle" font-size="10" fill="#666">42STH48-1684MAC</text>
+
+    <text x="950" y="345" font-size="11">A1</text>
+    <text x="950" y="370" font-size="11">A2</text>
+    <text x="950" y="395" font-size="11">B1</text>
+    <text x="950" y="420" font-size="11">B2</text>
+
+    <!-- A1 / A2 are a coil pair, B1 / B2 are a coil pair -->
+    <line x1="890" y1="345" x2="940" y2="345" stroke="#8e44ad" stroke-width="2.5"/>
+    <line x1="890" y1="370" x2="940" y2="370" stroke="#8e44ad" stroke-width="2.5"/>
+    <line x1="890" y1="395" x2="940" y2="395" stroke="#8e44ad" stroke-width="2.5"/>
+    <line x1="890" y1="420" x2="940" y2="420" stroke="#8e44ad" stroke-width="2.5"/>
+
+    <text x="900" y="338" font-size="9" fill="#555">coil A</text>
+    <text x="900" y="388" font-size="9" fill="#555">coil B</text>
+  </g>
+
+  <!-- =========== ENDSTOP (bottom) =========== -->
+  <g>
+    <rect x="430" y="560" width="220" height="80" rx="4" fill="#fff" stroke="#222" stroke-width="1.5"/>
+    <text x="540" y="582" text-anchor="middle" font-weight="700">Endstop</text>
+    <text x="540" y="598" text-anchor="middle" font-size="10" fill="#666">Creality NO microswitch</text>
+
+    <text x="445" y="625" font-size="11">COM</text>
+    <text x="635" y="625" font-size="11" text-anchor="end">NO</text>
+
+    <!-- COM to ESP32 GPIO7 -->
+    <line x1="445" y1="620" x2="445" y2="510" stroke="#7f8c8d" stroke-width="2.5"/>
+    <line x1="445" y1="510" x2="650" y2="510" stroke="#7f8c8d" stroke-width="2.5"/>
+    <line x1="650" y1="510" x2="650" y2="420" stroke="#7f8c8d" stroke-width="2.5"/>
+    <text x="500" y="504" font-size="9" fill="#555">to GPIO7 (COM)</text>
+
+    <!-- NO to GND -->
+    <line x1="635" y1="620" x2="635" y2="710" stroke="#222" stroke-width="3"/>
+    <circle cx="635" cy="710" r="3" fill="#222"/>
+    <text x="600" y="640" font-size="9" fill="#555">to GND (NO)</text>
+  </g>
+
+  <!-- footer notes -->
+  <g transform="translate(40, 740)">
+    <text font-size="11" fill="#444" font-weight="700">Notes:</text>
+    <text x="0" y="18" font-size="11" fill="#444">1. The 470 µF cap MUST sit physically next to the TMC2209's VM and GND pins (within a few cm). PSU-end caps are not a substitute — wire inductance is what kills the driver.</text>
+    <text x="0" y="35" font-size="11" fill="#444">2. Set the LM2596's output to 5.0 V before connecting the ESP32 (turn the pot, measure with a multimeter, then connect).</text>
+    <text x="0" y="52" font-size="11" fill="#444">3. Set the TMC2209's Vref to ~1.0 V before commanding motion. See docs/bench-test.md.</text>
+  </g>
+</svg>
