@@ -78,18 +78,32 @@ In tilt mode the moving end traces a short arc around the bottom edge. In turn m
 
 ## CAD files
 
-- `cad/common.scad` — shared parameters.
-- `cad/sash-bracket.scad` — moving-end bracket, 120 mm from the hinge on the sash top rail.
-- `cad/frame-bracket.scad` — fixed-end bracket, top-middle of the frame.
+- `cad/common.scad` — shared parameters (window dims, KP08 / Prusa-nut / NEMA17 dimensions).
+- `cad/sash-bracket.scad` — moving-end window bracket, 120 mm from the hinge on the sash top rail.
+- `cad/frame-bracket.scad` — fixed-end window bracket, top-middle of the frame.
+- `cad/rig-motor-mount.scad` — lead-screw rig: motor + KP08 #1 + frame-side rod-end mount.
+- `cad/rig-far-bearing.scad` — lead-screw rig: KP08 #2 holder at the far end.
+- `cad/rig-carriage.scad` — lead-screw rig: Prusa-nut + LH rod-end carriage that slides on the screw.
 - `cad/README.md` — install / render / print instructions.
-- `stl/sash-bracket.stl`, `stl/frame-bracket.stl` — exported printable STLs.
-- `stl/sash-bracket.png`, `stl/frame-bracket.png` — quick preview renders.
+- `stl/*.stl` and `stl/*.png` — exported printable STLs and preview renders.
+
+### Window-side brackets
 
 | Bracket | Preview |
 |---|---|
 | Sash bracket (flat plate, 4 corner M4 + central M6 + back-face hex pocket) | ![sash bracket](stl/sash-bracket.png) |
 | Frame bracket (plate + arm + ceiling-jam tab) | ![frame bracket](stl/frame-bracket.png) |
 
-Re-render after any `.scad` change — see `cad/README.md`.
+### Lead-screw rig (the "DIY linear actuator" between the two brackets)
+
+| Part | Preview |
+|---|---|
+| Motor mount + KP08 #1 holder + rod-end tab | ![motor mount](stl/rig-motor-mount.png) |
+| Far-end bearing block | ![far bearing](stl/rig-far-bearing.png) |
+| Carriage (holds Prusa nut + LH rod-end) | ![carriage](stl/rig-carriage.png) |
+
+The rig is a self-contained linear-actuator equivalent: NEMA17 at one end drives the lead screw through KP08 #1, the screw extends to KP08 #2 at the far end, and the carriage rides along the screw via the Prusa nut. An 8 mm smooth steel rod runs parallel to the screw at a 30 mm offset to prevent the carriage from rotating with the screw — the carriage has a clearance hole through it for that rod. The motor-end of the rig has a rod-end tab that mounts to the frame bracket, and the carriage has its own rod-end mount on the bottom that connects to the sash bracket.
+
+**Critical: rig CAD uses placeholder dimensions for the KP08 and Prusa nut at the top of `cad/common.scad`.** Verify with calipers before printing — those parts vary between manufacturers. Re-render after any `.scad` change.
 
 Enclosure (`cad/esp32-enclosure.scad`) is not yet modelled — comes after the electronics bring-up in Phase 1.
