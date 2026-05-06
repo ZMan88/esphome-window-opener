@@ -20,21 +20,21 @@ substitutions:
 stepper:
   - platform: a4988
     id: window_stepper
-    step_pin: GPIO4
-    dir_pin: GPIO5
+    step_pin: GPIO2   # XIAO D2
+    dir_pin:  GPIO1   # XIAO D1
     max_speed: 2000 steps/s
     acceleration: 1000 steps/s^2
     deceleration: 1000 steps/s^2
     sleep_pin:
-      number: GPIO6
+      number: GPIO21  # XIAO D3 (TMC2209 EN, active-low)
       inverted: true
 
 binary_sensor:
-  # Normally-open endstop on the closed side, wired between GPIO7 and GND.
+  # Normally-open endstop on the closed side. Wire between XIAO D8 (GPIO19) and GND.
   - platform: gpio
     id: endstop_closed
     pin:
-      number: GPIO7
+      number: GPIO19  # XIAO D8
       mode: INPUT_PULLUP
       inverted: true
     on_press:

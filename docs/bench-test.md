@@ -16,7 +16,7 @@ No window. No brackets. No lead screw yet. **Just a bare motor on the desk** mov
 
 ## Parts you need on the bench
 
-- ESP32-C6 DevKitC-1 + USB-C cable
+- Seeed Studio XIAO ESP32-C6 + USB-C cable
 - TMC2209 V1.3 (with stick-on heatsink)
 - LDO 42STH48-1684MAC stepper motor
 - **≥ 100 µF / ≥ 25 V electrolytic capacitor** — non-negotiable, see "Why the cap" below. 470 µF / 35 V is a fine upgrade.
@@ -35,15 +35,15 @@ No window. No brackets. No lead screw yet. **Just a bare motor on the desk** mov
 
 Solder a **100 µF / ≥ 25 V electrolytic** directly across the TMC2209's `VM` and `GND` pins on the underside of the module, with the leads as short as you can manage. Mind the polarity — the white stripe is the negative side, goes to GND. *Do not skip this step. Do not power up without it.*
 
-### 2. Logic side: ESP32-C6 → TMC2209
+### 2. Logic side: XIAO ESP32-C6 → TMC2209
 
-| ESP32-C6 pin | → | TMC2209 pin |
-|---|:-:|---|
-| GPIO4 | → | STEP |
-| GPIO5 | → | DIR |
-| GPIO6 | → | EN |
-| 3V3 | → | VIO |
-| GND | → | GND |
+| XIAO label | GPIO | → | TMC2209 pin |
+|---|---|:-:|---|
+| D2 | GPIO2 | → | STEP |
+| D1 | GPIO1 | → | DIR |
+| D3 | GPIO21 | → | EN |
+| 3V3 | — | → | VIO |
+| GND | — | → | GND |
 
 Five wires. The TMC2209 has eight other pins on the logic side (DIAG, INDEX, MS1, MS2, etc.) — leave them disconnected for v1; the defaults are fine (1/16 microstepping, STEP/DIR mode, no UART tuning).
 
@@ -71,12 +71,12 @@ If you're using the LM2596 buck for the ESP32 instead of USB power, also tap the
 
 ### 5. Endstop (only needed for step 5 of success criteria)
 
-| ESP32-C6 pin | → | Endstop |
-|---|:-:|---|
-| GPIO7 | → | Switch common (`COM`) |
-| GND | → | Normally-open contact (`NO`) |
+| XIAO label | GPIO | → | Endstop |
+|---|---|:-:|---|
+| D8 | GPIO19 | → | Switch common (`COM`) |
+| GND | — | → | Normally-open contact (`NO`) |
 
-The firmware uses `INPUT_PULLUP` with `inverted: true`, so closing the switch pulls GPIO7 to ground and the firmware reads it as "triggered → reset position to 0".
+The firmware uses `INPUT_PULLUP` with `inverted: true`, so closing the switch pulls GPIO19 to ground and the firmware reads it as "triggered → reset position to 0".
 
 ## Set Vref before commanding motion
 
@@ -120,7 +120,7 @@ If all four pass, Phase 1 is done.
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | Motor vibrates / hums but doesn't rotate | Coil pairs miswired (mixed across coils) | Swap any two adjacent motor wires — try `A2 ↔ B1`. |
-| Motor moves only one direction | DIR signal stuck or unwired | Re-seat GPIO5 wire; multimeter the signal during a `cover.close_cover` action. |
+| Motor moves only one direction | DIR signal stuck or unwired | Re-seat the D1 (GPIO1) wire; multimeter the signal during a `cover.close_cover` action. |
 | Motor stalls under modest load | Current limit too low | Raise Vref by 0.05 V at a time, retest. |
 | TMC2209 visibly hot (>70 °C at idle) | Current limit too high, or no heatsink, or no airflow | Lower Vref, attach the stick-on heatsink. |
 | HA shows the device offline | Wi-Fi creds, encryption key mismatch, or HA can't reach the subnet | Check ESPHome logs (`esphome logs firmware/window-opener.yaml`); verify `secrets.yaml`. |

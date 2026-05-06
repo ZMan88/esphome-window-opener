@@ -6,7 +6,7 @@ DIY opener for a European tilt-and-turn window, ESP32 + ESPHome + Home Assistant
 
 ## Locked decisions
 
-- **MCU:** ESP32-C6 (DevKitC-1) — chosen for forward-compatibility with Matter / Thread later if desired
+- **MCU:** Seeed Studio XIAO ESP32-C6 — chosen for forward-compatibility with Matter / Thread later if desired, plus the smaller form factor
 - **HA integration:** ESPHome, one `cover` entity with position 0–100 (native API; Matter is a future option)
 - **Mounting:** fixed end at top-middle of frame, moving end on top edge of sash 120 mm from hinge, ball-joint rod ends at both ends
 - **Actuator:** **stepper + lead screw** (Variant B) — committed late April 2026; parts ordered, see `docs/build-log.md`
@@ -34,6 +34,7 @@ Append entries as decisions get made. Format: `YYYY-MM-DD — decision — reaso
 - 2026-04-24 — Accept mode-asymmetry in firmware v1: `cover` reports raw stroke %, not per-mode %. Tilt full = ~26%, turn full = ~78%. HA handles mode semantics. A handle-position sensor could remap per mode later — not in v1.
 - 2026-04-29 — Variant B (stepper + Tr8x8 lead screw) committed. Parts ordered (LDO 0.9° NEMA17, BIGTREETECH TMC2209 V1.3 ×2, KP08 ×2, Tr8x8 nuts ×3, lead screw 400 mm, 5→8 couplers, M6 rod-ends, LM2596). See `docs/build-log.md`.
 - 2026-04-29 — **MCU swapped to ESP32-C6** (already in user's drawer). Kept ESPHome with native API for v1; the C6 keeps Matter/Thread on the table for a future migration. Required: framework switch from `arduino` to `esp-idf`, GPIO remap 25/26/27/34 → 4/5/6/7.
+- 2026-05-06 — Specific board confirmed: **Seeed Studio XIAO ESP32-C6** (smaller than the DevKitC-1, only 11 GPIOs broken out). GPIO remapped 4/5/6/7 → 1/2/21/19, exposed as XIAO labels D1/D2/D3/D8. Pin assignment: D1=DIR, D2=STEP, D3=EN, D8=endstop.
 
 ## Open questions
 

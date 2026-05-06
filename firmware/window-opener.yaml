@@ -15,10 +15,15 @@ esphome:
   friendly_name: ${device_friendly}
 
 esp32:
-  board: esp32-c6-devkitc-1
+  board: seeed_xiao_esp32c6
   variant: esp32c6
   framework:
     type: esp-idf
+  # If your ESPHome version does not yet recognise the XIAO board name,
+  # fall back to:
+  #   board: esp32-c6-devkitc-1
+  # The GPIO numbers below match the XIAO breakout — they're correct on
+  # any ESP32-C6 board, only the silkscreen labels (D1/D2/D3/D8) differ.
 
 packages:
   base: !include common/base.yaml

@@ -2,18 +2,19 @@
 
 NEMA17 stepper driven by a TMC2209 in STEP/DIR mode, controlled by an ESP32.
 
-## Pin map (ESP32-C6 DevKitC-1)
+## Pin map (Seeed Studio XIAO ESP32-C6)
 
-| ESP32-C6 GPIO | Goes to | Notes |
-|---|---|---|
-| GPIO4 | TMC2209 `STEP` | |
-| GPIO5 | TMC2209 `DIR` | |
-| GPIO6 | TMC2209 `EN` | Active-low; firmware inverts |
-| GPIO7 | Endstop switch | Other side of switch to GND; firmware uses internal pull-up |
-| 3V3 | TMC2209 `VIO` | Logic supply |
-| GND | TMC2209 `GND` | Common ground |
+| XIAO label | GPIO | Goes to | Notes |
+|---|---|---|---|
+| D1 | GPIO1 | TMC2209 `DIR` | |
+| D2 | GPIO2 | TMC2209 `STEP` | |
+| D3 | GPIO21 | TMC2209 `EN` | Active-low; firmware inverts |
+| D8 | GPIO19 | Endstop switch | Other side of switch to GND; firmware uses internal pull-up |
+| 3V3 | — | TMC2209 `VIO` | Logic supply |
+| GND | — | TMC2209 `GND` | Common ground |
+| 5V | — | LM2596 OUT+ | Power input from buck converter |
 
-**Avoid GPIOs 8, 9, 15** (strapping pins) and **GPIOs 12, 13** (USB-Serial-JTAG) on the C6. GPIOs 24-30 are typically reserved for SPI flash. The pins above (4-7) are all safe general-purpose I/O.
+The XIAO ESP32-C6 only breaks out 11 GPIOs (D0-D10), so most ESP32-C6 examples that use GPIO 4-7 won't apply directly. **Avoid D0 (GPIO0) for the endstop** — it's a strapping pin and a low at boot causes the chip to enter download mode. D1-D3 + D8 give clean breakouts on opposite sides of the small board.
 
 ## Power
 
@@ -57,9 +58,9 @@ If reversed, swap one coil pair (e.g. A1 ↔ A2) at the driver.
      +12V PSU− ──┴─────────────── TMC2209 GND┤             │
                                               └──── common GND
 
-    ESP32-C6 GPIO4 ── TMC2209 STEP        TMC2209 A1/A2 ── motor coil A
-    ESP32-C6 GPIO5 ── TMC2209 DIR         TMC2209 B1/B2 ── motor coil B
-    ESP32-C6 GPIO6 ── TMC2209 EN
-    ESP32-C6 3V3   ── TMC2209 VIO
-    ESP32-C6 GPIO7 ── endstop ── GND
+    XIAO D1  (GPIO1)  ── TMC2209 DIR     TMC2209 A1/A2 ── motor coil A
+    XIAO D2  (GPIO2)  ── TMC2209 STEP    TMC2209 B1/B2 ── motor coil B
+    XIAO D3  (GPIO21) ── TMC2209 EN
+    XIAO 3V3          ── TMC2209 VIO
+    XIAO D8  (GPIO19) ── endstop COM ── (NO) ── GND
 ```

@@ -52,7 +52,7 @@ Tracks parts ordered, prices paid, and assembly progress. The repo's `hardware/B
 
 | Part | Note |
 |---|---|
-| ESP32-C6 DevKitC-1 | User has spares from prior projects. Chosen over classic ESP32 to keep Matter/Thread on the table for the future. Firmware uses ESP-IDF framework + GPIO 4/5/6/7. |
+| Seeed Studio XIAO ESP32-C6 | User has spares from prior projects. Chosen over classic ESP32 to keep Matter/Thread on the table, and over the DevKitC-1 for the smaller form factor. Firmware uses ESP-IDF framework + GPIO 1/2/21/19 (XIAO labels D1=DIR, D2=STEP, D3=EN, D8=endstop). |
 | Configurable bench PSU | Used for Phase 1 bench testing instead of a fixed AC-DC brick. Set 12 V, 1 A limit for first power-on, 3 A limit for normal operation. A dedicated 12 V / 5 A AC-DC brick can wait until Phase 2 (window install). |
 | 470 µF / 35 V electrolytic cap | Used in place of the 100 µF / 25 V called out in the wiring docs. Higher capacitance + higher voltage rating = more headroom; common 3D-printer modding upgrade. ≥100 µF is the spec, more is better. |
 | Hookup wire | Mixed lengths / colours of 22 AWG silicone wire. Sufficient for bench + window runs. |

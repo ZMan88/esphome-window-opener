@@ -7,7 +7,7 @@ This page tells you in what order to put the perfboard together so you don't pai
 | Qty | Part | Notes |
 |---:|---|---|
 | 1 | Perfboard, 70 × 90 mm, 2.54 mm grid | Generic, available at any electronics shop. |
-| 1 | ESP32-C6 DevKitC-1 | Goes on female pin headers, removable. |
+| 1 | Seeed Studio XIAO ESP32-C6 | Castellated edges — solder direct or use 2× 1×7 female headers (recommended). |
 | 1 | TMC2209 V1.3 (with heatsink) | Goes on female pin headers, removable. |
 | 1 | LM2596 DC-DC buck module | Soldered direct or on female headers. |
 | 1 | 470 µF / 35 V electrolytic cap | Mind polarity. |
@@ -30,11 +30,11 @@ This page tells you in what order to put the perfboard together so you don't pai
 
 The rule: **solder the lowest-profile parts first**, then progressively taller. Otherwise the board won't sit flat against your work surface for soldering taller parts.
 
-### 1. Female pin headers for ESP32-C6 and TMC2209
+### 1. Female pin headers for XIAO ESP32-C6 and TMC2209
 
-These are the lowest profile after the bare board. Use **female** headers so the modules plug in/out — saves you from soldering a $7 module permanently and discovering it's a dud.
+These are the lowest profile after the bare board. Use **female** headers so the modules plug in/out — saves you from soldering a small module permanently and discovering it's a dud.
 
-- ESP32-C6: two rows of 1×15 (or 1×20 — count the pins on your board).
+- XIAO ESP32-C6: two rows of 1×7 — the XIAO has 7 pads on each long edge. (You can also direct-SMD-solder the XIAO via its castellated edges if you'd rather not use headers, but headers make life easier.)
 - TMC2209: two rows of 1×8.
 
 Solder one corner pin first, flip the board, check the header is flush and square against the board, then solder the rest. **Don't solder all pins at once on one side** — heat warps the plastic.
@@ -56,28 +56,28 @@ Solder it directly across the TMC2209's VM and GND pins, leads as short as possi
 
 ### 4. Logic-side jumpers (yellow / signal wires)
 
-Connect from the ESP32-C6's GPIOs to the TMC2209's logic pins:
+Connect from the XIAO ESP32-C6's GPIOs to the TMC2209's logic pins:
 
-| ESP32-C6 | TMC2209 |
-|---|---|
-| GPIO4 | STEP |
-| GPIO5 | DIR |
-| GPIO6 | EN |
-| 3V3 | VIO |
-| GND | GND |
+| XIAO label | GPIO | TMC2209 |
+|---|---|---|
+| D1 | GPIO1 | DIR |
+| D2 | GPIO2 | STEP |
+| D3 | GPIO21 | EN |
+| 3V3 | — | VIO |
+| GND | — | GND |
 
 And the endstop:
 
-| ESP32-C6 | Endstop |
-|---|---|
-| GPIO7 | COM |
-| GND | NO |
+| XIAO label | GPIO | Endstop |
+|---|---|---|
+| D8 | GPIO19 | COM |
+| GND | — | NO |
 
 These are low-current — any 22-26 AWG wire is fine.
 
-### 5. The 5 V jumper from LM2596 to ESP32
+### 5. The 5 V jumper from LM2596 to XIAO
 
-Orange wire, one stub: LM2596 OUT+ → ESP32 5 V. (LM2596 OUT− is already on the GND bus.)
+Orange wire, one stub: LM2596 OUT+ → XIAO 5V pin (top-left of the board, opposite the USB-C connector). LM2596 OUT− is already on the GND bus.
 
 > **Set the LM2596 to 5 V before this connection.** With nothing on OUT, hook a multimeter between OUT+ and OUT−, power up the 12 V side, and turn the brass screw on the LM2596's pot until you read 5.00 V. Power down, then make the connection.
 
@@ -89,7 +89,7 @@ Power input (2-pin), motor output (4-pin), endstop (2-pin) — soldered last bec
 
 Bench PSU at 12.0 V, current limit 1 A.
 
-1. Plug ESP32-C6 into its female headers.
+1. Plug the XIAO ESP32-C6 into its female headers.
 2. Plug TMC2209 into its female headers (no motor connected yet).
 3. Power up. Multimeter on the LM2596 OUT+ → should read 5.0 V.
 4. Touch the multimeter to the TMC2209's VREF test point and tweak its pot to **1.0 V**. (Skip if you already did this in `bench-test.md`.)
