@@ -10,9 +10,13 @@ NEMA17 stepper driven by a TMC2209 in STEP/DIR mode, controlled by an ESP32.
 | D2 | GPIO2 | TMC2209 `STEP` | |
 | D3 | GPIO21 | TMC2209 `EN` | Active-low; firmware inverts |
 | D8 | GPIO19 | Endstop switch | Other side of switch to GND; firmware uses internal pull-up |
+| **D6 (TX)** | GPIO16 | TMC2209 `RX` | UART (optional, enables current/load/temp readout in HA) |
+| **D7 (RX)** | GPIO17 | TMC2209 `TX` | UART, cross-connected with D6 |
 | 3V3 | — | TMC2209 `VIO` | Logic supply |
 | GND | — | TMC2209 `GND` | Common ground |
-| 5V | — | LM2596 OUT+ | Power input from buck converter |
+| 5V | — | Buck OUT+ (MP1584 / LM2596) | Power input from buck converter |
+
+The BTT V1.3 has **buffered TX/RX with no continuity between the pads**, so the UART connections are direct cross-wiring (XIAO TX → driver RX, XIAO RX → driver TX) with no series resistor needed. Verified by multimeter continuity test — if your specific board *does* show continuity, add a 1 kΩ resistor in series with the XIAO TX line to prevent contention.
 
 The XIAO ESP32-C6 only breaks out 11 GPIOs (D0-D10), so most ESP32-C6 examples that use GPIO 4-7 won't apply directly. **Avoid D0 (GPIO0) for the endstop** — it's a strapping pin and a low at boot causes the chip to enter download mode. D1-D3 + D8 give clean breakouts on opposite sides of the small board.
 
@@ -61,6 +65,8 @@ If reversed, swap one coil pair (e.g. A1 ↔ A2) at the driver.
     XIAO D1  (GPIO1)  ── TMC2209 DIR     TMC2209 A1/A2 ── motor coil A
     XIAO D2  (GPIO2)  ── TMC2209 STEP    TMC2209 B1/B2 ── motor coil B
     XIAO D3  (GPIO21) ── TMC2209 EN
+    XIAO D6  (GPIO16) ── TMC2209 RX      (UART, optional)
+    XIAO D7  (GPIO17) ── TMC2209 TX      (UART, optional)
     XIAO 3V3          ── TMC2209 VIO
     XIAO D8  (GPIO19) ── endstop COM ── (NO) ── GND
 ```

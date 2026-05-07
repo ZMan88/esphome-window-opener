@@ -46,4 +46,5 @@ Only one `variant:` line should be uncommented. Both variants expose the same HA
 - `common/base.yaml` — Wi-Fi, API, OTA, logger, uptime
 - `common/secrets.example.yaml` — template for `secrets.yaml`
 - `variants/linear-actuator.yaml` — BTS7960 + time-based cover
-- `variants/stepper.yaml` — TMC2209 + stepper + endstop + template cover
+- `variants/stepper.yaml` — TMC2209 + stepper + endstop + template cover (basic STEP/DIR, no UART)
+- `variants/stepper-uart.yaml` — TMC2209 over **UART**: software-set current, live current/load/temperature exposed to HA, optional StallGuard sensorless homing. Requires two extra wires (XIAO D6 → driver RX, XIAO D7 → driver TX) and the slimcdk community external component.

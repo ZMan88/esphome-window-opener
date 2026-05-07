@@ -16,7 +16,8 @@ DIY opener for a European tilt-and-turn window, ESP32 + ESPHome + Home Assistant
 ## Phases
 
 - [x] **Phase 0 — Scaffolding.** Repo structure, docs, base firmware YAML, BOM, wiring templates. (This PR.)
-- [ ] **Phase 1 — Bench prototype.** ESP32 + one driver + actuator on a bench jig. Home Assistant discovers `cover.window_opener`. % travel works against a dummy load, no window yet. **See `docs/bench-test.md` for the wiring + test procedure.**
+- [x] **Phase 1 — Bench prototype.** ESP32 + driver + actuator on a bench jig. Home Assistant discovers `cover.window_opener`. % travel works against a dummy load. ✅ Passed 2026-05-08 with `variants/stepper.yaml` (basic STEP/DIR).
+- [ ] **Phase 1.5 — UART upgrade (optional).** Add two wires to the driver, switch to `variants/stepper-uart.yaml`, verify current/load/temperature show up as HA sensors. Replaces the Vref pot with software current control.
 - [ ] **Phase 2 — Tilt on real window.** Print brackets, mount on the frame, tune stroke calibration for tilt. Stall detection dialed in.
 - [ ] **Phase 3 — Turn validation.** Verify the same mount drives turn mode without binding; measure max stroke actually used.
 - [ ] **Phase 4 — Polish.** Safety edge cases, HA automations, Lovelace card, enclosure, OTA workflow.
@@ -35,6 +36,7 @@ Append entries as decisions get made. Format: `YYYY-MM-DD — decision — reaso
 - 2026-04-29 — Variant B (stepper + Tr8x8 lead screw) committed. Parts ordered (LDO 0.9° NEMA17, BIGTREETECH TMC2209 V1.3 ×2, KP08 ×2, Tr8x8 nuts ×3, lead screw 400 mm, 5→8 couplers, M6 rod-ends, LM2596). See `docs/build-log.md`.
 - 2026-04-29 — **MCU swapped to ESP32-C6** (already in user's drawer). Kept ESPHome with native API for v1; the C6 keeps Matter/Thread on the table for a future migration. Required: framework switch from `arduino` to `esp-idf`, GPIO remap 25/26/27/34 → 4/5/6/7.
 - 2026-05-06 — Specific board confirmed: **Seeed Studio XIAO ESP32-C6** (smaller than the DevKitC-1, only 11 GPIOs broken out). GPIO remapped 4/5/6/7 → 1/2/21/19, exposed as XIAO labels D1/D2/D3/D8. Pin assignment: D1=DIR, D2=STEP, D3=EN, D8=endstop.
+- 2026-05-08 — Phase 1 bench-test passed (motor moves on command via HA). Added `variants/stepper-uart.yaml` for the UART-driven upgrade: motor current set in software, current/load/temperature surfaced as HA sensors, StallGuard available. The BTT V1.3 has buffered TX/RX (verified by multimeter — no continuity), so UART wires are direct cross-connection (XIAO D6 ↔ driver RX, XIAO D7 ↔ driver TX) with no series resistor needed.
 
 ## Open questions
 

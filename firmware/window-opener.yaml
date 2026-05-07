@@ -30,4 +30,5 @@ packages:
 
   # Active variant — keep exactly one of these uncommented.
   variant: !include variants/linear-actuator.yaml
-  # variant: !include variants/stepper.yaml
+  # variant: !include variants/stepper.yaml         # basic STEP/DIR (no UART, Vref pot sets current)
+  # variant: !include variants/stepper-uart.yaml    # UART-driven (current/load/temp in HA, software current)

@@ -30,6 +30,13 @@
     <text x="56" y="110">logic / signal</text>
   </g>
 
+  <!-- secondary legend for UART -->
+  <g transform="translate(820, 200)">
+    <rect x="0" y="0" width="260" height="40" fill="#fff" stroke="#ccc" rx="3"/>
+    <line x1="10" y1="20" x2="50" y2="20" stroke="#16a085" stroke-width="2.5"/>
+    <text x="56" y="24">UART (TMC2209 ↔ XIAO)</text>
+  </g>
+
   <!-- POWER INPUT -->
   <g>
     <rect x="40" y="80" width="120" height="60" rx="4" fill="#fff" stroke="#222" stroke-width="1.5"/>
@@ -172,6 +179,25 @@
     <line x1="690" y1="490" x2="685" y2="490" stroke="#222" stroke-width="3"/>
     <line x1="685" y1="490" x2="685" y2="710" stroke="#222" stroke-width="3"/>
     <circle cx="685" cy="710" r="3" fill="#222"/>
+
+    <!-- UART pins on TMC2209 (right side for clarity, on a logic-side break-out row) -->
+    <text x="700" y="515" font-size="11">RX</text>
+    <text x="700" y="535" font-size="11">TX</text>
+  </g>
+
+  <!-- UART connections: XIAO TX ↔ TMC2209 RX, XIAO RX ↔ TMC2209 TX -->
+  <g>
+    <!-- XIAO D6 (TX, GPIO16) → TMC2209 RX -->
+    <line x1="650" y1="450" x2="660" y2="450" stroke="#16a085" stroke-width="2.5"/>
+    <line x1="660" y1="450" x2="660" y2="515" stroke="#16a085" stroke-width="2.5"/>
+    <line x1="660" y1="515" x2="690" y2="515" stroke="#16a085" stroke-width="2.5"/>
+    <text x="657" y="500" font-size="9" fill="#16a085">D6 TX → RX</text>
+
+    <!-- XIAO D7 (RX, GPIO17) → TMC2209 TX -->
+    <line x1="650" y1="472" x2="667" y2="472" stroke="#16a085" stroke-width="2.5"/>
+    <line x1="667" y1="472" x2="667" y2="535" stroke="#16a085" stroke-width="2.5"/>
+    <line x1="667" y1="535" x2="690" y2="535" stroke="#16a085" stroke-width="2.5"/>
+    <text x="657" y="552" font-size="9" fill="#16a085">D7 RX → TX</text>
   </g>
 
   <!-- MOTOR -->

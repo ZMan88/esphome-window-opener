@@ -1,0 +1,128 @@
+# Variant: NEMA17 stepper driven by a TMC2209 in **UART mode**.
+#
+# Same physical wiring as variants/stepper.yaml plus two UART wires:
+#   XIAO D6 (GPIO16, TX) → driver RX
+#   XIAO D7 (GPIO17, RX) → driver TX
+# The BTT V1.3 has buffered TX/RX pads with no continuity between them,
+# so no series resistor is needed. (If your driver shows continuity
+# between TX and RX in a multimeter check, add a 1 kΩ resistor in
+# series with the XIAO TX line.)
+#
+# Benefits over the basic step/dir variant:
+#  - Motor current set in software (run_current / hold_current — no
+#    more Vref pot tuning).
+#  - Live diagnostics exposed to HA: motor current, load, temperature,
+#    stall flag, fault flags.
+#  - Optional: StallGuard sensorless homing replaces the physical
+#    endstop — uncomment the relevant block below.
+#
+# Uses the community ESPHome external component for TMC2209.
+# Pin map: hardware/wiring/stepper.md
+
+substitutions:
+  # Same as the basic stepper variant — see comment block there for the
+  # derivation (LDO at 0.9°/step × 1/16 microsteps × Tr8x8 = 800 µsteps/mm).
+  steps_full_stroke: "144000"
+
+# --- External component: tmc2209 UART platform ---
+external_components:
+  - source: github://slimcdk/esphome-component-tmc2209
+    components: [tmc2209, tmc2209_hub]
+    refresh: 1d
+
+# --- UART for driver communication ---
+uart:
+  - id: tmc_uart
+    tx_pin: GPIO16   # XIAO D6
+    rx_pin: GPIO17   # XIAO D7
+    baud_rate: 115200
+
+# --- TMC2209 hub: holds the driver-level config (current, microsteps, etc.) ---
+tmc2209_hub:
+  - id: window_driver
+    uart_id: tmc_uart
+    address: 0x00          # MS1=GND, MS2=GND on the BTT V1.3
+    rsense: 0.11            # BTT V1.3 sense resistor value
+    enn_pin:
+      number: GPIO21        # XIAO D3
+      inverted: true
+    diag_pin: GPIO19        # XIAO D8 — used for StallGuard (or leave for endstop)
+
+# --- Stepper platform driven via UART ---
+stepper:
+  - platform: tmc2209
+    id: window_stepper
+    hub_id: window_driver
+    step_pin: GPIO2         # XIAO D2
+    dir_pin: GPIO1          # XIAO D1
+    max_speed: 2000 steps/s
+    acceleration: 1000 steps/s^2
+    deceleration: 1000 steps/s^2
+    run_current: 800mA      # software-set motor current (per phase, RMS)
+    hold_current: 400mA     # halved when idle to reduce heat
+    microsteps: 16
+
+# --- Diagnostic sensors exposed to HA ---
+sensor:
+  - platform: tmc2209
+    hub_id: window_driver
+    motor_current:
+      name: "Window opener — motor current"
+      update_interval: 5s
+    motor_load:
+      name: "Window opener — motor load"
+      update_interval: 5s
+    driver_temperature:
+      name: "Window opener — driver temperature"
+      update_interval: 30s
+
+binary_sensor:
+  - platform: tmc2209
+    hub_id: window_driver
+    stalled:
+      name: "Window opener — stalled"
+    overheat:
+      name: "Window opener — overheat warning"
+
+  # Endstop kept for the closed-side homing — remove this block if
+  # you switch to StallGuard sensorless homing on the diag_pin above.
+  - platform: gpio
+    id: endstop_closed
+    pin:
+      number: GPIO19
+      mode: INPUT_PULLUP
+      inverted: true
+    on_press:
+      then:
+        - stepper.report_position:
+            id: window_stepper
+            position: 0
+        - stepper.set_target:
+            id: window_stepper
+            target: 0
+
+# --- Cover entity (identical contract as the step/dir variant) ---
+cover:
+  - platform: template
+    name: "Window"
+    id: window_cover
+    device_class: window
+    has_position: true
+    lambda: |-
+      return id(window_stepper).current_position / (float) ${steps_full_stroke};
+    open_action:
+      - stepper.set_target:
+          id: window_stepper
+          target: ${steps_full_stroke}
+    close_action:
+      - stepper.set_target:
+          id: window_stepper
+          target: 0
+    stop_action:
+      - stepper.set_target:
+          id: window_stepper
+          target: !lambda "return id(window_stepper).current_position;"
+    position_action:
+      - stepper.set_target:
+          id: window_stepper
+          target: !lambda "return (int)(pos * ${steps_full_stroke});"

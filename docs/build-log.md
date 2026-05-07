@@ -114,7 +114,8 @@ These come after the user has the parts in hand and can measure the actual nut a
 ## Assembly progress
 
 - [x] Phase 0 — Repo scaffolded
-- [ ] Phase 1 — Bench prototype (electronics + motor on the desk)
+- [x] **Phase 1 — Bench prototype passed 2026-05-08** (XIAO + TMC2209 + LDO motor on the desk; HA discovered `cover.window_opener`; open/close/% all working).
+- [ ] Phase 1.5 — UART upgrade: 2 wires + switch to `firmware/variants/stepper-uart.yaml` for current/load/temperature in HA.
 - [ ] Phase 2 — Mechanical assembly (lead-screw rig, dry-fit on window)
 - [ ] Phase 3 — Tuning + HA integration on real window
 - [ ] Phase 4 — Polish (enclosure, automations, CAD STLs released)
