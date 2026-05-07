@@ -33,7 +33,8 @@ Tracks parts ordered, prices paid, and assembly progress. The repo's `hardware/B
 
 | Part | Vendor | Price (RON) | Status |
 |---|---|---:|---|
-| LM2596 DC-DC step-down regulator × 4 (3 spare) | TBD | 37.48 | ✅ |
+| LM2596 DC-DC step-down regulator × 4 (kept as spares — MP1584 mini chosen for the build) | TBD | 37.48 | ✅ |
+| MP1584-style mini buck (~22 × 14 mm, 12 V → 5 V) | drawer | — | ✅ |
 
 ### Spares / parts ordered but not used in this build
 

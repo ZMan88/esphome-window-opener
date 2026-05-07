@@ -14,7 +14,7 @@ Headroom matters more than efficiency — the 12V rail also feeds the ESP32 buck
 - **5 A inline blade fuse** on the 12V+ lead out of the PSU, close to the PSU (not close to the driver). Motor fault or stuck carriage should pop the fuse, not melt wires.
 - **TVS diode (1.5KE18CA or similar)** across the actuator motor leads to snub inductive flyback. Linear actuator variant only — TMC2209 handles its own flyback.
 - **100 µF electrolytic cap** across `VM`/`GND` at the TMC2209. Stepper variant only — *required*, not optional.
-- The ESP32 buck converter is fed from the same 12V rail, after the fuse. If the fuse blows, the ESP32 loses power too — this is intentional so HA flags the outage.
+- The XIAO buck converter (MP1584 mini, or LM2596 if you prefer the bigger module) is fed from the same 12V rail, after the fuse. If the fuse blows, the XIAO loses power too — this is intentional so HA flags the outage.
 
 ## Grounding
 

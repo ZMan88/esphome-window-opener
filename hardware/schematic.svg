@@ -50,11 +50,11 @@
     <text x="200" y="704" font-size="10" fill="#222">GND bus</text>
   </g>
 
-  <!-- LM2596 BUCK -->
+  <!-- DC-DC BUCK (MP1584 or LM2596 — wiring identical) -->
   <g>
     <rect x="190" y="280" width="200" height="120" rx="4" fill="#fff" stroke="#222" stroke-width="1.5"/>
-    <text x="290" y="302" text-anchor="middle" font-weight="700">LM2596 buck</text>
-    <text x="290" y="318" text-anchor="middle" font-size="10" fill="#666">12 V → 5 V (set with pot)</text>
+    <text x="290" y="302" text-anchor="middle" font-weight="700">DC-DC buck (MP1584)</text>
+    <text x="290" y="318" text-anchor="middle" font-size="10" fill="#666">12 V → 5 V — verify with multimeter</text>
 
     <text x="200" y="345" font-size="10">IN+</text>
     <text x="200" y="365" font-size="10">IN−</text>

@@ -21,7 +21,7 @@ No window. No brackets. No lead screw yet. **Just a bare motor on the desk** mov
 - LDO 42STH48-1684MAC stepper motor
 - **≥ 100 µF / ≥ 25 V electrolytic capacitor** — non-negotiable, see "Why the cap" below. 470 µF / 35 V is a fine upgrade.
 - 12 V supply: a configurable bench PSU (set 12.0 V, current limit 1 A for first power-on, raise to 3 A once moving cleanly) or a fixed 12 V / 5 A AC-DC brick.
-- ESP32 power: USB during bench testing — no need for the LM2596 buck yet.
+- XIAO power: USB during bench testing — no need for the buck (MP1584 / LM2596) yet.
 - Creality endstop microswitch (optional for steps 1-4, required for step 5)
 - 8-10 jumper wires (Dupont female-to-female / female-to-male)
 - A breadboard or just twisted/soldered wire splices
@@ -67,7 +67,7 @@ If you don't know which two motor wires form a pair, **measure with a multimeter
 | `+12 V` | (via 3 A inline fuse) | `VM` |
 | `GND` | → | `GND` (same as logic GND — single star point) |
 
-If you're using the LM2596 buck for the ESP32 instead of USB power, also tap the 12 V into the buck IN+/IN- and run the buck OUT+/OUT- to the ESP32's 5V/GND pins.
+If you're using the buck (MP1584 mini or LM2596) for the XIAO instead of USB power, also tap the 12 V into the buck VIN/GND and run the buck VOUT/GND to the XIAO's 5V/GND pins.
 
 ### 5. Endstop (only needed for step 5 of success criteria)
 

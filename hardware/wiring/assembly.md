@@ -9,7 +9,7 @@ This page tells you in what order to put the perfboard together so you don't pai
 | 1 | Perfboard, 70 × 90 mm, 2.54 mm grid | Generic, available at any electronics shop. |
 | 1 | Seeed Studio XIAO ESP32-C6 | Castellated edges — solder direct or use 2× 1×7 female headers (recommended). |
 | 1 | TMC2209 V1.3 (with heatsink) | Goes on female pin headers, removable. |
-| 1 | LM2596 DC-DC buck module | Soldered direct or on female headers. |
+| 1 | DC-DC buck module (MP1584 mini *or* LM2596) | The MP1584-style mini board takes ~14 × 22 mm; LM2596 is bigger but works the same. Soldered direct (mini board) or on female headers (LM2596). |
 | 1 | 470 µF / 35 V electrolytic cap | Mind polarity. |
 | 1 | Inline 5 A blade fuse holder + fuse | Or panel-mount fuse holder. |
 | 2 | 2-pin screw terminal (5.08 mm pitch) | 12 V input + endstop. |
@@ -43,8 +43,8 @@ Solder one corner pin first, flip the board, check the header is flush and squar
 
 Lay down the +12 V and GND buses now while the board is still mostly flat. Use **solid 22 AWG** so you can route along the back side of the board cleanly.
 
-- Red wire from the 12 V input terminal → through the fuse → to a node where the LM2596 IN+ and the TMC2209 VM both tap in.
-- Black wire (GND) bus from the input terminal across the bottom edge of the board, with stubs going up to: LM2596 IN−, LM2596 OUT−, TMC2209 GND (×2), ESP32 GND (×2), 470 µF cap minus, endstop NO.
+- Red wire from the 12 V input terminal → through the fuse → to a node where the buck (MP1584/LM2596) IN+ and the TMC2209 VM both tap in.
+- Black wire (GND) bus from the input terminal across the bottom edge of the board, with stubs going up to: buck (MP1584/LM2596) IN−, buck (MP1584/LM2596) OUT−, TMC2209 GND (×2), ESP32 GND (×2), 470 µF cap minus, endstop NO.
 
 **Star ground**: every GND wire converges on one point. Don't daisy-chain — stub from the bus.
 
@@ -75,11 +75,11 @@ And the endstop:
 
 These are low-current — any 22-26 AWG wire is fine.
 
-### 5. The 5 V jumper from LM2596 to XIAO
+### 5. The 5 V jumper from buck (MP1584/LM2596) to XIAO
 
-Orange wire, one stub: LM2596 OUT+ → XIAO 5V pin (top-left of the board, opposite the USB-C connector). LM2596 OUT− is already on the GND bus.
+Orange wire, one stub: buck (MP1584/LM2596) OUT+ → XIAO 5V pin (top-left of the board, opposite the USB-C connector). buck (MP1584/LM2596) OUT− is already on the GND bus.
 
-> **Set the LM2596 to 5 V before this connection.** With nothing on OUT, hook a multimeter between OUT+ and OUT−, power up the 12 V side, and turn the brass screw on the LM2596's pot until you read 5.00 V. Power down, then make the connection.
+> **Set the buck output to 5 V before this connection.** With nothing on OUT, hook a multimeter between OUT+ and OUT−, power up the 12 V side, and verify the reading. If the module is *adjustable* (small SMD pot on the MP1584-style mini board, or the brass screw pot on the LM2596), turn it until you read 5.00 V. Some MP1584 boards are *fixed* at 5 V — in that case just confirm and move on. Power down, then make the connection.
 
 ### 6. Screw terminals
 
@@ -91,7 +91,7 @@ Bench PSU at 12.0 V, current limit 1 A.
 
 1. Plug the XIAO ESP32-C6 into its female headers.
 2. Plug TMC2209 into its female headers (no motor connected yet).
-3. Power up. Multimeter on the LM2596 OUT+ → should read 5.0 V.
+3. Power up. Multimeter on the buck (MP1584/LM2596) OUT+ → should read 5.0 V.
 4. Touch the multimeter to the TMC2209's VREF test point and tweak its pot to **1.0 V**. (Skip if you already did this in `bench-test.md`.)
 5. Power down. Connect the motor wires to the screw terminal — pair the wires by coil (multimeter continuity test if unsure).
 6. Connect the endstop.
