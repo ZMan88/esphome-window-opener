@@ -26,6 +26,24 @@ This page tells you in what order to put the perfboard together so you don't pai
 - Wire stripper, side cutters
 - Helping hands or a board holder
 
+## Wire gauges & lengths
+
+| Wire role | Carries | Recommended cross-section | Notes |
+|---|---|---|---|
+| 12 V from PSU to board | up to ~3 A | **0.75 mm²** silicone | 0.5 mm² acceptable for runs < 30 cm |
+| 12 V on-board (after fuse → TMC2209 VM, buck VIN) | up to 3 A | **0.75 mm²** | thick solder bridges OK in lieu of jumper wire |
+| GND bus | matches 12 V | **0.75 mm²** | star-ground to one node |
+| TMC2209 → motor coils | 1.7 A peak, chopped at ~30 kHz | **0.5 – 0.75 mm²** silicone, **twist each coil pair** (~5 twists per 10 cm) | reduces RFI |
+| XIAO logic, TMC2209 STEP / DIR / EN | ~1 mA | **0.14 mm²** Dupont jumper or ribbon | gauge doesn't matter; pick for flexibility |
+| Endstop (XIAO ↔ switch) | ~1 mA | **0.14 mm²** | use a 2-pin JST-XH on the switch end for easy swap |
+
+**Wire lengths:**
+
+- Endstop: **30–60 cm** typical for the real install (perfboard at the motor end of the rig, switch ~3–5 cm from the carriage's closed position). Any length up to ~1.5 m is fine electrically — the internal pull-up doesn't care.
+- 12 V from PSU to perfboard: cut to fit; keep short and tidy (1–2 m max).
+- Motor: the LDO ships with a ~1 m pigtail; trim or extend as needed. If extending, splice with solder + heatshrink and re-twist the pairs.
+- Logic and on-board jumpers: 5–10 cm each, routed flat against the perfboard back.
+
 ## Soldering order
 
 The rule: **solder the lowest-profile parts first**, then progressively taller. Otherwise the board won't sit flat against your work surface for soldering taller parts.
