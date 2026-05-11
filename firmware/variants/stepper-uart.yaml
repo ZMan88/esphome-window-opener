@@ -1,95 +1,135 @@
-# Variant: NEMA17 stepper driven by a TMC2209 in **UART mode**.
+# Variant: NEMA17 stepper driven by a TMC2209 in UART mode.
 #
-# Same physical wiring as variants/stepper.yaml plus two UART wires:
-#   XIAO D6 (GPIO16, TX) → driver RX
-#   XIAO D7 (GPIO17, RX) → driver TX
-# The BTT V1.3 has buffered TX/RX pads with no continuity between them,
-# so no series resistor is needed. (If your driver shows continuity
-# between TX and RX in a multimeter check, add a 1 kΩ resistor in
-# series with the XIAO TX line.)
+# Closely follows the slimcdk component author's reference config:
+# https://github.com/slimcdk/esphome-custom-components/blob/master/esphome/components/tmc2209/README.md#example-config
 #
-# Benefits over the basic step/dir variant:
-#  - Motor current set in software (run_current / hold_current — no
-#    more Vref pot tuning).
-#  - Live diagnostics exposed to HA: motor current, load, temperature,
-#    stall flag, fault flags.
-#  - Optional: StallGuard sensorless homing replaces the physical
-#    endstop — uncomment the relevant block below.
+# Wiring (XIAO ESP32-C6 → BTT TMC2209 V1.3 pads):
+#   3V3                       → VIO
+#   GND                       → GND (logic + motor power common)
+#   D1  (GPIO1)               → DIR
+#   D2  (GPIO2)               → STEP
+#   D3  (GPIO21)              → EN
+#   D6  (GPIO16) + 1 kΩ       → driver TX  (UART, see note below)
+#   D7  (GPIO17)              → driver RX  (UART, no resistor)
+#   D8  (GPIO19)              → endstop switch COM
+#   D9  (GPIO20)              → driver DIAG  (optional but strongly recommended
+#                                             for working stall detection — see
+#                                             diag_pin: line below)
 #
-# Uses the community ESPHome external component for TMC2209.
+# BTT V1.3 R10 must be bridged (factory NC) before TX pad is electrically live.
+# See hardware/wiring/stepper.md for the R10 detail and the 1 kΩ rationale.
+#
 # Pin map: hardware/wiring/stepper.md
 
 substitutions:
-  # Same as the basic stepper variant — see comment block there for the
-  # derivation (LDO at 0.9°/step × 1/16 microsteps × Tr8x8 = 800 µsteps/mm).
+  # LDO at 0.9°/step × 1/16 microsteps × Tr8x8 = 800 µsteps/mm; 180 mm stroke.
   steps_full_stroke: "144000"
 
-# --- External component: tmc2209 UART platform ---
 external_components:
-  - source: github://slimcdk/esphome-component-tmc2209
-    components: [tmc2209, tmc2209_hub]
+  - source: github://slimcdk/esphome-custom-components
+    components: [tmc2209_hub, tmc2209, stepper]
     refresh: 1d
 
-# --- UART for driver communication ---
 uart:
   - id: tmc_uart
-    tx_pin: GPIO16   # XIAO D6
-    rx_pin: GPIO17   # XIAO D7
-    baud_rate: 115200
+    tx_pin: GPIO16
+    rx_pin: GPIO17
+    baud_rate: 500000
 
-# --- TMC2209 hub: holds the driver-level config (current, microsteps, etc.) ---
 tmc2209_hub:
-  - id: window_driver
+  - id: window_hub
     uart_id: tmc_uart
-    address: 0x00          # MS1=GND, MS2=GND on the BTT V1.3
-    rsense: 0.11            # BTT V1.3 sense resistor value
-    enn_pin:
-      number: GPIO21        # XIAO D3
-      inverted: true
-    diag_pin: GPIO19        # XIAO D8 — used for StallGuard (or leave for endstop)
 
-# --- Stepper platform driven via UART ---
 stepper:
   - platform: tmc2209
     id: window_stepper
-    hub_id: window_driver
-    step_pin: GPIO2         # XIAO D2
-    dir_pin: GPIO1          # XIAO D1
+    tmc2209_hub_id: window_hub
+    rsense: 110 mOhm
+    vsense: False
+    step_pin: GPIO2
+    dir_pin:  GPIO1
+    enn_pin:  GPIO21        # Do NOT set inverted: true — component inverts internally.
+    # diag_pin: GPIO20       # ← Uncomment ONCE driver DIAG pad is wired to D9.
+    #                          With this set, the component uses a hardware
+    #                          interrupt for stall detection. Without it, the
+    #                          component polls IOIN over UART, which is unreliable
+    #                          during motion (main thread busy generating steps).
     max_speed: 2000 steps/s
     acceleration: 1000 steps/s^2
     deceleration: 1000 steps/s^2
-    run_current: 800mA      # software-set motor current (per phase, RMS)
-    hold_current: 400mA     # halved when idle to reduce heat
-    microsteps: 16
+    on_stall:
+      - logger.log:
+          level: INFO
+          format: "Stall detected — stopping window"
+      - stepper.stop: window_stepper
+    on_status:
+      # Surface the chip's temperature threshold flags as a single sensor that
+      # holds the lower bound of the current band: 0 / 120 / 143 / 150 / 157.
+      - if:
+          condition: { lambda: 'return code == tmc2209::TEMPERATURE_ABOVE_120C;' }
+          then: { sensor.template.publish: { id: driver_temp_band, state: 120 } }
+      - if:
+          condition: { lambda: 'return code == tmc2209::TEMPERATURE_BELOW_120C;' }
+          then: { sensor.template.publish: { id: driver_temp_band, state: 0 } }
+      - if:
+          condition: { lambda: 'return code == tmc2209::TEMPERATURE_ABOVE_143C;' }
+          then: { sensor.template.publish: { id: driver_temp_band, state: 143 } }
+      - if:
+          condition: { lambda: 'return code == tmc2209::TEMPERATURE_BELOW_143C;' }
+          then: { sensor.template.publish: { id: driver_temp_band, state: 120 } }
+      - if:
+          condition: { lambda: 'return code == tmc2209::TEMPERATURE_ABOVE_150C;' }
+          then: { sensor.template.publish: { id: driver_temp_band, state: 150 } }
+      - if:
+          condition: { lambda: 'return code == tmc2209::TEMPERATURE_BELOW_150C;' }
+          then: { sensor.template.publish: { id: driver_temp_band, state: 143 } }
+      - if:
+          condition: { lambda: 'return code == tmc2209::TEMPERATURE_ABOVE_157C;' }
+          then: { sensor.template.publish: { id: driver_temp_band, state: 157 } }
+      - if:
+          condition: { lambda: 'return code == tmc2209::TEMPERATURE_BELOW_157C;' }
+          then: { sensor.template.publish: { id: driver_temp_band, state: 150 } }
 
-# --- Diagnostic sensors exposed to HA ---
+esphome:
+  on_boot:
+    - tmc2209.configure:
+        id: window_stepper
+        microsteps: 16
+        interpolation: true
+    - tmc2209.stallguard:
+        id: window_stepper
+        threshold: 50
+    - tmc2209.currents:
+        id: window_stepper
+        run_current: 1100mA
+        hold_current: 500mA
+
 sensor:
   - platform: tmc2209
-    hub_id: window_driver
-    motor_current:
-      name: "Window opener — motor current"
-      update_interval: 5s
-    motor_load:
-      name: "Window opener — motor load"
-      update_interval: 5s
-    driver_temperature:
-      name: "Window opener — driver temperature"
-      update_interval: 30s
+    tmc2209_id: window_stepper
+    type: actual_current
+    name: "Window opener — actual current"
+    update_interval: 5s
+
+  - platform: tmc2209
+    tmc2209_id: window_stepper
+    type: motor_load
+    name: "Window opener — motor load"
+    update_interval: 250ms
+
+  - platform: template
+    id: driver_temp_band
+    name: "Window opener — driver temperature band"
+    unit_of_measurement: "°C"
+    accuracy_decimals: 0
+    icon: mdi:thermometer
+    entity_category: diagnostic
 
 binary_sensor:
-  - platform: tmc2209
-    hub_id: window_driver
-    stalled:
-      name: "Window opener — stalled"
-    overheat:
-      name: "Window opener — overheat warning"
-
-  # Endstop kept for the closed-side homing — remove this block if
-  # you switch to StallGuard sensorless homing on the diag_pin above.
   - platform: gpio
     id: endstop_closed
     pin:
-      number: GPIO19
+      number: GPIO19          # XIAO D8
       mode: INPUT_PULLUP
       inverted: true
     on_press:
@@ -101,7 +141,6 @@ binary_sensor:
             id: window_stepper
             target: 0
 
-# --- Cover entity (identical contract as the step/dir variant) ---
 cover:
   - platform: template
     name: "Window"

@@ -200,6 +200,18 @@
     <text x="657" y="552" font-size="9" fill="#16a085">D7 RX → TX</text>
   </g>
 
+  <!-- R10 bridge callout -->
+  <g>
+    <rect x="820" y="500" width="260" height="92" rx="3" fill="#fff7e6" stroke="#c99b2b" stroke-width="1.2"/>
+    <text x="830" y="518" font-size="11" font-weight="700" fill="#7a5a00">⚠ V1.3 UART setup</text>
+    <text x="830" y="534" font-size="10" fill="#5a4400">R10 is factory NC — bridge it OR solder</text>
+    <text x="830" y="546" font-size="10" fill="#5a4400">a 1 kΩ SMD in the R10 footprint.</text>
+    <text x="830" y="562" font-size="10" fill="#5a4400">Add 1 kΩ in series on XIAO D6 (TX) line</text>
+    <text x="830" y="574" font-size="10" fill="#5a4400">unless you used a 1 kΩ at R10.</text>
+    <text x="830" y="588" font-size="9" fill="#7a5a00" font-style="italic">(slimcdk component requires it)</text>
+    <line x1="820" y1="525" x2="700" y2="525" stroke="#c99b2b" stroke-width="1" stroke-dasharray="3,2"/>
+  </g>
+
   <!-- MOTOR -->
   <g>
     <rect x="940" y="280" width="120" height="160" rx="4" fill="#fff" stroke="#222" stroke-width="1.5"/>
@@ -247,5 +259,6 @@
     <text x="0" y="18" font-size="11" fill="#444">1. The 470 µF cap MUST sit physically next to the TMC2209's VM and GND pins (within a few cm). PSU-end caps are not a substitute — wire inductance is what kills the driver.</text>
     <text x="0" y="35" font-size="11" fill="#444">2. Set the LM2596's output to 5.0 V before connecting the XIAO (turn the pot, measure with a multimeter, then connect).</text>
     <text x="0" y="52" font-size="11" fill="#444">3. The XIAO ESP32-C6 only breaks out 11 GPIOs. Pins above use D1/D2/D3 + D8 — leaves D0 (avoid: strapping pin), D4-D7, D9, D10 free for future expansion.</text>
+    <text x="0" y="69" font-size="11" fill="#444">4. UART (D6/D7): on the BTT V1.3, R10 is factory-NC, so the TX pad is dead until you bridge R10. The slimcdk component also requires 1 kΩ in series on the XIAO D6 (TX) line — easiest is to solder a 1 kΩ SMD into the R10 footprint, which both bridges R10 and adds the contention resistor in one step.</text>
   </g>
 </svg>

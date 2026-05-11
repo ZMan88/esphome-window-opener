@@ -115,7 +115,7 @@ These come after the user has the parts in hand and can measure the actual nut a
 
 - [x] Phase 0 — Repo scaffolded
 - [x] **Phase 1 — Bench prototype passed 2026-05-08** (XIAO + TMC2209 + LDO motor on the desk; HA discovered `cover.window_opener`; open/close/% all working).
-- [ ] Phase 1.5 — UART upgrade: 2 wires + switch to `firmware/variants/stepper-uart.yaml` for current/load/temperature in HA.
+- [ ] Phase 1.5 — UART upgrade: **bridge R10 on driver bottom** (factory-NC on V1.3 — without it the TX pad is dead) + 2 wires (D6→RX, D7→TX) + switch to `firmware/variants/stepper-uart.yaml` for current/load/temperature in HA.
 - [ ] Phase 2 — Mechanical assembly (lead-screw rig, dry-fit on window)
 - [ ] Phase 3 — Tuning + HA integration on real window
 - [ ] Phase 4 — Polish (enclosure, automations, CAD STLs released)
