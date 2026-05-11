@@ -49,7 +49,7 @@ stepper:
     step_pin: GPIO2
     dir_pin:  GPIO1
     enn_pin:  GPIO21        # Do NOT set inverted: true — component inverts internally.
-    # diag_pin: GPIO20       # ← Uncomment ONCE driver DIAG pad is wired to D9.
+    diag_pin: GPIO20       # ← Uncomment ONCE driver DIAG pad is wired to D9.
     #                          With this set, the component uses a hardware
     #                          interrupt for stall detection. Without it, the
     #                          component polls IOIN over UART, which is unreliable
@@ -96,9 +96,24 @@ esphome:
         id: window_stepper
         microsteps: 16
         interpolation: true
+        # TCOOLTHRS gates the chip's DIAG-for-stall output. The TMC2209
+        # datasheet requires it > 0 for StallGuard to drive DIAG (with
+        # TCOOLTHRS = 0, DIAG only signals driver errors). Setting it
+        # high (close to max 20-bit) means StallGuard is active across
+        # the entire useful motion velocity range. Without this, on_stall
+        # never fires no matter how hard you hold the shaft.
+        tcool_threshold: 400000
     - tmc2209.stallguard:
         id: window_stepper
-        threshold: 50
+        # SGTHRS = 0 disables stall detection via the DIAG output (the chip
+        # only fires DIAG for driver errors, not for SG_RESULT < SGTHRS*2).
+        # Why: at the bench with no mechanical load, SG_RESULT sits in 0-16
+        # even during normal motion, so any non-zero threshold trips on every
+        # move. RE-TUNE after Phase 2 mounting: with the lead-screw + sash
+        # load, watch the actual_current / motor_load sensors during a full
+        # open/close, note the SG_RESULT floor under normal load, then set
+        # SGTHRS to ~half of that floor.
+        threshold: 0
     - tmc2209.currents:
         id: window_stepper
         run_current: 1100mA

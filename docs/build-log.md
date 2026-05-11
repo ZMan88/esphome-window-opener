@@ -115,7 +115,22 @@ These come after the user has the parts in hand and can measure the actual nut a
 
 - [x] Phase 0 — Repo scaffolded
 - [x] **Phase 1 — Bench prototype passed 2026-05-08** (XIAO + TMC2209 + LDO motor on the desk; HA discovered `cover.window_opener`; open/close/% all working).
-- [ ] Phase 1.5 — UART upgrade: **bridge R10 on driver bottom** (factory-NC on V1.3 — without it the TX pad is dead) + 2 wires (D6→RX, D7→TX) + switch to `firmware/variants/stepper-uart.yaml` for current/load/temperature in HA.
+- [x] **Phase 1.5 — UART upgrade passed 2026-05-11**. R10 bridged on driver, 1 kΩ on TX line, DIAG wire from driver → XIAO D9 for hardware-interrupt stall detection. `firmware/variants/stepper-uart.yaml` is the active variant. Software currents (1100/500 mA), motor_load + actual_current sensors, temperature-band sensor all working.
 - [ ] Phase 2 — Mechanical assembly (lead-screw rig, dry-fit on window)
 - [ ] Phase 3 — Tuning + HA integration on real window
 - [ ] Phase 4 — Polish (enclosure, automations, CAD STLs released)
+
+## Phase 3 — StallGuard tuning procedure (do this once mounted)
+
+StallGuard is currently disabled (`tmc2209.stallguard: { threshold: 0 }` in `firmware/variants/stepper-uart.yaml`) because at the bench with no mechanical load the chip can't distinguish "free running" from "stalled" — SG_RESULT pins near 0 either way. Once the motor is on the lead-screw rig with the carriage and rod-ends loaded, retune as follows:
+
+1. **First run, keep `threshold: 0`.** Run a few full open + close cycles via HA so motion completes without spurious stall trips.
+2. **Watch `motor_load` in HA.** Ignore the accel/decel spikes — look for the **max reading during the constant-velocity middle portion** of motion. Call that **M** (expect 40-70% under typical sash + seal friction).
+3. **Compute SGTHRS** for trip 30 points above the floor:
+   ```
+   target_SG = 510 * (1 - (M + 30)/100)
+   SGTHRS    = target_SG / 2
+   ```
+   Example: M = 50% → SGTHRS = (510·0.2)/2 = **51**.
+4. **Edit the YAML**, change `threshold: 0` to the computed value, flash, retest.
+5. **Verify**: normal motion completes without `Stall detected — stopping window`. Manually pinching the carriage / running into the closed-handle hard stop should fire it within ~½ s. If it false-trips during normal motion, bump SGTHRS down ~10 and retry.
