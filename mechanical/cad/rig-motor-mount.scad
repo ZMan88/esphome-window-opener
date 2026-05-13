@@ -91,9 +91,14 @@ module motor_mount() {
     // The bolt-hole axis is PERPENDICULAR to the bore (Z in this local
     // frame), spaced J = KP08_HOLE_SPACING centre-to-centre. Both holes
     // share the same X (the KP08's centre along the bore axis).
+    // The cylinder must be rotated so its axis runs VERTICALLY (along
+    // local Y), matching the floor's thickness — otherwise the hole
+    // pokes the side of the floor instead of through it (the "scoop"
+    // bug seen in earlier renders).
     for (z = [-KP08_HOLE_SPACING / 2, KP08_HOLE_SPACING / 2])
       translate([KP08_CENTER_X, FLOOR_BOTTOM_Y - 1, z])
-        cylinder(d = KP08_HOLE_D, h = FLOOR_THK + 2);
+        rotate([-90, 0, 0])
+          cylinder(d = KP08_HOLE_D, h = FLOOR_THK + 2);
 
     // Anti-rotation rod hole — passes through the back plate, extends some way into the rig
     translate([-PLATE_THK - 1, SHAFT_Y - ANTI_ROT_OFFSET, 0])

@@ -47,9 +47,14 @@ module far_bearing() {
 
     // KP08 mounting holes — bolt-hole axis is PERPENDICULAR to the bore
     // (along Z in this local frame), spaced J = KP08_HOLE_SPACING.
+    // Rotate the cylinder to run vertically (along local Y, matching
+    // floor thickness) — without the rotation OpenSCAD's default Z-axis
+    // cylinder pokes the side of the floor and leaves a scoop instead
+    // of a through-hole.
     for (z = [-KP08_HOLE_SPACING / 2, KP08_HOLE_SPACING / 2])
       translate([KP08_CENTER_X, FLOOR_BOTTOM_Y - 1, z])
-        cylinder(d = KP08_HOLE_D, h = FLOOR_THK + 2);
+        rotate([-90, 0, 0])
+          cylinder(d = KP08_HOLE_D, h = FLOOR_THK + 2);
 
     // Anti-rotation rod hole through the end wall
     translate([FLOOR_LEN_X - END_WALL_THK - 1, -ANTI_ROT_OFFSET, 0])
