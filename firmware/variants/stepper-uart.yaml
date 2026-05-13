@@ -130,7 +130,44 @@ sensor:
     tmc2209_id: window_stepper
     type: motor_load
     name: "Window opener — motor load"
-    update_interval: 250ms
+    update_interval: 1s    # Bump to 250ms during Phase 3 stall tuning.
+
+  # --- Diagnostic sensors (disabled) ---
+  # These poll TMC2209 registers over UART. The slimcdk stepper generates
+  # STEP pulses on the same main thread, so even at slow update intervals
+  # (1s) these were starving the pulse generator and the motor crawled.
+  # Re-enable a subset during Phase 3 StallGuard tuning, then disable again.
+  # See `docs/build-log.md` "Phase 3 — StallGuard tuning procedure".
+  #
+  # - platform: tmc2209
+  #   tmc2209_id: window_stepper
+  #   type: stallguard_result
+  #   name: Driver stallguard
+  #   update_interval: 250ms
+  #
+  # - platform: tmc2209
+  #   tmc2209_id: window_stepper
+  #   type: pwm_scale_sum
+  #   name: PWM Scale Sum
+  #   update_interval: 1s
+  #
+  # - platform: tmc2209
+  #   tmc2209_id: window_stepper
+  #   type: pwm_scale_auto
+  #   name: PWM Scale Auto
+  #   update_interval: 1s
+  #
+  # - platform: tmc2209
+  #   tmc2209_id: window_stepper
+  #   type: pwm_ofs_auto
+  #   name: PWM OFS Auto
+  #   update_interval: 30s
+  #
+  # - platform: tmc2209
+  #   tmc2209_id: window_stepper
+  #   type: pwm_grad_auto
+  #   name: PWM Grad Auto
+  #   update_interval: 30s
 
   - platform: template
     id: driver_temp_band
