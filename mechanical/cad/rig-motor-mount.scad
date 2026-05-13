@@ -37,9 +37,9 @@ include <common.scad>;
 
 // ---- design parameters (tune as needed) ----
 PLATE_THK          = 6;         // back-plate thickness (X direction)
-FLOOR_THK          = 6;         // floor thickness (Y direction)
 ANTI_ROT_OFFSET    = 30;        // anti-rotation rod offset below the lead-screw axis
 ANTI_ROT_HOLE_D    = 8.4;       // 8 mm rod with print clearance
+ANTI_ROT_HOLE_MARGIN = 5;       // material below the rod hole's lower edge
 GUSSET_T           = 4;         // gusset rib thickness for L-corner stiffness
 GUSSET_LEG         = 25;        // gusset leg length (square triangle)
 COUPLER_MOTOR_GRIP = 12;        // mm of motor shaft buried inside the coupler
@@ -52,12 +52,21 @@ ROD_END_TAP_D      = 18;        // M6 tap depth for the rod-end shank
 // ---- derived geometry ----
 SHAFT_Y           = 0;                                  // lead-screw axis at Y=0
 FLOOR_TOP_Y       = SHAFT_Y - NEMA17_FACE / 2;          // -21.15: motor body sits on floor
-FLOOR_BOTTOM_Y    = FLOOR_TOP_Y - FLOOR_THK;            // -27.15
+// Floor is ONE block: its bottom drops below the anti-rotation rod so
+// the rod hole drills through floor material rather than air. The rod
+// at Y = -30 with Ø8.4 hole has its lower edge at Y = -34.2; floor
+// bottom at -ANTI_ROT_OFFSET - ANTI_ROT_HOLE_MARGIN gives 0.8 mm of
+// material below the hole.
+FLOOR_BOTTOM_Y    = SHAFT_Y - ANTI_ROT_OFFSET - ANTI_ROT_HOLE_MARGIN;  // -35
+FLOOR_THK         = FLOOR_TOP_Y - FLOOR_BOTTOM_Y;       //  13.85
 PEDESTAL_HEIGHT   = -KP08_BORE_HEIGHT - FLOOR_TOP_Y;    //  7.15: lifts KP08 base up to bore alignment
 KP08_BASE_Y       = -KP08_BORE_HEIGHT;                  // -14: pedestal top = KP08 base bottom
 
+// Back plate sits ABOVE the floor only. The old design had it extend
+// down past the floor to enclose the anti-rotation rod hole; the floor
+// now handles that, so the back plate stops where the floor starts.
 BACK_PLATE_TOP_Y    = SHAFT_Y + NEMA17_FACE / 2 + 4;    //  25.15
-BACK_PLATE_BOT_Y    = SHAFT_Y - ANTI_ROT_OFFSET - 5;    // -35: extends below floor for anti-rot rod
+BACK_PLATE_BOT_Y    = FLOOR_TOP_Y;                      // -21.15
 BACK_PLATE_W        = NEMA17_FACE + 16;                 //  58.3: Z width with margin
 
 // Floor extends behind the back plate far enough to seat the full motor
@@ -80,13 +89,6 @@ REAR_WALL_X_INNER = -PLATE_THK - MOTOR_FLOOR_EXT;       // -56: rear wall's +X f
 REAR_WALL_X_OUTER = REAR_WALL_X_INNER - REAR_WALL_THK;  // -62
 REAR_WALL_TOP_Y   = SHAFT_Y + ROD_END_TAB_S / 2;        //   9: top of wall = top of tab
 
-// Anti-rotation rod sleeve — continuous rib below the floor that runs
-// the full bracket length. Without it the rod would have only PLATE_THK
-// = 6 mm of bearing (the back plate alone). With it, ≈111 mm.
-ROD_SLEEVE_Z_W    = 14;                                 // Z width (8.4 hole + ~2.8 wall each side)
-ROD_SLEEVE_TOP_Y  = FLOOR_BOTTOM_Y + 1;                 // -26.15: 1 mm overlap into floor for clean union
-ROD_SLEEVE_BOT_Y  = SHAFT_Y - ANTI_ROT_OFFSET - 5;      // -35: same as old BACK_PLATE_BOT_Y
-
 // ---- the part ----
 module motor_mount() {
   difference() {
@@ -96,9 +98,10 @@ module motor_mount() {
       translate([-PLATE_THK, BACK_PLATE_BOT_Y, -BACK_PLATE_W / 2])
         cube([PLATE_THK, BACK_PLATE_TOP_Y - BACK_PLATE_BOT_Y, BACK_PLATE_W]);
 
-      // Floor: continuous plate from the rear wall's outer face all the
-      // way forward past the KP08 pedestal. Motor body rests on the
-      // -X portion (from rear wall to back plate).
+      // Floor: ONE solid block from the rear wall's outer face all the
+      // way forward past the KP08 pedestal, full BACK_PLATE_W in Z,
+      // 13.85 mm tall in Y. Motor body rests on its top; anti-rotation
+      // rod hole drills through the lower half.
       translate([REAR_WALL_X_OUTER, FLOOR_BOTTOM_Y, -BACK_PLATE_W / 2])
         cube([FLOOR_LEN_X - REAR_WALL_X_OUTER, FLOOR_THK, BACK_PLATE_W]);
 
@@ -116,14 +119,6 @@ module motor_mount() {
       // lead-screw axis. M6 tap drilled inside it (see removals).
       translate([REAR_WALL_X_OUTER - ROD_END_TAB_LEN, SHAFT_Y - ROD_END_TAB_S / 2, -ROD_END_TAB_S / 2])
         cube([ROD_END_TAB_LEN, ROD_END_TAB_S, ROD_END_TAB_S]);
-
-      // Anti-rotation rod sleeve — rib hanging below the floor along the
-      // bracket's full length, so the rod hole drills through ≈111 mm of
-      // material instead of just the 6 mm back plate. Overlaps the floor
-      // by 1 mm on top for a clean union, and merges with the back plate's
-      // downward extension at X = -6 to 0.
-      translate([REAR_WALL_X_OUTER, ROD_SLEEVE_BOT_Y, -ROD_SLEEVE_Z_W / 2])
-        cube([FLOOR_LEN_X - REAR_WALL_X_OUTER, ROD_SLEEVE_TOP_Y - ROD_SLEEVE_BOT_Y, ROD_SLEEVE_Z_W]);
 
       // Gussets at the BACK PLATE L-corners, both +X (KP08 side) and
       // -X (motor side).
