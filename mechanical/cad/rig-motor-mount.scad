@@ -100,6 +100,18 @@ module motor_mount() {
         rotate([-90, 0, 0])
           cylinder(d = KP08_HOLE_D, h = FLOOR_THK + 2);
 
+    // Access slots in the floor for the bottom 2 motor mount bolts.
+    // The motor's M3 holes sit at Y = ±NEMA17_HOLE_SPACING/2 = ±15.5.
+    // The floor (top at Y = FLOOR_TOP_Y = -14) covers the lower two
+    // (at Y = -15.5) — you can't fit a bolt head + driver in there.
+    // These slots are cut through the floor at each lower-bolt Z so
+    // a screwdriver can come in from outside the back plate.
+    ACCESS_SLOT_X_LEN = 12;       // how far in front of the back plate
+    ACCESS_SLOT_W     = 8;        // along Z; clears the M3 bolt head + tool
+    for (dz = [-NEMA17_HOLE_SPACING / 2, NEMA17_HOLE_SPACING / 2])
+      translate([0, FLOOR_BOTTOM_Y - 1, dz - ACCESS_SLOT_W / 2])
+        cube([ACCESS_SLOT_X_LEN, FLOOR_THK + 2, ACCESS_SLOT_W]);
+
     // Anti-rotation rod hole — passes through the back plate, extends some way into the rig
     translate([-PLATE_THK - 1, SHAFT_Y - ANTI_ROT_OFFSET, 0])
       rotate([0, 90, 0])
