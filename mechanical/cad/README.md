@@ -73,7 +73,13 @@ openscad --camera=150,-25,800,150,-25,0 --imgsize=1600,650 --colorscheme=Tomorro
 # Isometric (perspective)
 openscad --camera=600,400,500,150,-25,0 --imgsize=1600,900 --colorscheme=Tomorrow \
          -o ../stl/rig-assembled-iso.png  rig-assembled.scad
+# Single mesh of the whole rig (printable parts + hardware stand-ins)
+openscad --export-format binstl -o ../stl/rig-assembled.stl rig-assembled.scad
 ```
+
+The assembled STL is a visualization aid only — it includes the off-the-shelf
+stand-ins (motor, screw, KP08s, nut, rod-ends) and is not meant for slicing.
+For printing, use the individual part STLs (`rig-motor-mount.stl`, etc.).
 
 The repo ships with the current STLs and PNGs in `mechanical/stl/`;
 re-render after any change to the `.scad` sources.
