@@ -16,6 +16,7 @@ FLOOR_THK       = 6;
 ANTI_ROT_OFFSET = 30;        // must match motor mount
 ANTI_ROT_HOLE_D = 8.4;
 END_WALL_THK    = 6;         // small wall at the far end to stop the anti-rot rod
+END_WALL_UP     = 30;        // how far the end wall rises above the floor
 SIDE_MARGIN     = 4;         // margin past KP08 (X direction; bore axis)
 SIDE_MARGIN_Y   = 4;         // margin past KP08 base (Z direction; perpendicular)
 
@@ -33,6 +34,13 @@ KP08_BASE_Y     = -KP08_BORE_HEIGHT;
 FLOOR_TOP_Y     = KP08_BASE_Y;
 FLOOR_BOTTOM_Y  = FLOOR_TOP_Y - FLOOR_THK;
 
+// End-wall Y range. The wall must encompass BOTH:
+//   • lead screw clearance hole at Y = 0 (top of wall well above 0)
+//   • anti-rotation rod hole at Y = -ANTI_ROT_OFFSET (= -30, below floor)
+// Bottom = -ANTI_ROT_OFFSET - 5 to give 5 mm of material below the rod hole.
+END_WALL_BOT_Y  = -ANTI_ROT_OFFSET - 5;             // -35
+END_WALL_TOP_Y  = FLOOR_TOP_Y + END_WALL_UP;        //  16
+
 module far_bearing() {
   difference() {
     union() {
@@ -40,9 +48,14 @@ module far_bearing() {
       translate([0, FLOOR_BOTTOM_Y, -FLOOR_W / 2])
         cube([FLOOR_LEN_X, FLOOR_THK, FLOOR_W]);
 
-      // End wall at the far end (X+ side) — supports the anti-rotation rod end
-      translate([FLOOR_LEN_X - END_WALL_THK, FLOOR_TOP_Y, -FLOOR_W / 2])
-        cube([END_WALL_THK, 30, FLOOR_W]);
+      // End wall at the far end (X+ side) — anchors both the lead-screw
+      // clearance hole (at Y = 0) and the anti-rotation rod hole (at
+      // Y = -30, below the floor). Extends from END_WALL_BOT_Y (-35) up
+      // to END_WALL_TOP_Y (+16) so both holes drill through real
+      // material; the original wall stopped at FLOOR_TOP_Y = -14 and
+      // the rod-hole cylinder cut air.
+      translate([FLOOR_LEN_X - END_WALL_THK, END_WALL_BOT_Y, -FLOOR_W / 2])
+        cube([END_WALL_THK, END_WALL_TOP_Y - END_WALL_BOT_Y, FLOOR_W]);
     }
 
     // KP08 mounting holes — bolt-hole axis is PERPENDICULAR to the bore

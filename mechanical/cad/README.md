@@ -20,22 +20,6 @@ geometry is diffable in git.
   Render with the camera invocations below to get the three views in
   `../stl/rig-assembled-{top,side,iso}.png`. The standalone parts'
   STLs/PNGs remain the source-of-truth for slicing.
-- `window-opener-rig.skp` — **SketchUp model** of the rig in window context.
-  Each printable part appears as ONE named group matching the `.scad` file
-  name (`frame-bracket`, `sash-bracket`, `rig-motor-mount`,
-  `rig-far-bearing`, `rig-carriage`), with off-the-shelf hardware
-  (`NEMA17-motor`, `Coupler-5to8`, `Lead-screw-Tr8x8-400`, `KP08-1/2`,
-  `Prusa-MK3-brass-nut`, `Rod-end-LH-CSL10`, `Rod-end-RH-CS10`,
-  `Anti-rotation-rod`) and the 845 × 1325 mm window (4 frame rails +
-  4 sash rails + glass) as separate groups. 23 groups total.
-
-  Each group is independently selectable. To export a printable STL:
-  open in SketchUp, right-click the group → **Export** → **3D Model**
-  → choose STL. Cutouts (bolt holes, counterbores) are not yet modelled
-  — for printable STLs, still use the `.stl` files in `../stl/`. The
-  `.scad` sources remain source-of-truth for slicing.
-
-  Thumbnail beside the file: `window-opener-rig.skp.png`.
 
 ## Install OpenSCAD
 

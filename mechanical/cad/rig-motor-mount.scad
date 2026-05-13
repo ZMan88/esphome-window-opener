@@ -80,6 +80,13 @@ REAR_WALL_X_INNER = -PLATE_THK - MOTOR_FLOOR_EXT;       // -56: rear wall's +X f
 REAR_WALL_X_OUTER = REAR_WALL_X_INNER - REAR_WALL_THK;  // -62
 REAR_WALL_TOP_Y   = SHAFT_Y + ROD_END_TAB_S / 2;        //   9: top of wall = top of tab
 
+// Anti-rotation rod sleeve — continuous rib below the floor that runs
+// the full bracket length. Without it the rod would have only PLATE_THK
+// = 6 mm of bearing (the back plate alone). With it, ≈111 mm.
+ROD_SLEEVE_Z_W    = 14;                                 // Z width (8.4 hole + ~2.8 wall each side)
+ROD_SLEEVE_TOP_Y  = FLOOR_BOTTOM_Y + 1;                 // -26.15: 1 mm overlap into floor for clean union
+ROD_SLEEVE_BOT_Y  = SHAFT_Y - ANTI_ROT_OFFSET - 5;      // -35: same as old BACK_PLATE_BOT_Y
+
 // ---- the part ----
 module motor_mount() {
   difference() {
@@ -109,6 +116,14 @@ module motor_mount() {
       // lead-screw axis. M6 tap drilled inside it (see removals).
       translate([REAR_WALL_X_OUTER - ROD_END_TAB_LEN, SHAFT_Y - ROD_END_TAB_S / 2, -ROD_END_TAB_S / 2])
         cube([ROD_END_TAB_LEN, ROD_END_TAB_S, ROD_END_TAB_S]);
+
+      // Anti-rotation rod sleeve — rib hanging below the floor along the
+      // bracket's full length, so the rod hole drills through ≈111 mm of
+      // material instead of just the 6 mm back plate. Overlaps the floor
+      // by 1 mm on top for a clean union, and merges with the back plate's
+      // downward extension at X = -6 to 0.
+      translate([REAR_WALL_X_OUTER, ROD_SLEEVE_BOT_Y, -ROD_SLEEVE_Z_W / 2])
+        cube([FLOOR_LEN_X - REAR_WALL_X_OUTER, ROD_SLEEVE_TOP_Y - ROD_SLEEVE_BOT_Y, ROD_SLEEVE_Z_W]);
 
       // Gussets at the BACK PLATE L-corners, both +X (KP08 side) and
       // -X (motor side).
@@ -144,10 +159,13 @@ module motor_mount() {
         rotate([-90, 0, 0])
           cylinder(d = KP08_HOLE_D, h = FLOOR_THK + PEDESTAL_HEIGHT + 2);
 
-    // Anti-rotation rod hole through the back plate's downward extension.
-    translate([-PLATE_THK - 1, SHAFT_Y - ANTI_ROT_OFFSET, 0])
+    // Anti-rotation rod hole — drilled through the rod sleeve + back
+    // plate, the full bracket length. Cylinder spans from before the
+    // sleeve's -X face to past its +X face so the hole opens cleanly
+    // at both ends of the part.
+    translate([REAR_WALL_X_OUTER - 1, SHAFT_Y - ANTI_ROT_OFFSET, 0])
       rotate([0, 90, 0])
-        cylinder(d = ANTI_ROT_HOLE_D, h = PLATE_THK + 5);
+        cylinder(d = ANTI_ROT_HOLE_D, h = FLOOR_LEN_X - REAR_WALL_X_OUTER + 2);
 
     // M6 tap for the rod-end shank — opens toward -X, threads into the tab.
     translate([REAR_WALL_X_OUTER - ROD_END_TAB_LEN - 1, SHAFT_Y, 0])
