@@ -19,13 +19,24 @@
 include <common.scad>;
 
 // ---- design parameters ----
-BODY_W              = 50;     // X (along screw)
-BODY_H              = 36;     // Y (vertical)
-BODY_D              = 50;     // Z (across rig, including rod-end mount)
+// The body needs to accommodate (perpendicular to the bore):
+//   • Prusa nut flange OD = 25 (with print clearance)
+//   • plus a few mm of wall around the flange counterbore
+// Along the bore (X) it needs:
+//   • a Prusa nut counterbore (4 mm flange thickness) + body (10 mm) = 14 mm
+//   • plus material around it
+// Vertical (Y):
+//   • SHAFT_Y above the bottom to position the bore in the upper half so the
+//     LH rod-end's M6 tap fits in the bottom face without intersecting the
+//     screw bore. With 18 mm tap depth + the bore at SHAFT_Y = 21.6, leaves
+//     comfortable wall.
+BODY_W              = 32;     // X (along screw)   — was 50, shrunk
+BODY_H              = 36;     // Y (vertical)      — kept (rod-end tap depth)
+BODY_D              = 36;     // Z (across rig)    — was 50, shrunk
 ANTI_ROT_OFFSET     = 30;     // must match motor mount and far bearing
 ANTI_ROT_HOLE_D     = 8.4;    // 8 mm rod with print clearance for sliding fit
 ROD_END_TAP_D       = 18;     // M6 tap depth for the rod-end shank
-NUT_POCKET_DEPTH    = 10;     // how deep the nut sits into the carriage
+NUT_POCKET_DEPTH    = PRUSA_NUT_FLANGE_THK + 0.5; // counterbore for flange (~4.5)
 NUT_FLANGE_CLEAR    = 0.4;    // clearance around the flange in its pocket
 
 // ---- derived ----

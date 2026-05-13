@@ -10,6 +10,16 @@ geometry is diffable in git.
 - `sash-bracket.scad` — moving-end bracket, attaches to the sash top rail.
 - `frame-bracket.scad` — fixed-end bracket, attaches to the 20 mm strip of
   frame face between the sash top and the ceiling.
+- `rig-motor-mount.scad` — printed L-bracket carrying the NEMA17 + KP08 #1.
+- `rig-far-bearing.scad` — printed L-bracket carrying KP08 #2 + anchor for
+  the anti-rotation rod.
+- `rig-carriage.scad` — printed block riding on the lead screw via the
+  Prusa MK3 brass nut; holds the LH M6 rod-end on its bottom face.
+- `rig-assembled.scad` — **assembly preview**. Includes the parts above
+  plus stylised stand-ins for the motor / screw / KP08 / brass nut / rod-ends.
+  Render with the camera invocations below to get the three views in
+  `../stl/rig-assembled-{top,side,iso}.png`. The standalone parts'
+  STLs/PNGs remain the source-of-truth for slicing.
 
 ## Install OpenSCAD
 
@@ -32,6 +42,21 @@ Optional preview render (PNG, no slicer needed):
 ```
 openscad --colorscheme=Nature --imgsize=900,600 -o ../stl/sash-bracket.png  sash-bracket.scad
 openscad --colorscheme=Nature --imgsize=900,600 -o ../stl/frame-bracket.png frame-bracket.scad
+```
+
+## Assembled view
+
+```
+cd mechanical/cad
+# Top  (orthographic, looking straight down)
+openscad --camera=150,800,0,150,-25,0   --imgsize=1600,500 --colorscheme=Tomorrow --projection=ortho \
+         -o ../stl/rig-assembled-top.png  rig-assembled.scad
+# Side (orthographic, looking along the rig's depth axis)
+openscad --camera=150,-25,800,150,-25,0 --imgsize=1600,650 --colorscheme=Tomorrow --projection=ortho \
+         -o ../stl/rig-assembled-side.png rig-assembled.scad
+# Isometric (perspective)
+openscad --camera=600,400,500,150,-25,0 --imgsize=1600,900 --colorscheme=Tomorrow \
+         -o ../stl/rig-assembled-iso.png  rig-assembled.scad
 ```
 
 The repo ships with the current STLs and PNGs in `mechanical/stl/`;

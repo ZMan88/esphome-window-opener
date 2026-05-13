@@ -16,40 +16,78 @@ WIN_WIDTH    = 845;
 WIN_HEIGHT   = 1325;
 D_FROM_HINGE = 120;   // moving-anchor offset from the hinge side
 
-// -------- KP08 pillow-block bearing (measured 2026-05-06) --------
-// Caliper readings: 54 (base length), 30 (body width along axis),
-//                   47 (across mounting holes outer-to-outer),
-//                   12.1 (width of one foot at the mounting hole),
-//                   10.8 / 10.7 (bore region — uncertain),
-//                   7.6 (slot length dimension),
-//                   1.8 (uncertain — possibly wall thickness).
-KP08_BASE_L      = 54;        // measured
-KP08_BASE_W      = 21;        // not directly measured — KP08 standard width through bearing centre
-KP08_HOLE_SPACING = 39;       // c-to-c, derived from outer-to-outer (47) − slot length (~8) ≈ 39 mm
-KP08_HOLE_D      = 6.5;       // M5 slot clearance + a hair
-KP08_HOLE_SLOT_L = 8;         // slot length (allows lateral adjustment)
-KP08_BORE_HEIGHT = 17;        // base bottom → bore centre — CRITICAL, KP08 standard, NOT directly measured
-KP08_BODY_W      = 30;        // measured — width along bearing axis
-KP08_TOTAL_H     = 33;        // KP08 standard, not directly measured
+// -------- KP08 pillow-block bearing (per grema3d datasheet, 2026-05-13) --------
+// Datasheet variable names (KP08 column, shaft d = 8 mm):
+//   L  = 55  total base width PERPENDICULAR to bore
+//   A  = 13  body width ALONG bore (the bearing axis)
+//   J  = 42  bolt-hole spacing (c-to-c)
+//   N  = 5   bolt-hole diameter (M5)
+//   H  = 14  base bottom → bore centre  (CRITICAL — was 17 in earlier guess)
+//   H1 = 5   base thickness
+//   H2 = 28  total height
+//
+// SCAD variable names retained for backwards-compat with rig-*.scad files,
+// but their MEANINGS are now spec-driven, not measured-guess:
+//   KP08_BASE_L      → L  (along Y, perpendicular to lead screw)
+//   KP08_BASE_W      → A  (along X, along lead screw)
+//   KP08_HOLE_SPACING → J
+//   KP08_HOLE_D       → N (M5 clearance)
+//   KP08_BORE_HEIGHT  → H
+//   KP08_BODY_W       → body width along Y (perpendicular to bore)
+//   KP08_TOTAL_H      → H2
+KP08_BASE_L       = 55;       // L — base width perpendicular to bore
+KP08_BASE_W       = 13;       // A — width ALONG bore axis (NB: lead screw direction)
+KP08_HOLE_SPACING = 42;       // J — bolt-hole c-to-c
+KP08_HOLE_D       = 5.5;      // M5 clearance (N = 5 mm bolt, + a hair)
+KP08_HOLE_SLOT_L  = 8;        // slot length (legacy; some KP08s have slotted holes)
+KP08_BORE_HEIGHT  = 14;       // H — base bottom to bore centre
+KP08_BODY_W       = 30;       // approximate body width perpendicular to bore
+KP08_TOTAL_H      = 28;       // H2 — total height
 
-// -------- Prusa MK3 brass nut (measured 2026-05-06) --------
-// Caliper readings: 14.7 (total length), 19.0 (flange OD), 9.0 (body length),
-//                   12.1 (M3 hole spacing across opposite holes).
-PRUSA_NUT_FLANGE_D   = 19;       // measured — flange OD
-PRUSA_NUT_FLANGE_THK = 5.7;      // derived from total (14.7) − body length (9.0)
-PRUSA_NUT_BODY_D     = 10.2;     // not directly measured — Prusa MK3 standard
-PRUSA_NUT_TOTAL_L    = 14.7;     // measured
-PRUSA_NUT_M3_SPACING = 12.1;     // measured — across opposite M3 holes (square pattern)
-PRUSA_NUT_M3_HOLE_D  = 3.4;      // M3 clearance
+// -------- Prusa MK3 brass nut (per piese3d datasheet, 2026-05-13) --------
+// Datasheet (Tr8x8 brass nut for MK3):
+//   Flange OD      = 25       (was incorrectly measured as 19 — 19 is the
+//                              bolt-hole *circle* diameter, not the flange OD)
+//   Flange thk     = 4
+//   Body OD        = 10
+//   Body length    = 10
+//   Total length   = 14       (= flange thk + body length)
+//   Bolt circle    = Ø19      with 4 holes at 90°: 2× M3 threaded
+//                              (vertically opposed) + 2× Ø4.1 clearance
+//                              (horizontally opposed)
+PRUSA_NUT_FLANGE_D       = 25;     // outer flange OD
+PRUSA_NUT_FLANGE_THK     = 4;
+PRUSA_NUT_BODY_D         = 10;
+PRUSA_NUT_BODY_L         = 10;
+PRUSA_NUT_TOTAL_L        = PRUSA_NUT_FLANGE_THK + PRUSA_NUT_BODY_L; // 14
+PRUSA_NUT_BOLT_CIRCLE_D  = 19;     // diameter on which the 4 holes sit
+PRUSA_NUT_M3_HOLE_D      = 3.4;    // M3 clearance (for the carriage side)
+PRUSA_NUT_CLEAR_HOLE_D   = 4.1;    // the 2× Ø4.1 holes in the nut flange
 
-// -------- LDO 42STH48-1684MAC NEMA17 (standard NEMA17 dimensions) --------
-NEMA17_FACE     = 42.3;    // face dimension (square)
-NEMA17_BODY_L   = 48;      // body length
-NEMA17_HOLE_SPACING = 31;  // M3 mounting-hole pattern (centre-to-centre)
-NEMA17_HOLE_D   = 3.4;     // M3 clearance
-NEMA17_BORE_D   = 22.5;    // central bore on the front face (for the shaft flange)
-NEMA17_SHAFT_D  = 5;       // shaft diameter
-NEMA17_SHAFT_L  = 24;      // shaft length
+// Legacy alias retained so existing rig-carriage.scad keeps compiling.
+// Square-pattern spacing equivalent to the 19 mm bolt circle (diagonal 19,
+// side = 19/√2 ≈ 13.43). Update rig-carriage.scad to use BOLT_CIRCLE_D for
+// the correct alternating-hole pattern; this approximation gets close.
+PRUSA_NUT_M3_SPACING     = 13.43;
+
+// -------- LDO 42STH48-1684MAC NEMA17 (per LDO datasheet, 2026-05-13) --------
+// Per the official LDO drawing (kb-3d datasheet):
+//   Face            42.3 × 42.3 MAX
+//   Body length     48 MAX
+//   Mounting holes  4× M3 on 31 × 31 mm pattern, depth 4.5 min
+//   Pilot boss      Ø22 (-0/-0.052)            ← was 22.5 in earlier guess
+//   Shaft           Ø5 -0.002/-0.012, 24 ± 0.5 long
+//   Shaft has a 15 mm flat (D-cut), 4.5 mm deep — not modelled here
+NEMA17_FACE         = 42.3;
+NEMA17_BODY_L       = 48;
+NEMA17_HOLE_SPACING = 31;
+NEMA17_HOLE_D       = 3.4;     // M3 clearance
+NEMA17_HOLE_DEPTH   = 4.5;     // minimum tap depth into the motor face
+NEMA17_BORE_D       = 22;      // pilot-boss OD (fits matching counterbore)
+NEMA17_SHAFT_D      = 5;
+NEMA17_SHAFT_L      = 24;
+NEMA17_SHAFT_FLAT_L = 15;      // D-cut flat length, for coupler grip
+NEMA17_SHAFT_FLAT_D = 4.5;     // D-cut depth from full Ø
 
 // -------- Coupler --------
 COUPLER_OD = 19;

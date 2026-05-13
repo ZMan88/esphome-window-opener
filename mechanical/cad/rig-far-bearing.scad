@@ -16,12 +16,19 @@ FLOOR_THK       = 6;
 ANTI_ROT_OFFSET = 30;        // must match motor mount
 ANTI_ROT_HOLE_D = 8.4;
 END_WALL_THK    = 6;         // small wall at the far end to stop the anti-rot rod
-SIDE_MARGIN     = 4;         // floor margin around KP08 base
+SIDE_MARGIN     = 4;         // margin past KP08 (X direction; bore axis)
+SIDE_MARGIN_Y   = 4;         // margin past KP08 base (Z direction; perpendicular)
 
 // ---- derived ----
-FLOOR_LEN_X     = KP08_BASE_L + 2 * SIDE_MARGIN + END_WALL_THK;
-FLOOR_W         = max(KP08_BASE_W + 2 * SIDE_MARGIN, ANTI_ROT_OFFSET + 12);
+// Along X (bore axis): only need to fit A = KP08_BASE_W = 13 mm + a small
+// margin + the end wall. Was previously sized to KP08_BASE_L (= 55 mm) along
+// X, which was 4× larger than needed.
+FLOOR_LEN_X     = KP08_BASE_W + 2 * SIDE_MARGIN + END_WALL_THK;
+// Perpendicular to bore (Z): must support the KP08 base across L = 55 mm,
+// and also reach down past the anti-rotation rod (offset 30) with margin.
+FLOOR_W         = max(KP08_BASE_L + 2 * SIDE_MARGIN_Y, ANTI_ROT_OFFSET + 12);
 KP08_START_X    = SIDE_MARGIN;
+KP08_CENTER_X   = KP08_START_X + KP08_BASE_W / 2;
 KP08_BASE_Y     = -KP08_BORE_HEIGHT;
 FLOOR_TOP_Y     = KP08_BASE_Y;
 FLOOR_BOTTOM_Y  = FLOOR_TOP_Y - FLOOR_THK;
@@ -38,11 +45,10 @@ module far_bearing() {
         cube([END_WALL_THK, 30, FLOOR_W]);
     }
 
-    // KP08 mounting holes
-    KP08_HOLE_X1 = KP08_START_X + (KP08_BASE_L - KP08_HOLE_SPACING) / 2;
-    KP08_HOLE_X2 = KP08_START_X + (KP08_BASE_L + KP08_HOLE_SPACING) / 2;
-    for (x = [KP08_HOLE_X1, KP08_HOLE_X2])
-      translate([x, FLOOR_BOTTOM_Y - 1, 0])
+    // KP08 mounting holes — bolt-hole axis is PERPENDICULAR to the bore
+    // (along Z in this local frame), spaced J = KP08_HOLE_SPACING.
+    for (z = [-KP08_HOLE_SPACING / 2, KP08_HOLE_SPACING / 2])
+      translate([KP08_CENTER_X, FLOOR_BOTTOM_Y - 1, z])
         cylinder(d = KP08_HOLE_D, h = FLOOR_THK + 2);
 
     // Anti-rotation rod hole through the end wall

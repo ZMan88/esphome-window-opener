@@ -33,16 +33,22 @@ ANTI_ROT_HOLE_D = 8.4;       // 8 mm rod with print clearance
 GUSSET_T        = 4;         // gusset rib thickness for L-corner stiffness
 
 // ---- derived geometry ----
-SHAFT_Y         = 0;         // lead-screw axis at Y=0
-KP08_BASE_Y     = SHAFT_Y - KP08_BORE_HEIGHT;  // KP08 base sits this far below shaft axis
-FLOOR_TOP_Y     = KP08_BASE_Y;                  // top of floor = KP08 base
+SHAFT_Y         = 0;                            // lead-screw axis at Y=0
+KP08_BASE_Y     = SHAFT_Y - KP08_BORE_HEIGHT;   // KP08 base sits H below shaft axis
+FLOOR_TOP_Y     = KP08_BASE_Y;                  // top of floor = KP08 base bottom
 FLOOR_BOTTOM_Y  = FLOOR_TOP_Y - FLOOR_THK;
 NEMA_FACE_HALF  = NEMA17_FACE / 2;
 BACK_PLATE_TOP_Y    = SHAFT_Y + NEMA_FACE_HALF + 4;
 BACK_PLATE_BOT_Y    = FLOOR_BOTTOM_Y;            // join cleanly with floor
 BACK_PLATE_W        = NEMA17_FACE + 16;          // Z width with margin
-KP08_START_X        = NEMA17_SHAFT_L + 2;        // KP08 starts after the motor shaft
-FLOOR_LEN_X         = KP08_START_X + KP08_BASE_L + 8;
+
+// KP08 position along X (the bore axis):
+//   KP08_START_X = where the KP08 base STARTS in X (motor side)
+//   The base is KP08_BASE_W (= A = 13 mm) wide along X.
+//   Floor extends from X=0 (back plate) to past the KP08, with a margin.
+KP08_START_X        = NEMA17_SHAFT_L + 2;        // clearance for the motor shaft + a hair
+KP08_CENTER_X       = KP08_START_X + KP08_BASE_W / 2;
+FLOOR_LEN_X         = KP08_START_X + KP08_BASE_W + 12;  // small margin past the KP08
 
 // ---- the part ----
 module motor_mount() {
@@ -81,11 +87,12 @@ module motor_mount() {
           rotate([0, 90, 0])
             cylinder(d = NEMA17_HOLE_D, h = PLATE_THK + 2);
 
-    // KP08 mounting holes through the floor
-    KP08_HOLE_X1 = KP08_START_X + (KP08_BASE_L - KP08_HOLE_SPACING) / 2;
-    KP08_HOLE_X2 = KP08_START_X + (KP08_BASE_L + KP08_HOLE_SPACING) / 2;
-    for (x = [KP08_HOLE_X1, KP08_HOLE_X2])
-      translate([x, FLOOR_BOTTOM_Y - 1, 0])
+    // KP08 mounting holes through the floor.
+    // The bolt-hole axis is PERPENDICULAR to the bore (Z in this local
+    // frame), spaced J = KP08_HOLE_SPACING centre-to-centre. Both holes
+    // share the same X (the KP08's centre along the bore axis).
+    for (z = [-KP08_HOLE_SPACING / 2, KP08_HOLE_SPACING / 2])
+      translate([KP08_CENTER_X, FLOOR_BOTTOM_Y - 1, z])
         cylinder(d = KP08_HOLE_D, h = FLOOR_THK + 2);
 
     // Anti-rotation rod hole — passes through the back plate, extends some way into the rig
