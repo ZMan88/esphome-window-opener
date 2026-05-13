@@ -20,6 +20,13 @@ geometry is diffable in git.
   Render with the camera invocations below to get the three views in
   `../stl/rig-assembled-{top,side,iso}.png`. The standalone parts'
   STLs/PNGs remain the source-of-truth for slicing.
+- `window-opener-rig.skp` — **SketchUp model** of the rig in window context.
+  Built via the Trimble SketchUp MCP using the same dimensions as the SCAD
+  sources. Contains the rig (printed parts + stand-ins for the hardware) and
+  a 845 × 1325 mm tilt-and-turn window (frame + sash + glass). Open in
+  SketchUp Free (web) or any desktop SketchUp to rotate / measure / inspect.
+  Thumbnail beside the file: `window-opener-rig.skp.png`. The SCAD sources
+  remain the source-of-truth — the `.skp` is a visualisation snapshot.
 
 ## Install OpenSCAD
 
