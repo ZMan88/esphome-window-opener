@@ -36,12 +36,13 @@
 include <common.scad>;
 
 // ---- design parameters (tune as needed) ----
-PLATE_THK         = 6;         // back-plate thickness (X direction)
-FLOOR_THK         = 6;         // floor thickness (Y direction)
-ANTI_ROT_OFFSET   = 30;        // anti-rotation rod offset below the lead-screw axis
-ANTI_ROT_HOLE_D   = 8.4;       // 8 mm rod with print clearance
-GUSSET_T          = 4;         // gusset rib thickness for L-corner stiffness
-MOTOR_FLOOR_EXT   = NEMA17_BODY_L + 2;  // how far floor extends in -X past back plate
+PLATE_THK          = 6;         // back-plate thickness (X direction)
+FLOOR_THK          = 6;         // floor thickness (Y direction)
+ANTI_ROT_OFFSET    = 30;        // anti-rotation rod offset below the lead-screw axis
+ANTI_ROT_HOLE_D    = 8.4;       // 8 mm rod with print clearance
+GUSSET_T           = 4;         // gusset rib thickness for L-corner stiffness
+GUSSET_LEG         = 25;        // gusset leg length (square triangle)
+COUPLER_MOTOR_GRIP = 12;        // mm of motor shaft buried inside the coupler
 
 // ---- derived geometry ----
 SHAFT_Y           = 0;                                  // lead-screw axis at Y=0
@@ -49,20 +50,26 @@ FLOOR_TOP_Y       = SHAFT_Y - NEMA17_FACE / 2;          // -21.15: motor body si
 FLOOR_BOTTOM_Y    = FLOOR_TOP_Y - FLOOR_THK;            // -27.15
 PEDESTAL_HEIGHT   = -KP08_BORE_HEIGHT - FLOOR_TOP_Y;    //  7.15: lifts KP08 base up to bore alignment
 KP08_BASE_Y       = -KP08_BORE_HEIGHT;                  // -14: pedestal top = KP08 base bottom
-NEMA_FACE_HALF    = NEMA17_FACE / 2;
 
-BACK_PLATE_TOP_Y    = SHAFT_Y + NEMA_FACE_HALF + 4;     //  25.15
+BACK_PLATE_TOP_Y    = SHAFT_Y + NEMA17_FACE / 2 + 4;    //  25.15
 BACK_PLATE_BOT_Y    = SHAFT_Y - ANTI_ROT_OFFSET - 5;    // -35: extends below floor for anti-rot rod
 BACK_PLATE_W        = NEMA17_FACE + 16;                 //  58.3: Z width with margin
 
-// KP08 position along X (the bore axis):
-//   KP08_START_X = where the KP08 base STARTS in X (motor side)
-//   The base is KP08_BASE_W (= A = 13 mm) wide along X.
-KP08_START_X      = NEMA17_SHAFT_L + 2;                 // clearance for the motor shaft + a hair
-KP08_CENTER_X     = KP08_START_X + KP08_BASE_W / 2;
-FLOOR_LEN_X       = KP08_START_X + KP08_BASE_W + 12;    // small margin past the KP08
-PEDESTAL_X_W      = KP08_BASE_W + 4;
-PEDESTAL_Z_W      = KP08_BASE_L;                        // matches KP08 base depth perpendicular to bore
+// Floor extends behind the back plate only as far as the gusset reach —
+// the back plate's 4 M3 bolts carry the motor; the floor just sits the
+// motor at the right Y and gives it something to rest on near the L.
+MOTOR_FLOOR_EXT   = GUSSET_LEG;                         //  25
+
+// KP08 must sit past the coupler. The coupler is COUPLER_L (= 25) long
+// and grips COUPLER_MOTOR_GRIP (= 12) of the motor shaft, so its +X end
+// sits at (shaft_tip - COUPLER_MOTOR_GRIP + COUPLER_L).
+SHAFT_TIP_X       = NEMA17_SHAFT_L - PLATE_THK;         //  18: motor shaft tip in rig coords
+COUPLER_END_X     = SHAFT_TIP_X - COUPLER_MOTOR_GRIP + COUPLER_L;  // 31
+KP08_START_X      = COUPLER_END_X + 1;                  //  32: 1 mm clearance past coupler
+KP08_CENTER_X     = KP08_START_X + KP08_BASE_W / 2;     //  38.5
+FLOOR_LEN_X       = KP08_START_X + KP08_BASE_W + 4;     //  49: small margin past KP08
+PEDESTAL_X_W      = KP08_BASE_W + 4;                    //  17
+PEDESTAL_Z_W      = KP08_BASE_L;                        //  55: matches KP08 base perpendicular to bore
 
 // ---- the part ----
 module motor_mount() {
@@ -90,11 +97,11 @@ module motor_mount() {
         // +X side gusset
         translate([0, FLOOR_TOP_Y, z])
           linear_extrude(GUSSET_T)
-            polygon([[0, 0], [25, 0], [0, 25]]);
+            polygon([[0, 0], [GUSSET_LEG, 0], [0, GUSSET_LEG]]);
         // -X side gusset (mirror — supports back plate ↔ motor-floor join)
         translate([-PLATE_THK, FLOOR_TOP_Y, z])
           linear_extrude(GUSSET_T)
-            polygon([[0, 0], [-25, 0], [0, 25]]);
+            polygon([[0, 0], [-GUSSET_LEG, 0], [0, GUSSET_LEG]]);
       }
     }
 
