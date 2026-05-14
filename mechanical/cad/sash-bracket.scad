@@ -7,6 +7,13 @@
 // into the sash. (You'll still need to drill a small Ø6.5 mm pilot in the
 // sash for the protruding tail of the rod-end shank — see install notes.)
 //
+// The M6 hole is NOT on the plate's vertical centreline — it's shifted
+// M6_HOLE_OFFSET (= 11 mm) toward one long edge so that, in the assembled
+// rig, the hole aligns with the carriage's offset M6 tap. The carriage's
+// rod-end tap is offset from its centreline in Z (M6_TAP_Z_OFFSET in
+// rig-carriage.scad) to clear the anti-rotation rod hole. If that
+// offset ever changes, update M6_HOLE_OFFSET here to match.
+//
 // Print orientation: BACK FACE UP (so the hex pocket prints clean,
 // without supports inside the cavity). The M4 holes will print over the
 // pocket-side; that's fine, they're large enough.
@@ -17,7 +24,9 @@
 include <common.scad>;
 
 // -------- dimensions --------
-PLATE_H          = 45;    // plate height (vertical on the sash face)
+PLATE_H_BASE     = 45;    // symmetric base height before offset
+M6_HOLE_OFFSET   = 11;    // matches |M6_TAP_Z_OFFSET| in rig-carriage.scad
+PLATE_H          = PLATE_H_BASE + M6_HOLE_OFFSET;   // 56: grown to keep the M6 hole clear of the M4 corner holes
 
 NUT_AF           = 10.0;  // M6 nut across-flats
 NUT_THK          = 5.5;   // M6 nut nominal thickness + a hair of clearance
@@ -25,7 +34,13 @@ POCKET_DEPTH     = 4.0;   // hex pocket depth on the back face (deeper = more nu
 
 SCREW_INSET_X    = 20;    // distance from short edge to M4 centre
 SCREW_INSET_Y    = 10;    // distance from long edge to M4 centre
-ROD_END_OFFSET_Y = PLATE_H / 2;   // M6 centred vertically
+
+// M6 sits PLATE_H_BASE / 2 from the bottom edge, then shifts another
+// M6_HOLE_OFFSET upward. The extra plate height (PLATE_H - PLATE_H_BASE)
+// is added on the top side so the top-row M4 corner holes have room
+// above the M6 hole, while the bottom-row M4 holes stay close to the
+// original positions.
+ROD_END_OFFSET_Y = PLATE_H_BASE / 2 + M6_HOLE_OFFSET;   // = 33.5
 
 // -------- the part --------
 module hex_prism(across_flats, h) {
