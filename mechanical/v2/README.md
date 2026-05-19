@@ -42,7 +42,7 @@ pushed away.
 | 1 | NEMA17 motor (LDO 42STH48-1684MAC) | reused from v1 |
 | 2 | Tr8x8 lead screw, ~500 mm | reused from v1 (longer; see stroke notes) |
 | 3 | Prusa MK3 brass nut | reused from v1 |
-| 4 | Ø5–Ø8 universal joint | sourced (cheap, ~$5) |
+| 4 | Ø5–Ø8 single Cardan U-joint, L=35 mm, OD=14 mm | QUARKZMAN / Aopin pin-and-block style, 45° max angle, 2× M4 set screws per bore. Listing: Amazon DE `B0DTTRBWLK` (QUARKZMAN, 2-pack with wrench and spare grub screws). Equivalent Amazon US `B08V92X8M8` (Aopin). |
 | 5 | Cross pins for gimbal (Ø3 × 25 mm) | sourced (steel dowel) |
 | 6 | sash-motor-mount | printed — `cad/sash-motor-mount.scad` |
 | 7 | frame-nut-gimbal | printed — `cad/frame-nut-gimbal.scad` |
@@ -86,7 +86,26 @@ giving ~150 mm of stroke each way.
 | Closed → full tilt (~15°) | screw pitch + yaw both vary, max ~25° from horizontal |
 | Closed → 90° turn | screw yaw varies by ~25° in the horizontal plane |
 
-A 2-DOF gimbal with ±30° pin clearance handles both.
+A 2-DOF gimbal with ±30° pin clearance handles both, and the
+sourced 45°-max U-joint covers the motor-shaft side with ~20°
+headroom.
+
+## U-joint install notes
+
+- **Motor end (5 mm bore):** seat both M4 set screws on the LDO 42STH48's
+  D-flat (15 mm long × 4.5 mm deep, declared in `common.scad`). Loctite
+  blue on the threads — the joint sees full motor torque and constant
+  vibration.
+- **Lead-screw end (8 mm bore):** Tr8 has no flat. File a small flat
+  (~6 mm × 0.3 mm) on the smooth end-section of the screw for the
+  set screws to bite. Loctite there too.
+- **Backlash:** budget 1–2° of rotational play in the joint. At the
+  Tr8 lead this is < 0.05 mm of axial slop — invisible at the percent
+  resolution the HA `cover` entity exposes.
+- **Velocity-ratio variation:** a single Cardan introduces ±10% RPM
+  ripple at 25° angle. Irrelevant for a slow window cover, but if
+  position holding ever feels jittery at the extremes, the upgrade is
+  a double-Cardan or a constant-velocity joint of the same family.
 
 ## Render
 
