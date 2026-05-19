@@ -96,6 +96,10 @@ openscad --export-format binstl -o ../stl/sash-motor-mount.stl  sash-motor-mount
 openscad --export-format binstl -o ../stl/frame-nut-gimbal.stl  frame-nut-gimbal.scad
 openscad --colorscheme=Nature --imgsize=900,600 -o ../stl/sash-motor-mount.png sash-motor-mount.scad
 openscad --colorscheme=Nature --imgsize=900,600 -o ../stl/frame-nut-gimbal.png frame-nut-gimbal.scad
-openscad --camera=200,400,400,200,0,0 --imgsize=1600,900 --colorscheme=Tomorrow \
+openscad --camera=350,-350,500,250,0,-15 --imgsize=1600,900 --colorscheme=Tomorrow \
          -o ../stl/v2-assembled-iso.png  v2-assembled.scad
+
+# Single mesh STL of the whole assembly (viewing aid, not for slicing —
+# the hardware stand-ins for motor / U-joint / screw / nut are baked in)
+openscad --export-format binstl -o ../stl/v2-assembled.stl v2-assembled.scad
 ```
