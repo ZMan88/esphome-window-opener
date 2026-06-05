@@ -71,9 +71,10 @@ substitutions:
   lock_hold_current: "900mA"   # standstill while locked (firmer anti-backdrive)
 
   # The window's OWN closed/contact sensor, already present in Home Assistant.
-  # REPLACE this with your real entity id. Door/window contacts follow the HA
-  # convention state "on" = OPEN, "off" = CLOSED — handled in window_closed's
-  # lambda below; flip it there if your sensor is reversed.
+  # SET THE REAL ENTITY ID IN window-opener.yaml (it overrides this default) —
+  # this line is just a fallback so the variant validates standalone. Door/window
+  # contacts follow the HA convention state "on" = OPEN, "off" = CLOSED, handled
+  # in window_closed's lambda below; flip it there if your sensor is reversed.
   closed_sensor_entity: "binary_sensor.window_contact"
 
 external_components:

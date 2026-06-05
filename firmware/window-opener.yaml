@@ -10,6 +10,14 @@ substitutions:
   device_name: window-opener
   device_friendly: "Window Opener"
 
+  # The window's existing "is it closed?" contact sensor, ALREADY in Home
+  # Assistant (a reed/contact sensor, Zigbee/Z-Wave door sensor, etc.). This is
+  # NOT an external_component — it's an HA entity pulled back over the API.
+  # Put the real entity id here. Convention assumed: state "on" = OPEN,
+  # "off" = CLOSED (flip the lambda in stepper-uart.yaml if yours is reversed).
+  # This overrides the default in the active variant file.
+  closed_sensor_entity: "binary_sensor.window_contact"
+
 esphome:
   name: ${device_name}
   friendly_name: ${device_friendly}

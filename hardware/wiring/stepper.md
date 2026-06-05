@@ -62,8 +62,10 @@ The XIAO ESP32-C6 only breaks out 11 GPIOs (D0-D10), so most ESP32-C6 examples t
 
 **Current state (`stepper-uart.yaml`): the D8 micro-switch is NOT installed.**
 Closed detection runs off the window's **own contact sensor, imported from Home
-Assistant**. Set the entity in the variant's `closed_sensor_entity` substitution
-(default `binary_sensor.window_contact`). The HA contact is the homing reference
+Assistant** (the built-in `homeassistant` platform — *not* an `external_component`).
+Set the entity in the `closed_sensor_entity` substitution **in
+`firmware/window-opener.yaml`** (default `binary_sensor.window_contact`; the entry
+file overrides the variant's fallback). The HA contact is the homing reference
 and the free-wheel move-detector. Convention assumed: HA state `on` = open,
 `off` = closed — flip the `!...state` in `window_closed`'s lambda if reversed.
 
