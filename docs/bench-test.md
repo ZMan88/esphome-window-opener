@@ -128,6 +128,50 @@ If all four pass, Phase 1 is done.
 | TMC2209 dies on first power-up | **Missing 100 µF cap** | Order another driver. Don't skip the cap this time. |
 | Position drifts after multiple moves | Steps lost (current too low, speed too high, or mechanical bind) | Lower `max_speed` in `stepper.yaml`; increase Vref; check the lead screw moves freely by hand. |
 
+## Feature test — lock / free-wheel / HA closed sensor (`stepper-uart` variant)
+
+These exercise the firmware feature set added 2026-06-05. Run them at the desk
+(bare motor, no window) before mounting. They only apply to
+`firmware/variants/stepper-uart.yaml` — the linear-actuator and basic-stepper
+variants don't have current-based lock/free-wheel.
+
+### Simulating the window contact on the bench
+
+There's no real window contact on the desk, so fake it with a Home Assistant
+helper and point the firmware at it:
+
+1. In HA: **Settings → Devices & services → Helpers → Create → Toggle**, name it
+   e.g. *Fake window contact* (`input_boolean.fake_window_contact`).
+2. In `firmware/variants/stepper-uart.yaml` set
+   `closed_sensor_entity: "input_boolean.fake_window_contact"`, flash.
+3. Polarity matches the real convention used in the lambda: **toggle ON = window
+   OPEN, toggle OFF = window CLOSED**. (Flip the `!...state` in `window_closed`'s
+   lambda if your real sensor is the other way round.)
+
+Watch `esphome logs firmware/window-opener.yaml` throughout — every transition
+logs a line.
+
+### Tests
+
+| # | Do this | Expect |
+|---|---|---|
+| F1 | Flash with the fake contact **ON** (open). Look at `cover.window` position. | Position is **`unknown`** — no homing has happened, and boot is passive (motor does **not** move). |
+| F2 | Toggle the fake contact **OFF** (closed). | `window_closed` → on_press fires: position snaps to **0** with **no motor motion** (homed in place). Log: "Homed…". |
+| F3 | Toggle contact **ON** (open) again, then call `cover.open_cover`. | Position was known, so it just runs toward open. (If you'd toggled to make position unknown first, the move would **home toward closed first**, then open.) |
+| F4 | Call **`lock.lock`** on `lock.window_lock`. | Motor drives to closed (pos 0), then *Window opener — actual current* climbs to ~**900 mA** (the lock clamp). Lock entity shows **locked**. |
+| F5 | While locked, call `cover.open_cover` or set position 50. | **Ignored.** Log: "Locked — open/position command ignored". Slider snaps back. `cover.close_cover` is still allowed. |
+| F6 | While locked, turn on `switch.window_freewheel`. | **Rejected.** Log: "Cannot free-wheel while locked". Toggle reverts to off on its own. |
+| F7 | Call `lock.unlock`. | Hold current drops back to ~**500 mA**; lock shows **unlocked**. |
+| F8 | Power-cycle while **locked** (lock first, then unplug/replug). | On boot it actively drives closed and re-clamps to ~900 mA; lock entity comes back **locked**. (Only the locked state moves the motor on boot.) |
+| F9 | Unlocked: turn on `switch.window_freewheel`. | *actual current* drops to **0**; the shaft spins **freely by hand** (driver disabled via `tmc2209.disable`). |
+| F10 | While free-wheeling, toggle the fake contact (simulate the sash crossing the closed point), then turn the switch **off**. | Position goes **`unknown`** (move detected). Next `cover.*` command **homes first**, then moves. |
+| F11 | While free-wheeling, *don't* toggle the contact, then turn the switch off. | Position is **kept** (no crossing detected → assumed unmoved). Known limitation: a real hand-move that never crosses the contact isn't caught — see `PLAN.md`. |
+
+> **Open-end stall (F-extra):** StallGuard is disabled on the bench (`threshold: 0`)
+> because an unloaded motor reads near-stall constantly. The "stall while opening
+> → reported full stroke" path is therefore inert until SGTHRS is tuned on the
+> real rig — see `docs/build-log.md` "Phase 3 — StallGuard tuning procedure".
+
 ## After Phase 1 passes
 
 Move to **Phase 2 — mechanical bring-up**:

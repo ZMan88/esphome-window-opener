@@ -58,11 +58,26 @@ The XIAO ESP32-C6 only breaks out 11 GPIOs (D0-D10), so most ESP32-C6 examples t
 
 **Required:** a 100 µF electrolytic capacitor across `VM` and `GND`, close to the TMC2209. Missing this cap is the #1 cause of driver death.
 
-## Endstop
+## Endstop / closed detection
+
+**Current state (`stepper-uart.yaml`): the D8 micro-switch is NOT installed.**
+Closed detection runs off the window's **own contact sensor, imported from Home
+Assistant**. Set the entity in the variant's `closed_sensor_entity` substitution
+(default `binary_sensor.window_contact`). The HA contact is the homing reference
+and the free-wheel move-detector. Convention assumed: HA state `on` = open,
+`off` = closed — flip the `!...state` in `window_closed`'s lambda if reversed.
+
+> Trade-off: homing now depends on the HA connection. If HA is unreachable at
+> boot, the homing sweep can't confirm closed and position stays `unknown` until
+> it reconnects (or the open-side StallGuard hard stop is hit).
+
+To add a **physical** closed endstop later (makes homing local + HA-independent):
 
 - Normally-open micro-switch (or magnetic reed + magnet on the carriage).
 - One lead to XIAO `D8` (GPIO19), other lead to `GND`.
 - Firmware uses `INPUT_PULLUP` with `inverted: true`.
+- Uncomment the `endstop_closed` `binary_sensor` block in `stepper-uart.yaml`
+  **and** the `|| id(endstop_closed).state` term in `window_closed`'s lambda.
 
 ## Current limit
 

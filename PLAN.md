@@ -37,12 +37,19 @@ Append entries as decisions get made. Format: `YYYY-MM-DD — decision — reaso
 - 2026-04-29 — **MCU swapped to ESP32-C6** (already in user's drawer). Kept ESPHome with native API for v1; the C6 keeps Matter/Thread on the table for a future migration. Required: framework switch from `arduino` to `esp-idf`, GPIO remap 25/26/27/34 → 4/5/6/7.
 - 2026-05-06 — Specific board confirmed: **Seeed Studio XIAO ESP32-C6** (smaller than the DevKitC-1, only 11 GPIOs broken out). GPIO remapped 4/5/6/7 → 1/2/21/19, exposed as XIAO labels D1/D2/D3/D8. Pin assignment: D1=DIR, D2=STEP, D3=EN, D8=endstop.
 - 2026-05-08 — Phase 1 bench-test passed (motor moves on command via HA). Added `variants/stepper-uart.yaml` for the UART-driven upgrade: motor current set in software, current/load/temperature surfaced as HA sensors, StallGuard available. The BTT V1.3 has buffered TX/RX (verified by multimeter — no continuity), so UART wires are direct cross-connection (XIAO D6 ↔ driver RX, XIAO D7 ↔ driver TX) with no series resistor needed.
+- 2026-06-05 — **Firmware feature pass on `stepper-uart.yaml`** (now the active variant in `window-opener.yaml`):
+  - **Closed detection via the window's own contact sensor imported from HA** (`closed_sensor_entity` substitution), not the printed D8 switch. The D8 endstop is **not installed at the moment** — its block is left commented, ready to OR back in. Reason: v2 mechanical has no carriage to mount the switch on yet, and the window already has a contact sensor. Trade-off: homing now depends on the HA connection.
+  - **Lock** (`lock.window_lock`): drives fully closed then clamps at a firmer hold current (`lock_hold_current`, default 900 mA); refuses open/position commands while locked (closing still allowed). The manual handle remains the real mechanical lock. Lock state persists across reboot (re-homes then re-clamps on boot).
+  - **Free-wheel** (`switch.window_freewheel`): `tmc2209.disable` so the sash is hand-movable. Move-detection: a transition of the closed signal while free-wheeling marks position unknown → next command re-homes first. Limitation: a bare TMC2209 has no rotor feedback, so hand-movement that never crosses the closed sensor can't be detected (keeps last position). Encoder would fix this — deferred.
+  - **Open-end** = StallGuard hard-stop (DIAG on D9): a stall while opening reports position = full stroke; a stall while closing is treated as an obstruction (stop + hold, no retry). Inert until SGTHRS is tuned in Phase 3.
+  - **Homing**: passive on boot (no auto-motion — a power blip won't slam an open window shut). Position reads `unknown` until the closed contact reports shut (zeroes in place) or the first move triggers a homing sweep. Locked state is the exception: it actively drives closed on boot to re-clamp. CLAUDE.md "unknown until homed" invariant now actually enforced.
 
 ## Open questions
 
 - License choice (placeholder MIT).
 - 3D-print material for brackets — PETG vs ABS (sun/heat resistance).
-- Do we want an `esphome` `switch` for "home now" on boot, or keep homing fully automatic?
+- ~~Do we want an `esphome` `switch` for "home now" on boot, or keep homing fully automatic?~~ **Resolved 2026-06-05:** homing is fully automatic on boot and on-demand before any move when position is unknown. No manual "home" button. (A free-wheel switch and a lock entity were added instead.)
+- Free-wheel hand-movement that never crosses the closed sensor isn't detectable without rotor feedback — add a magnetic encoder (e.g. AS5600 on the screw) if per-mm position must survive manual moves. Deferred.
 - Stall detection threshold — decide empirically in Phase 1.
 - Handle-position sensor (reed switch) to detect tilt vs turn mode — if added, firmware can remap `cover.position` per mode for clean HA UX. Defer to v1.5.
 - Exact sash weight — estimated 15–25 kg; confirm with a luggage scale before final actuator purchase.

@@ -20,10 +20,61 @@
 # See hardware/wiring/stepper.md for the R10 detail and the 1 kΩ rationale.
 #
 # Pin map: hardware/wiring/stepper.md
+#
+# ─────────────────────────────────────────────────────────────────────────
+# FEATURE SET (TMC2209/UART-specific — not portable to the linear-actuator
+# variant, which has no current control or freewheel concept):
+#
+#   • Homing            — drives toward the closed end until the closed signal
+#                         trips, then zeroes. Boot is PASSIVE: no auto-motion
+#                         (a power blip won't slam an open window shut). On boot
+#                         position is `unknown` and is recovered for free the
+#                         moment the closed contact reports shut (zeroes in
+#                         place), or by a homing sweep before the first move if
+#                         still unknown. Locked state is the one exception — it
+#                         actively drives closed on boot to re-clamp. Position
+#                         reads `unknown` in HA until homed (CLAUDE.md invariant).
+#   • Closed detection  — the window's OWN contact sensor imported from Home
+#                         Assistant (${closed_sensor_entity}) signals "sash
+#                         shut". The printed D8 endstop is NOT installed yet;
+#                         its block is left commented for when it's added.
+#                         (Homing therefore depends on the HA connection right
+#                         now — if HA is unreachable on boot the sweep can't
+#                         confirm closed and position stays unknown.)
+#   • Open detection    — StallGuard (DIAG on D9) is the open hard-stop
+#                         reference once tuned in Phase 3. Until SGTHRS is
+#                         set (threshold: 0 below) this is inert; the
+#                         calibrated step count is the working open limit.
+#   • Lock              — `lock.window_lock`. Drives fully closed, then holds
+#                         energized at ${lock_hold_current} so the screw
+#                         resists back-driving. Open/position commands are
+#                         refused while locked (closing is still allowed).
+#                         The manual handle remains the real mechanical lock.
+#   • Free-wheel        — `switch.window_freewheel`. Disables the driver so
+#                         the window can be moved by hand. While free-wheeling,
+#                         a transition of the closed signal means the sash was
+#                         physically moved → position is marked unknown and the
+#                         next command re-homes first. NOTE: a bare TMC2209 has
+#                         no rotor feedback, so hand-movement that never crosses
+#                         the closed sensor cannot be detected — re-engaging
+#                         then keeps the last position. Add an encoder if that
+#                         matters. Cannot be enabled while locked.
+# ─────────────────────────────────────────────────────────────────────────
 
 substitutions:
   # LDO at 0.9°/step × 1/16 microsteps × Tr8x8 = 800 µsteps/mm; 180 mm stroke.
   steps_full_stroke: "144000"
+
+  # TMC2209 currents (UART register writes; the Vref pot is ignored).
+  run_current: "1100mA"        # during motion
+  hold_current: "500mA"        # standstill, unlocked
+  lock_hold_current: "900mA"   # standstill while locked (firmer anti-backdrive)
+
+  # The window's OWN closed/contact sensor, already present in Home Assistant.
+  # REPLACE this with your real entity id. Door/window contacts follow the HA
+  # convention state "on" = OPEN, "off" = CLOSED — handled in window_closed's
+  # lambda below; flip it there if your sensor is reversed.
+  closed_sensor_entity: "binary_sensor.window_contact"
 
 external_components:
   - source: github://slimcdk/esphome-custom-components
@@ -62,6 +113,30 @@ stepper:
           level: INFO
           format: "Stall detected — stopping window"
       - stepper.stop: window_stepper
+      # Interpret the stall by what we were doing when it fired:
+      - if:
+          condition:
+            lambda: 'return id(g_homing);'
+          then:
+            # Hit the closed hard stop during a homing sweep → this IS home.
+            - stepper.report_position: { id: window_stepper, position: 0 }
+            - stepper.set_target: { id: window_stepper, target: 0 }
+            - globals.set: { id: g_homed, value: 'true' }
+            - globals.set: { id: g_homing, value: 'false' }
+            - logger.log: "Homed via stall (closed hard stop)"
+          else:
+            - if:
+                condition:
+                  lambda: 'return id(g_move_dir) == 1;'
+                then:
+                  # Stalled while opening → reached the open hard stop.
+                  - stepper.report_position:
+                      id: window_stepper
+                      position: ${steps_full_stroke}
+                  - logger.log: "Open hard stop reached via stall"
+                # else: stalled while closing/holding → obstruction. Stop and
+                # hold, do NOT auto-retry (CLAUDE.md safety invariant).
+      - globals.set: { id: g_move_dir, value: '0' }
     on_status:
       # Surface the chip's temperature threshold flags as a single sensor that
       # holds the lower bound of the current band: 0 / 120 / 143 / 150 / 157.
@@ -90,6 +165,119 @@ stepper:
           condition: { lambda: 'return code == tmc2209::TEMPERATURE_BELOW_157C;' }
           then: { sensor.template.publish: { id: driver_temp_band, state: 150 } }
 
+# ---- runtime state ----
+globals:
+  - id: g_homed          # position is known (a successful home has happened)
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+  - id: g_homing         # a homing sweep is in progress (used by on_stall)
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+  - id: g_locked         # lock engaged; persists across reboot
+    type: bool
+    restore_value: yes
+    initial_value: 'false'
+  - id: g_freewheel      # driver disabled, window hand-movable
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+  - id: g_pos_dirty      # closed signal moved while free-wheeling → position suspect
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+  - id: g_move_dir       # last commanded direction: +1 opening, -1 closing, 0 idle
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+script:
+  # Drive toward the closed end until the combined closed signal trips (or the
+  # closed hard stop stalls, handled in on_stall), then zero the position.
+  - id: do_home
+    mode: restart
+    then:
+      - logger.log: "Homing → driving toward closed"
+      # Make sure the driver is live (a homing request overrides free-wheel).
+      - if:
+          condition: { lambda: 'return id(g_freewheel);' }
+          then:
+            - tmc2209.enable: { id: window_stepper }
+            - globals.set: { id: g_freewheel, value: 'false' }
+      - globals.set: { id: g_homing, value: 'true' }
+      - globals.set: { id: g_move_dir, value: '-1' }
+      - stepper.set_target:
+          id: window_stepper
+          target: !lambda 'return id(window_stepper).current_position - (long)(${steps_full_stroke} * 1.2);'
+      - wait_until:
+          condition:
+            or:
+              - binary_sensor.is_on: window_closed
+              - lambda: 'return id(g_homed);'   # set by on_stall if we hit the hard stop
+          timeout: 90s
+      - stepper.stop: window_stepper
+      - if:
+          condition:
+            binary_sensor.is_on: window_closed
+          then:
+            - stepper.report_position: { id: window_stepper, position: 0 }
+            - stepper.set_target: { id: window_stepper, target: 0 }
+            - globals.set: { id: g_homed, value: 'true' }
+            - globals.set: { id: g_pos_dirty, value: 'false' }
+            - logger.log: "Homed (closed sensor tripped)"
+          else:
+            - if:
+                condition: { lambda: 'return id(g_homed);' }
+                then:
+                  - logger.log: "Homed (closed hard stop via stall)"
+                else:
+                  - logger.log:
+                      level: WARN
+                      format: "Homing failed: no closed signal within 90 s — position stays unknown"
+      - globals.set: { id: g_homing, value: 'false' }
+      - globals.set: { id: g_move_dir, value: '0' }
+
+  # Single entry point for all motion. Enforces lock + homing, then targets pos.
+  - id: goto
+    mode: restart
+    parameters:
+      pos: float
+    then:
+      - if:
+          condition:
+            lambda: 'return id(g_locked) && pos > 0.001f;'
+          then:
+            - logger.log: "Locked — open/position command ignored (unlock first)"
+          else:
+            # Leaving free-wheel: re-engage the driver. If the sash was moved
+            # across the closed sensor while free, position is now unknown.
+            - if:
+                condition: { lambda: 'return id(g_freewheel);' }
+                then:
+                  - tmc2209.enable: { id: window_stepper }
+                  - globals.set: { id: g_freewheel, value: 'false' }
+                  - if:
+                      condition: { lambda: 'return id(g_pos_dirty);' }
+                      then:
+                        - globals.set: { id: g_homed, value: 'false' }
+            # Re-home first if position is unknown.
+            - if:
+                condition: { lambda: 'return !id(g_homed);' }
+                then:
+                  - script.execute: do_home
+                  - script.wait: do_home
+            # Only move if homing succeeded.
+            - if:
+                condition: { lambda: 'return id(g_homed);' }
+                then:
+                  - globals.set:
+                      id: g_move_dir
+                      value: !lambda 'return ((long)(pos * ${steps_full_stroke}) >= id(window_stepper).current_position) ? 1 : -1;'
+                  - stepper.set_target:
+                      id: window_stepper
+                      target: !lambda 'return (long)(pos * ${steps_full_stroke});'
+
 esphome:
   on_boot:
     - tmc2209.configure:
@@ -116,8 +304,28 @@ esphome:
         threshold: 0
     - tmc2209.currents:
         id: window_stepper
-        run_current: 1100mA
-        hold_current: 500mA
+        standstill_mode: normal
+        run_current: ${run_current}
+        hold_current: ${hold_current}
+    # Homing on boot is deliberately PASSIVE for the unlocked case: we never
+    # auto-drive the motor on boot, so a power blip can't slam an open window
+    # shut. Position stays `unknown` until either the closed contact reports
+    # shut (window_closed's on_press homes in place, no motion) or the first
+    # user command triggers a homing sweep. The ONLY exception is restoring a
+    # lock, where we actively drive closed and re-clamp.
+    - delay: 3s
+    - if:
+        condition: { lambda: 'return id(g_locked);' }
+        then:
+          - logger.log: "Restoring lock — driving closed and clamping"
+          - script.execute: do_home
+          - script.wait: do_home
+          - tmc2209.currents:
+              id: window_stepper
+              standstill_mode: normal
+              run_current: ${run_current}
+              hold_current: ${lock_hold_current}
+          # window_lock's lambda already reports LOCKED from the restored g_locked.
 
 sensor:
   - platform: tmc2209
@@ -178,20 +386,51 @@ sensor:
     entity_category: diagnostic
 
 binary_sensor:
-  - platform: gpio
-    id: endstop_closed
-    pin:
-      number: GPIO19          # XIAO D8
-      mode: INPUT_PULLUP
-      inverted: true
+  # Printed closed-end microswitch on D8. NOT INSTALLED at the moment — closed
+  # detection currently runs off the HA contact sensor alone. To add the
+  # physical endstop later: uncomment this block AND the endstop_closed term in
+  # window_closed's lambda below.
+  # - platform: gpio
+  #   id: endstop_closed
+  #   pin:
+  #     number: GPIO19          # XIAO D8
+  #     mode: INPUT_PULLUP
+  #     inverted: true
+
+  # The window's OWN contact sensor, imported from Home Assistant. Requires the
+  # API connection (common/base.yaml). Convention: state "on" = OPEN.
+  - platform: homeassistant
+    id: ha_window_contact
+    entity_id: ${closed_sensor_entity}
+    internal: true
+
+  # "Sash is shut" signal. Currently the HA contact alone; OR in the printed
+  # endstop once it's installed. This is the homing reference and the
+  # free-wheel move-detector.
+  - platform: template
+    id: window_closed
+    name: "Window at closed position"
+    icon: mdi:window-closed-variant
+    lambda: |-
+      // HA window/door contact: has_state() guards against "unavailable"
+      // (defaults to false, which would otherwise read as CLOSED). Flip the
+      // "!...state" if your sensor reports on == closed.
+      bool ha_closed = id(ha_window_contact).has_state() && !id(ha_window_contact).state;
+      return ha_closed;   // || id(endstop_closed).state;  ← add when D8 is wired
     on_press:
-      then:
-        - stepper.report_position:
-            id: window_stepper
-            position: 0
-        - stepper.set_target:
-            id: window_stepper
-            target: 0
+      # Became closed → snap the home reference to 0 (corrects any drift).
+      - stepper.report_position: { id: window_stepper, position: 0 }
+      - stepper.set_target: { id: window_stepper, target: 0 }
+      - globals.set: { id: g_homed, value: 'true' }
+      - globals.set: { id: g_pos_dirty, value: 'false' }
+    on_release:
+      # Left closed while free-wheeling → the sash was moved by hand.
+      - if:
+          condition: { lambda: 'return id(g_freewheel);' }
+          then:
+            - globals.set: { id: g_pos_dirty, value: 'true' }
+            - globals.set: { id: g_homed, value: 'false' }
+            - logger.log: "Window moved by hand while free-wheeling — position unknown"
 
 cover:
   - platform: template
@@ -200,20 +439,78 @@ cover:
     device_class: window
     has_position: true
     lambda: |-
+      if (!id(g_homed)) return NAN;   // unknown until first home
       return id(window_stepper).current_position / (float) ${steps_full_stroke};
     open_action:
-      - stepper.set_target:
-          id: window_stepper
-          target: ${steps_full_stroke}
+      - script.execute: { id: goto, pos: 1.0 }
     close_action:
-      - stepper.set_target:
-          id: window_stepper
-          target: 0
-    stop_action:
-      - stepper.set_target:
-          id: window_stepper
-          target: !lambda "return id(window_stepper).current_position;"
+      - script.execute: { id: goto, pos: 0.0 }
     position_action:
-      - stepper.set_target:
+      - script.execute: { id: goto, pos: !lambda 'return pos;' }
+    stop_action:
+      - script.stop: goto
+      - script.stop: do_home
+      - stepper.stop: window_stepper
+      - globals.set: { id: g_homing, value: 'false' }
+      - globals.set: { id: g_move_dir, value: '0' }
+
+# Motor-driven "hold it shut" lock. Not the mechanical handle lock — this keeps
+# the actuator clamped closed and refuses to open until unlocked.
+lock:
+  - platform: template
+    name: "Window lock"
+    id: window_lock
+    icon: mdi:lock
+    # State is derived from g_locked; the lambda auto-reports it (no manual publish).
+    lambda: |-
+      return id(g_locked) ? lock::LOCK_STATE_LOCKED : lock::LOCK_STATE_UNLOCKED;
+    lock_action:
+      - logger.log: "Locking — closing fully and clamping"
+      - script.execute: { id: goto, pos: 0.0 }
+      - script.wait: goto
+      - globals.set: { id: g_locked, value: 'true' }
+      - tmc2209.currents:
           id: window_stepper
-          target: !lambda "return (int)(pos * ${steps_full_stroke});"
+          standstill_mode: normal
+          run_current: ${run_current}
+          hold_current: ${lock_hold_current}
+    unlock_action:
+      - globals.set: { id: g_locked, value: 'false' }
+      - tmc2209.currents:
+          id: window_stepper
+          standstill_mode: normal
+          run_current: ${run_current}
+          hold_current: ${hold_current}
+      - logger.log: "Unlocked"
+
+# Free-wheel: disable the driver so the window can be moved by hand.
+switch:
+  - platform: template
+    name: "Window free-wheel"
+    id: window_freewheel
+    icon: mdi:hand-back-right
+    # State is derived from g_freewheel; the lambda auto-reports it. A rejected
+    # turn-on simply leaves g_freewheel false, so the toggle reverts on its own.
+    lambda: 'return id(g_freewheel);'
+    turn_on_action:
+      - if:
+          condition: { lambda: 'return id(g_locked);' }
+          then:
+            - logger.log: "Cannot free-wheel while locked — unlock first"
+          else:
+            - logger.log: "Free-wheel ON — motor disabled; window is hand-movable"
+            - script.stop: goto
+            - script.stop: do_home
+            - stepper.stop: window_stepper
+            - tmc2209.disable: { id: window_stepper }
+            - globals.set: { id: g_freewheel, value: 'true' }
+            - globals.set: { id: g_pos_dirty, value: 'false' }
+    turn_off_action:
+      - logger.log: "Free-wheel OFF — re-engaging motor"
+      - tmc2209.enable: { id: window_stepper }
+      - globals.set: { id: g_freewheel, value: 'false' }
+      - if:
+          condition: { lambda: 'return id(g_pos_dirty);' }
+          then:
+            - logger.log: "Sash was moved by hand — position unknown, will re-home on next command"
+            - globals.set: { id: g_homed, value: 'false' }
