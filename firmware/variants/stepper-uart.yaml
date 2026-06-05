@@ -240,7 +240,7 @@ script:
       - globals.set: { id: g_move_dir, value: '0' }
 
   # Single entry point for all motion. Enforces lock + homing, then targets pos.
-  - id: goto
+  - id: move_to
     mode: restart
     parameters:
       pos: float
@@ -443,13 +443,13 @@ cover:
       if (!id(g_homed)) return NAN;   // unknown until first home
       return id(window_stepper).current_position / (float) ${steps_full_stroke};
     open_action:
-      - script.execute: { id: goto, pos: 1.0 }
+      - script.execute: { id: move_to, pos: 1.0 }
     close_action:
-      - script.execute: { id: goto, pos: 0.0 }
+      - script.execute: { id: move_to, pos: 0.0 }
     position_action:
-      - script.execute: { id: goto, pos: !lambda 'return pos;' }
+      - script.execute: { id: move_to, pos: !lambda 'return pos;' }
     stop_action:
-      - script.stop: goto
+      - script.stop: move_to
       - script.stop: do_home
       - stepper.stop: window_stepper
       - globals.set: { id: g_homing, value: 'false' }
@@ -467,8 +467,8 @@ lock:
       return id(g_locked) ? lock::LOCK_STATE_LOCKED : lock::LOCK_STATE_UNLOCKED;
     lock_action:
       - logger.log: "Locking — closing fully and clamping"
-      - script.execute: { id: goto, pos: 0.0 }
-      - script.wait: goto
+      - script.execute: { id: move_to, pos: 0.0 }
+      - script.wait: move_to
       - globals.set: { id: g_locked, value: 'true' }
       - tmc2209.currents:
           id: window_stepper
@@ -500,7 +500,7 @@ switch:
             - logger.log: "Cannot free-wheel while locked — unlock first"
           else:
             - logger.log: "Free-wheel ON — motor disabled; window is hand-movable"
-            - script.stop: goto
+            - script.stop: move_to
             - script.stop: do_home
             - stepper.stop: window_stepper
             - tmc2209.disable: { id: window_stepper }

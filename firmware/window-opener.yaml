@@ -16,7 +16,7 @@ substitutions:
   # Put the real entity id here. Convention assumed: state "on" = OPEN,
   # "off" = CLOSED (flip the lambda in stepper-uart.yaml if yours is reversed).
   # This overrides the default in the active variant file.
-  closed_sensor_entity: "binary_sensor.window_contact"
+  closed_sensor_entity: "binary_sensor.0x00158d000a9873f3_contact"
 
 esphome:
   name: ${device_name}
