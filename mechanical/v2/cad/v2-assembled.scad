@@ -95,10 +95,11 @@ SCREW_START_X = NEMA17_SHAFT_L - 6 + 32;  // motor shaft tip + U-joint length
 translate([SCREW_START_X, 0, SASH_SHAFT_Z]) lead_screw();
 
 // Frame-side: nut gimbal at X = ACTUATOR_LEN, gimbal center matches
-// frame-nut-gimbal's GIMBAL_OFFSET_Z (= SASH_SHAFT_Z)
+// frame-nut-gimbal's GIMBAL_OFFSET_Z (= SASH_SHAFT_Z). show_pins=true
+// draws the four Ø3 steel dowel pins as stand-ins so the gimbal's
+// connectivity is visible.
 translate([ACTUATOR_LEN, 0, 0])
-  color([0.95, 0.55, 0.20, 0.95])
-    frame_nut_gimbal();
+  frame_nut_gimbal(show_pins = true);
 
 // Prusa brass nut, captured in the gimbal's nut block at the gimbal center
 translate([ACTUATOR_LEN - PRUSA_NUT_TOTAL_L / 2, 0, SASH_SHAFT_Z])
