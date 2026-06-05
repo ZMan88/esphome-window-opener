@@ -163,7 +163,7 @@ logs a line.
 | F6 | While locked, turn on `switch.window_freewheel`. | **Rejected.** Log: "Cannot free-wheel while locked". Toggle reverts to off on its own. |
 | F7 | Call `lock.unlock`. | Hold current drops back to ~**500 mA**; lock shows **unlocked**. |
 | F8 | Power-cycle while **locked** (lock first, then unplug/replug). | On boot it actively drives closed and re-clamps to ~900 mA; lock entity comes back **locked**. (Only the locked state moves the motor on boot.) |
-| F9 | Unlocked: turn on `switch.window_freewheel`. | *actual current* drops to **0**; the shaft spins **freely by hand** (driver disabled via `tmc2209.disable`). |
+| F9 | Unlocked: turn on `switch.window_freewheel`. | *actual current* drops to **0**; the shaft spins **freely by hand** (coils released via `standstill_mode: freewheeling`, 0 mA hold). |
 | F10 | While free-wheeling, toggle the fake contact (simulate the sash crossing the closed point), then turn the switch **off**. | Position goes **`unknown`** (move detected). Next `cover.*` command **homes first**, then moves. |
 | F11 | While free-wheeling, *don't* toggle the contact, then turn the switch off. | Position is **kept** (no crossing detected → assumed unmoved). Known limitation: a real hand-move that never crosses the contact isn't caught — see `PLAN.md`. |
 

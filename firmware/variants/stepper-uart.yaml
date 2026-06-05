@@ -50,8 +50,9 @@
 #                         resists back-driving. Open/position commands are
 #                         refused while locked (closing is still allowed).
 #                         The manual handle remains the real mechanical lock.
-#   • Free-wheel        — `switch.window_freewheel`. Disables the driver so
-#                         the window can be moved by hand. While free-wheeling,
+#   • Free-wheel        — `switch.window_freewheel`. Releases the coils
+#                         (standstill_mode: freewheeling, 0 mA hold) so the
+#                         window can be moved by hand. While free-wheeling,
 #                         a transition of the closed signal means the sash was
 #                         physically moved → position is marked unknown and the
 #                         next command re-homes first. NOTE: a bare TMC2209 has
@@ -194,6 +195,27 @@ globals:
     initial_value: '0'
 
 script:
+  # Engage / release the motor via standstill current, NOT tmc2209.enable/
+  # disable: the slimcdk ActivationAction fails to compile under ESPHome's
+  # 2026-04 TemplatableFn change. standstill_mode: freewheeling + 0 mA hold
+  # releases the coils at rest (shaft hand-movable) without touching enn.
+  # These scripts have no delays, so script.execute runs them synchronously
+  # (currents are applied before the caller's next action).
+  - id: motor_engage         # normal hold — driver clamps position at standstill
+    then:
+      - tmc2209.currents:
+          id: window_stepper
+          standstill_mode: normal
+          run_current: ${run_current}
+          hold_current: ${hold_current}
+  - id: motor_freewheel      # release coils at standstill — window hand-movable
+    then:
+      - tmc2209.currents:
+          id: window_stepper
+          standstill_mode: freewheeling
+          run_current: ${run_current}
+          hold_current: 0mA
+
   # Drive toward the closed end until the combined closed signal trips (or the
   # closed hard stop stalls, handled in on_stall), then zero the position.
   - id: do_home
@@ -204,7 +226,7 @@ script:
       - if:
           condition: { lambda: 'return id(g_freewheel);' }
           then:
-            - tmc2209.enable: { id: window_stepper }
+            - script.execute: motor_engage
             - globals.set: { id: g_freewheel, value: 'false' }
       - globals.set: { id: g_homing, value: 'true' }
       - globals.set: { id: g_move_dir, value: '-1' }
@@ -256,7 +278,7 @@ script:
             - if:
                 condition: { lambda: 'return id(g_freewheel);' }
                 then:
-                  - tmc2209.enable: { id: window_stepper }
+                  - script.execute: motor_engage
                   - globals.set: { id: g_freewheel, value: 'false' }
                   - if:
                       condition: { lambda: 'return id(g_pos_dirty);' }
@@ -499,16 +521,16 @@ switch:
           then:
             - logger.log: "Cannot free-wheel while locked — unlock first"
           else:
-            - logger.log: "Free-wheel ON — motor disabled; window is hand-movable"
+            - logger.log: "Free-wheel ON — coils released; window is hand-movable"
             - script.stop: move_to
             - script.stop: do_home
             - stepper.stop: window_stepper
-            - tmc2209.disable: { id: window_stepper }
+            - script.execute: motor_freewheel
             - globals.set: { id: g_freewheel, value: 'true' }
             - globals.set: { id: g_pos_dirty, value: 'false' }
     turn_off_action:
       - logger.log: "Free-wheel OFF — re-engaging motor"
-      - tmc2209.enable: { id: window_stepper }
+      - script.execute: motor_engage
       - globals.set: { id: g_freewheel, value: 'false' }
       - if:
           condition: { lambda: 'return id(g_pos_dirty);' }
