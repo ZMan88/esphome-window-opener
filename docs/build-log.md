@@ -121,6 +121,41 @@ These come after the user has the parts in hand and can measure the actual nut a
 - [ ] Phase 3 — Tuning + HA integration on real window
 - [ ] Phase 4 — Polish (enclosure, automations, CAD STLs released)
 
+## Phase 2 — Open-travel calibration (set "fully open")
+
+There is **no open-end switch**. "Fully open" is dead-reckoned: the firmware
+counts microsteps from the closed home (position 0) up to `steps_full_stroke`,
+then stops. That number **must match the rig's real usable travel**, or one of
+two bad things happens:
+
+- `steps_full_stroke` **too large** → the motor keeps driving past the real end
+  and rams the mechanical hard stop (until StallGuard is tuned to catch it).
+- `steps_full_stroke` **too small** → "100% open" stops short of the real max.
+
+`steps_full_stroke` and `microsteps` live in `firmware/window-opener.yaml`
+(they override the variant). Scale factor: **µsteps/mm = 50 × microsteps**
+(50 = (360/0.9 steps-per-rev) ÷ 8 mm-per-rev for the Tr8x8). So at microsteps
+16 → 800 µsteps/mm; at 8 → 400.
+
+Procedure, once the rig is mounted and homed:
+
+1. **Home** (window closed, contact reports shut → position 0).
+2. **Free-wheel** the motor (`switch.window_freewheel`) and **push the sash by
+   hand to the maximum opening you actually want** (tilt fully open, or the turn
+   angle you'll use). Measure the actuator travel from closed to here, in mm —
+   call it `T`. (Or compute from geometry in `docs/window-spec.md`.)
+3. Re-engage, set **`steps_full_stroke = round(T × 50 × microsteps)`**.
+   Example: T = 180 mm at microsteps 16 → 180 × 800 = **144000**.
+4. Flash, home, then command **`cover.open_cover`**. Verify it reaches the
+   intended max and stops **without** straining against the end. Trim the number
+   down 1–2% if it bottoms out hard.
+5. Sanity-check 50%: `cover.set_cover_position 50` should land at ~`T/2` mm.
+
+> Leave a small safety margin: set `steps_full_stroke` a few mm short of the
+> absolute mechanical limit so normal full-open never relies on hitting the
+> hard stop. StallGuard (next section) is the *backstop* for lost steps /
+> obstructions, not the everyday end-of-travel signal.
+
 ## Phase 3 — StallGuard tuning procedure (do this once mounted)
 
 StallGuard is currently disabled (`tmc2209.stallguard: { threshold: 0 }` in `firmware/variants/stepper-uart.yaml`) because at the bench with no mechanical load the chip can't distinguish "free running" from "stalled" — SG_RESULT pins near 0 either way. Once the motor is on the lead-screw rig with the carriage and rod-ends loaded, retune as follows:

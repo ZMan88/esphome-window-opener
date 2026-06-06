@@ -21,6 +21,16 @@ substitutions:
   # ── Tuning knobs (stepper-uart variant) ──────────────────────────────────
   # These override the defaults in variants/stepper-uart.yaml — edit here.
   #
+  # Travel / "fully open". There is NO open-end switch — fully-open is just the
+  # step count below. It MUST match the rig's real usable travel or the motor
+  # drives into the hard stop. Calibrate per docs/build-log.md "Open-travel
+  # calibration". Keep these two consistent:
+  #   µsteps/mm = 50 × microsteps   (50 = (360/0.9) ÷ 8 mm-per-rev)
+  #   steps_full_stroke = µsteps/mm × usable_travel_mm
+  # microsteps 16 → 800 µsteps/mm → 144000 for 180 mm. (8 → 400 → 72000.)
+  microsteps: "16"
+  steps_full_stroke: "144000"  # = fully-open position, in microsteps from closed
+  #
   # Speed: mm/s = max_speed ÷ (50 × microsteps). At microsteps 16,
   #   6000 steps/s = 7.5 mm/s. If the motor crawls/skips when you raise this,
   #   the C6 can't pulse fast enough — drop microsteps to 8 AND set
