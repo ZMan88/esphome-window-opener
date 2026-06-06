@@ -63,11 +63,33 @@
 # ─────────────────────────────────────────────────────────────────────────
 
 substitutions:
-  # LDO at 0.9°/step × 1/16 microsteps × Tr8x8 = 800 µsteps/mm; 180 mm stroke.
+  # Geometry → step scale. These two MUST stay consistent:
+  #   µsteps/mm = (360/0.9) × microsteps / 8 mm-per-rev = 50 × microsteps
+  #   steps_full_stroke = µsteps/mm × 180 mm stroke
+  # At microsteps 16 → 800 µsteps/mm → 144000.  At 8 → 400 → 72000.
+  microsteps: "16"
   steps_full_stroke: "144000"
 
-  # TMC2209 currents (UART register writes; the Vref pot is ignored).
-  run_current: "1100mA"        # during motion
+  # Speed. max_speed is the top cruise rate in steps/s; mm/s = max_speed ÷
+  # (50 × microsteps). At microsteps 16: 6000 steps/s = 7.5 mm/s → ~24 s for
+  # the full 180 mm stroke, ~7 s for a full tilt (~26% of stroke).
+  # acceleration/deceleration is the ramp; raise it too or short tilt moves
+  # never reach cruise.
+  #
+  # If the motor CRAWLS or SKIPS at higher max_speed, the C6 can't generate
+  # STEP pulses fast enough (single-thread limit) — DON'T just lower max_speed,
+  # instead drop microsteps to 8 (and steps_full_stroke to 72000): same mm/s at
+  # half the pulse rate, and `interpolation: true` keeps the motor smooth.
+  max_speed: "6000"      # steps/s   (was 2000 = 2.5 mm/s)
+  accel: "3000"          # steps/s^2 (was 1000)
+
+  # TMC2209 currents — set in software over UART, the Vref pot is IGNORED.
+  # run_current is the MAX current (TMC2209 IRUN) while the motor is moving;
+  # raise it for more torque/speed-under-load, lower it if the driver runs hot.
+  # Ceiling: the LDO 42STH48-1684MAC is rated 1.68 A RMS — stay at/below ~1500mA
+  # and watch the "driver temperature band" sensor. hold_current is the
+  # standstill clamp; lock_hold_current is the firmer clamp while locked.
+  run_current: "1100mA"        # MAX motion current  (motor rated 1.68 A)
   hold_current: "500mA"        # standstill, unlocked
   lock_hold_current: "900mA"   # standstill while locked (firmer anti-backdrive)
 
@@ -107,9 +129,9 @@ stepper:
     #                          interrupt for stall detection. Without it, the
     #                          component polls IOIN over UART, which is unreliable
     #                          during motion (main thread busy generating steps).
-    max_speed: 2000 steps/s
-    acceleration: 1000 steps/s^2
-    deceleration: 1000 steps/s^2
+    max_speed: ${max_speed} steps/s
+    acceleration: ${accel} steps/s^2
+    deceleration: ${accel} steps/s^2
     on_stall:
       - logger.log:
           level: INFO
@@ -305,7 +327,7 @@ esphome:
   on_boot:
     - tmc2209.configure:
         id: window_stepper
-        microsteps: 16
+        microsteps: ${microsteps}
         interpolation: true
         # TCOOLTHRS gates the chip's DIAG-for-stall output. The TMC2209
         # datasheet requires it > 0 for StallGuard to drive DIAG (with

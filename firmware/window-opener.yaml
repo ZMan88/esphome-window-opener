@@ -18,6 +18,24 @@ substitutions:
   # This overrides the default in the active variant file.
   closed_sensor_entity: "binary_sensor.0x00158d000a9873f3_contact"
 
+  # ── Tuning knobs (stepper-uart variant) ──────────────────────────────────
+  # These override the defaults in variants/stepper-uart.yaml — edit here.
+  #
+  # Speed: mm/s = max_speed ÷ (50 × microsteps). At microsteps 16,
+  #   6000 steps/s = 7.5 mm/s. If the motor crawls/skips when you raise this,
+  #   the C6 can't pulse fast enough — drop microsteps to 8 AND set
+  #   steps_full_stroke to 72000 (see the variant's notes) rather than lowering.
+  max_speed: "6000"            # steps/s
+  accel: "3000"                # steps/s^2 (ramp; raise so short tilt moves cruise)
+  #
+  # Currents (TMC2209, software-set, Vref pot ignored). run_current is the MAX
+  # motion current — motor (LDO 42STH48-1684MAC) is rated 1.68 A RMS, so keep
+  # ≤ ~1500mA and watch the driver temperature-band sensor.
+  run_current: "1100mA"        # MAX motion current
+  hold_current: "500mA"        # standstill, unlocked
+  lock_hold_current: "900mA"   # standstill while locked
+  # ─────────────────────────────────────────────────────────────────────────
+
 esphome:
   name: ${device_name}
   friendly_name: ${device_friendly}
