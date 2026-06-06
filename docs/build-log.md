@@ -156,6 +156,22 @@ Procedure, once the rig is mounted and homed:
 > hard stop. StallGuard (next section) is the *backstop* for lost steps /
 > obstructions, not the everyday end-of-travel signal.
 
+### Sensorless mode (`homing_mode: sensorless`)
+
+If you set `homing_mode: sensorless` (no contact sensor), the above changes:
+
+- **Closed** isn't sensed — it's found by ramming the stop until StallGuard
+  trips, at the gentle `homing_current`. **Requires `stall_threshold` (SGTHRS)
+  tuned > 0 first** (see the StallGuard section) or homing never completes.
+- **Open** isn't a fixed number — the firmware *learns* it from the
+  opening-direction stall into the runtime `g_full_stroke`. After homing,
+  **command one full `cover.open_cover`** so it learns the stroke before you use
+  intermediate positions; otherwise a mid-position command can mis-learn a short
+  stroke. `steps_full_stroke` is then only the *initial guess* / overshoot target.
+- Trade-offs (rams stops every home, can't tell obstruction from end, SGTHRS
+  must be re-tuned whenever you change speed/current) are why `contact` is the
+  default. See PLAN.md.
+
 ## Phase 3 — StallGuard tuning procedure (do this once mounted)
 
 StallGuard is currently disabled (`tmc2209.stallguard: { threshold: 0 }` in `firmware/variants/stepper-uart.yaml`) because at the bench with no mechanical load the chip can't distinguish "free running" from "stalled" — SG_RESULT pins near 0 either way. Once the motor is on the lead-screw rig with the carriage and rod-ends loaded, retune as follows:

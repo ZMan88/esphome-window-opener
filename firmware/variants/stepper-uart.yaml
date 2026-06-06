@@ -34,17 +34,17 @@
 #                         still unknown. Locked state is the one exception — it
 #                         actively drives closed on boot to re-clamp. Position
 #                         reads `unknown` in HA until homed (CLAUDE.md invariant).
-#   • Closed detection  — the window's OWN contact sensor imported from Home
-#                         Assistant (${closed_sensor_entity}) signals "sash
-#                         shut". The printed D8 endstop is NOT installed yet;
-#                         its block is left commented for when it's added.
-#                         (Homing therefore depends on the HA connection right
-#                         now — if HA is unreachable on boot the sweep can't
-#                         confirm closed and position stays unknown.)
-#   • Open detection    — StallGuard (DIAG on D9) is the open hard-stop
-#                         reference once tuned in Phase 3. Until SGTHRS is
-#                         set (threshold: 0 below) this is inert; the
-#                         calibrated step count is the working open limit.
+#   • End detection     — selected by the `homing_mode` substitution:
+#                           contact    (default): home CLOSED from the window's
+#                             OWN HA contact sensor (${closed_sensor_entity});
+#                             OPEN is the calibrated step count (g_full_stroke),
+#                             with StallGuard only an obstruction backstop.
+#                           sensorless: no contact. Home CLOSED by ramming the
+#                             stop at a gentle current until StallGuard trips,
+#                             and LEARN the OPEN end from the opening-direction
+#                             stall. REQUIRES a tuned stall_threshold (> 0).
+#                         (Printed D8 endstop is left commented for when added;
+#                         in contact mode, homing depends on the HA connection.)
 #   • Lock              — `lock.window_lock`. Drives fully closed, then holds
 #                         energized at ${lock_hold_current} so the screw
 #                         resists back-driving. Open/position commands are
@@ -92,6 +92,19 @@ substitutions:
   run_current: "1100mA"        # MAX motion current  (motor rated 1.68 A)
   hold_current: "500mA"        # standstill, unlocked
   lock_hold_current: "900mA"   # standstill while locked (firmer anti-backdrive)
+
+  # End detection mode:
+  #   contact    — home CLOSED from the HA contact sensor; OPEN by step count
+  #                (stall is only a safety backstop / obstruction stop).
+  #   sensorless — no contact: home CLOSED by ramming the stop until StallGuard
+  #                trips, and LEARN the OPEN end from the opening-direction stall.
+  # Sensorless REQUIRES a tuned stall_threshold (> 0) — see docs/build-log.md
+  # "Phase 3 — StallGuard tuning". With contact mode keep stall_threshold 0
+  # until tuned (it's just an obstruction backstop there).
+  homing_mode: "contact"       # contact | sensorless
+  stall_threshold: "0"         # SGTHRS (0 = stall detection off). Sensorless needs > 0.
+  homing_current: "600mA"      # gentler current while ram-homing (sensorless): softer
+                               # impact + earlier, cleaner StallGuard trip at the stop.
 
   # The window's OWN closed/contact sensor, already present in Home Assistant.
   # SET THE REAL ENTITY ID IN window-opener.yaml (it overrides this default) —
@@ -153,13 +166,22 @@ stepper:
                 condition:
                   lambda: 'return id(g_move_dir) == 1;'
                 then:
-                  # Stalled while opening → reached the open hard stop.
-                  - stepper.report_position:
-                      id: window_stepper
-                      position: ${steps_full_stroke}
-                  - logger.log: "Open hard stop reached via stall"
+                  - if:
+                      condition: { lambda: 'return id(g_sensorless);' }
+                      then:
+                        # Sensorless: the opening stall IS the open end. Learn the
+                        # stroke (current pos becomes 100%).
+                        - lambda: 'id(g_full_stroke) = id(window_stepper).current_position;'
+                        - logger.log:
+                            format: "Open end learned via stall at %d µsteps"
+                            args: [ 'id(window_stepper).current_position' ]
+                      else:
+                        # Contact mode: the open count is trusted, so a stall here
+                        # is an obstruction (or over-long calibration). Stop + hold,
+                        # do NOT learn or auto-retry (CLAUDE.md safety invariant).
+                        - logger.log: "Obstruction while opening — stopped and holding"
                 # else: stalled while closing/holding → obstruction. Stop and
-                # hold, do NOT auto-retry (CLAUDE.md safety invariant).
+                # hold, do NOT auto-retry.
       - globals.set: { id: g_move_dir, value: '0' }
     on_status:
       # Surface the chip's temperature threshold flags as a single sensor that
@@ -215,6 +237,14 @@ globals:
     type: int
     restore_value: no
     initial_value: '0'
+  - id: g_sensorless     # true if homing_mode == sensorless (set from substitution)
+    type: bool
+    restore_value: no
+    initial_value: 'std::string("${homing_mode}") == std::string("sensorless")'
+  - id: g_full_stroke    # current full-open position in µsteps. Fixed in contact
+    type: int            # mode; LEARNED from the open-stall in sensorless mode.
+    restore_value: no
+    initial_value: '${steps_full_stroke}'
 
 script:
   # Engage / release the motor via standstill current, NOT tmc2209.enable/
@@ -238,8 +268,10 @@ script:
           run_current: ${run_current}
           hold_current: 0mA
 
-  # Drive toward the closed end until the combined closed signal trips (or the
-  # closed hard stop stalls, handled in on_stall), then zero the position.
+  # Drive toward the closed end and zero there. Contact mode: stop when the HA
+  # contact reports shut. Sensorless mode: ram the stop at a gentle current until
+  # StallGuard trips (on_stall's g_homing branch zeroes). Either way wait_until
+  # accepts both signals, so the same script covers both modes.
   - id: do_home
     mode: restart
     then:
@@ -250,16 +282,26 @@ script:
           then:
             - script.execute: motor_engage
             - globals.set: { id: g_freewheel, value: 'false' }
+      # Sensorless: drop to the gentle homing current so the ram is soft and the
+      # stall trips cleanly at the stop. (No effect in contact mode.)
+      - if:
+          condition: { lambda: 'return id(g_sensorless);' }
+          then:
+            - tmc2209.currents:
+                id: window_stepper
+                standstill_mode: normal
+                run_current: ${homing_current}
+                hold_current: ${hold_current}
       - globals.set: { id: g_homing, value: 'true' }
       - globals.set: { id: g_move_dir, value: '-1' }
       - stepper.set_target:
           id: window_stepper
-          target: !lambda 'return id(window_stepper).current_position - (long)(${steps_full_stroke} * 1.2);'
+          target: !lambda 'return id(window_stepper).current_position - (long)(id(g_full_stroke) * 1.2);'
       - wait_until:
           condition:
             or:
-              - binary_sensor.is_on: window_closed
-              - lambda: 'return id(g_homed);'   # set by on_stall if we hit the hard stop
+              - binary_sensor.is_on: window_closed     # contact mode
+              - lambda: 'return id(g_homed);'          # sensorless: set by on_stall
           timeout: 90s
       - stepper.stop: window_stepper
       - if:
@@ -270,7 +312,7 @@ script:
             - stepper.set_target: { id: window_stepper, target: 0 }
             - globals.set: { id: g_homed, value: 'true' }
             - globals.set: { id: g_pos_dirty, value: 'false' }
-            - logger.log: "Homed (closed sensor tripped)"
+            - logger.log: "Homed (closed contact)"
           else:
             - if:
                 condition: { lambda: 'return id(g_homed);' }
@@ -279,7 +321,12 @@ script:
                 else:
                   - logger.log:
                       level: WARN
-                      format: "Homing failed: no closed signal within 90 s — position stays unknown"
+                      format: "Homing failed within 90 s (no contact / no stall) — position stays unknown"
+      # Restore the normal running current after a sensorless ram.
+      - if:
+          condition: { lambda: 'return id(g_sensorless);' }
+          then:
+            - script.execute: motor_engage
       - globals.set: { id: g_homing, value: 'false' }
       - globals.set: { id: g_move_dir, value: '0' }
 
@@ -318,10 +365,10 @@ script:
                 then:
                   - globals.set:
                       id: g_move_dir
-                      value: !lambda 'return ((long)(pos * ${steps_full_stroke}) >= id(window_stepper).current_position) ? 1 : -1;'
+                      value: !lambda 'return ((long)(pos * id(g_full_stroke)) >= id(window_stepper).current_position) ? 1 : -1;'
                   - stepper.set_target:
                       id: window_stepper
-                      target: !lambda 'return (long)(pos * ${steps_full_stroke});'
+                      target: !lambda 'return (long)(pos * id(g_full_stroke));'
 
 esphome:
   on_boot:
@@ -345,8 +392,9 @@ esphome:
         # move. RE-TUNE after Phase 2 mounting: with the lead-screw + sash
         # load, watch the actual_current / motor_load sensors during a full
         # open/close, note the SG_RESULT floor under normal load, then set
-        # SGTHRS to ~half of that floor.
-        threshold: 0
+        # SGTHRS to ~half of that floor. SENSORLESS homing_mode REQUIRES this
+        # > 0 (it's how both ends are found); contact mode can leave it 0.
+        threshold: ${stall_threshold}
     - tmc2209.currents:
         id: window_stepper
         standstill_mode: normal
@@ -354,10 +402,12 @@ esphome:
         hold_current: ${hold_current}
     # Homing on boot is deliberately PASSIVE for the unlocked case: we never
     # auto-drive the motor on boot, so a power blip can't slam an open window
-    # shut. Position stays `unknown` until either the closed contact reports
-    # shut (window_closed's on_press homes in place, no motion) or the first
-    # user command triggers a homing sweep. The ONLY exception is restoring a
-    # lock, where we actively drive closed and re-clamp.
+    # shut. Position stays `unknown` until recovered:
+    #   contact mode    — for free when the contact reports shut (window_closed's
+    #                     on_press homes in place, no motion), else on first cmd.
+    #   sensorless mode — on the first user command (which ram-homes closed).
+    # The ONLY exception is restoring a lock, where we actively drive closed and
+    # re-clamp.
     - delay: 3s
     - if:
         condition: { lambda: 'return id(g_locked);' }
@@ -485,7 +535,9 @@ cover:
     has_position: true
     lambda: |-
       if (!id(g_homed)) return NAN;   // unknown until first home
-      return id(window_stepper).current_position / (float) ${steps_full_stroke};
+      float fs = id(g_full_stroke);   // fixed (contact) or learned (sensorless)
+      if (fs < 1) fs = 1;
+      return id(window_stepper).current_position / fs;
     open_action:
       - script.execute: { id: move_to, pos: 1.0 }
     close_action:

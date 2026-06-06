@@ -44,6 +44,16 @@ substitutions:
   run_current: "1100mA"        # MAX motion current
   hold_current: "500mA"        # standstill, unlocked
   lock_hold_current: "900mA"   # standstill while locked
+  #
+  # End detection:
+  #   contact    — home CLOSED from closed_sensor_entity; OPEN by step count.
+  #   sensorless — no contact: ram CLOSED until StallGuard trips, LEARN OPEN
+  #                from the opening stall. REQUIRES stall_threshold > 0 (tuned
+  #                per docs/build-log.md). Rams the stops every home — see the
+  #                trade-offs there before switching.
+  homing_mode: "contact"       # contact | sensorless
+  stall_threshold: "0"         # SGTHRS (0 = off). Sensorless needs a tuned value > 0.
+  homing_current: "600mA"      # gentle current while ram-homing (sensorless only)
   # ─────────────────────────────────────────────────────────────────────────
 
 esphome:
