@@ -302,7 +302,7 @@ script:
             or:
               - binary_sensor.is_on: window_closed     # contact mode
               - lambda: 'return id(g_homed);'          # sensorless: set by on_stall
-          timeout: 90s
+          timeout: 120s
       - stepper.stop: window_stepper
       - if:
           condition:
@@ -321,7 +321,7 @@ script:
                 else:
                   - logger.log:
                       level: WARN
-                      format: "Homing failed within 90 s (no contact / no stall) — position stays unknown"
+                      format: "Homing failed within 120 s (no contact / no stall) — position stays unknown"
       # Restore the normal running current after a sensorless ram.
       - if:
           condition: { lambda: 'return id(g_sensorless);' }
@@ -342,12 +342,23 @@ script:
           then:
             - logger.log: "Locked — open/position command ignored (unlock first)"
           else:
-            # Leaving free-wheel: re-engage the driver. If the sash was moved
-            # across the closed sensor while free, position is now unknown.
+            # ALWAYS (re)apply running currents over UART before driving, so the
+            # driver can never sit in a released / 0-current standstill while we
+            # think it's engaged. This is the fix for "command accepted but motor
+            # silent": at boot (or after a UART hiccup) the chip can be in a
+            # de-energised state with g_freewheel == false; the old code only
+            # re-engaged when g_freewheel was true, so the move set a target with
+            # no torque. Skipped only while locked (the lock clamp owns currents,
+            # and a close-while-locked is already engaged).
+            - if:
+                condition: { lambda: 'return !id(g_locked);' }
+                then:
+                  - script.execute: motor_engage
+            # Leaving free-wheel: clear the flag. If the sash was moved across the
+            # closed sensor while free, position is now unknown → force re-home.
             - if:
                 condition: { lambda: 'return id(g_freewheel);' }
                 then:
-                  - script.execute: motor_engage
                   - globals.set: { id: g_freewheel, value: 'false' }
                   - if:
                       condition: { lambda: 'return id(g_pos_dirty);' }
