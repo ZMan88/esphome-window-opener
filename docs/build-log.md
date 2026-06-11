@@ -156,6 +156,25 @@ Procedure, once the rig is mounted and homed:
 > hard stop. StallGuard (next section) is the *backstop* for lost steps /
 > obstructions, not the everyday end-of-travel signal.
 
+### Manual calibration buttons (no sensor / no StallGuard)
+
+Two HA buttons let you set the references by hand from wherever the actuator is:
+
+- **Set CLOSED home (0%) here** — declares the current position as 0.
+- **Set OPEN limit (100%) here** — captures the current step count as full stroke
+  (`g_full_stroke`); persists across reboot.
+
+Flow on the mounted window:
+1. Jog the window (cover slider, small steps) until **physically closed** → press
+   *Set CLOSED home (0%)*.
+2. Jog until **physically fully open** — gently, StallGuard is off so there's no
+   over-travel/obstruction protection → press *Set OPEN limit (100%)*.
+
+These capture the **motor's step count**, which only tracks motor-driven motion.
+Moving the sash by hand in free-wheel does **not** update it, so press the
+buttons only after positioning via the motor (or right as the sash crosses the
+closed contact). Good for first calibration before StallGuard/contact are dialed.
+
 ### Sensorless mode (`homing_mode: sensorless`)
 
 If you set `homing_mode: sensorless` (no contact sensor), the above changes:

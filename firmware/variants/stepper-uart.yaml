@@ -60,6 +60,13 @@
 #                         the closed sensor cannot be detected — re-engaging
 #                         then keeps the last position. Add an encoder if that
 #                         matters. Cannot be enabled while locked.
+#   • Manual calibration— two `button` entities: "Set CLOSED home (0%) here" and
+#                         "Set OPEN limit (100%) here". Capture the current motor
+#                         step count as the closed (0) / open (full-stroke)
+#                         reference, so you can teach both ends by jogging to
+#                         them — no contact sensor or StallGuard needed. The
+#                         open scale persists across reboot. (Captures motor-
+#                         driven position only, not hand movement in free-wheel.)
 # ─────────────────────────────────────────────────────────────────────────
 
 substitutions:
@@ -248,9 +255,14 @@ globals:
     type: bool
     restore_value: no
     initial_value: 'std::string("${homing_mode}") == std::string("sensorless")'
-  - id: g_full_stroke    # current full-open position in µsteps. Fixed in contact
-    type: int            # mode; LEARNED from the open-stall in sensorless mode.
-    restore_value: no
+  - id: g_full_stroke    # full-open position in µsteps. Fixed in contact mode,
+    type: int            # LEARNED from the open-stall in sensorless mode, or set
+    #                      manually by the "Set OPEN limit here" button. Persists
+    #                      across reboot so a manual calibration survives a power
+    #                      cycle (the step COUNT doesn't persist, but the scale
+    #                      does). initial_value applies only on the first boot
+    #                      after a flash; thereafter the saved value is restored.
+    restore_value: yes
     initial_value: '${steps_full_stroke}'
 
 script:
@@ -629,3 +641,66 @@ switch:
           then:
             - logger.log: "Sash was moved by hand — position unknown, will re-home on next command"
             - globals.set: { id: g_homed, value: 'false' }
+
+# Manual calibration buttons. Teach the firmware where closed (0%) and fully
+# open (100%) are, from wherever the actuator currently sits — no contact sensor
+# or StallGuard needed. Typical flow on the mounted window:
+#   1. Jog the window (cover slider, small steps) until it's PHYSICALLY closed.
+#   2. Press "Set CLOSED home (0%)".
+#   3. Jog until PHYSICALLY fully open (go gently — StallGuard is off, so there's
+#      no obstruction/over-travel protection).
+#   4. Press "Set OPEN limit (100%)".
+# IMPORTANT: these capture the motor's STEP COUNT, which only tracks
+# motor-driven motion. Moving the sash BY HAND in free-wheel does NOT update it,
+# so press these only after positioning via the motor (or right after the sash
+# crosses the closed contact). The captured open scale persists across reboot.
+button:
+  - platform: template
+    name: "Set CLOSED home (0%) here"
+    id: set_closed_here
+    icon: mdi:arrow-collapse-left
+    entity_category: config
+    on_press:
+      # Stop any motion so the captured position is stable.
+      - script.stop: move_to
+      - script.stop: do_home
+      - stepper.stop: window_stepper
+      - globals.set: { id: g_homing, value: 'false' }
+      - globals.set: { id: g_move_dir, value: '0' }
+      # Declare here = closed = 0, and mark position known.
+      - stepper.report_position: { id: window_stepper, position: 0 }
+      - stepper.set_target: { id: window_stepper, target: 0 }
+      - globals.set: { id: g_homed, value: 'true' }
+      - globals.set: { id: g_pos_dirty, value: 'false' }
+      - logger.log: "Manual calibration: current position set as CLOSED (0)"
+
+  - platform: template
+    name: "Set OPEN limit (100%) here"
+    id: set_open_here
+    icon: mdi:arrow-expand-right
+    entity_category: config
+    on_press:
+      - script.stop: move_to
+      - script.stop: do_home
+      - stepper.stop: window_stepper
+      - globals.set: { id: g_homing, value: 'false' }
+      - globals.set: { id: g_move_dir, value: '0' }
+      # Open must be on the positive side of closed (0). Capture the count as the
+      # full stroke; the cover then reads 100% here.
+      - if:
+          condition:
+            lambda: 'return id(window_stepper).current_position > 0;'
+          then:
+            - lambda: 'id(g_full_stroke) = id(window_stepper).current_position;'
+            - stepper.set_target:
+                id: window_stepper
+                target: !lambda 'return id(window_stepper).current_position;'
+            - globals.set: { id: g_homed, value: 'true' }
+            - logger.log:
+                format: "Manual calibration: OPEN limit set at %d µsteps"
+                args: [ 'id(window_stepper).current_position' ]
+          else:
+            - logger.log:
+                level: WARN
+                format: "Set OPEN ignored: position %d is not open of closed — set CLOSED home first, then jog open"
+                args: [ 'id(window_stepper).current_position' ]
