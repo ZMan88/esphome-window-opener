@@ -114,9 +114,16 @@ substitutions:
   closed_sensor_entity: "binary_sensor.window_contact"
 
 external_components:
-  - source: github://slimcdk/esphome-custom-components
+  # PINNED to a specific commit (was `refresh: 1d` off master) so the driver
+  # code is a frozen, reproducible baseline — no silent daily re-pulls while
+  # we're chasing a crash. b5f0e44 (2026-03-04) is master HEAD as of pinning
+  # and is exactly what the running firmware was built against. NOTE: the
+  # earlier compile break (tmc2209.enable/disable) and deprecation warnings came
+  # from the ESPHome CORE moving (2026.x), not this component — pinning here
+  # does not pin the core. To update deliberately, bump the ref below.
+  - source: github://slimcdk/esphome-custom-components@b5f0e44ae8732f68b9bbeaed9e962ca052d04cdb
     components: [tmc2209_hub, tmc2209, stepper]
-    refresh: 1d
+    refresh: 0s
 
 uart:
   - id: tmc_uart
