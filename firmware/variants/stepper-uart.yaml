@@ -60,6 +60,9 @@
 #                         the closed sensor cannot be detected — re-engaging
 #                         then keeps the last position. Add an encoder if that
 #                         matters. Cannot be enabled while locked.
+#   • Home now          — `button` "Home now (drive to closed)" runs the homing
+#                         sweep on demand (move_to only auto-homes when position
+#                         is unknown). Drives the motor.
 #   • Manual calibration— two `button` entities: "Set CLOSED home (0%) here" and
 #                         "Set OPEN limit (100%) here". Capture the current motor
 #                         step count as the closed (0) / open (full-stroke)
@@ -661,6 +664,18 @@ switch:
 # to the steps_full_stroke substitution on reboot; bake the measured count into
 # that substitution to make it permanent.
 button:
+  # Trigger a homing sweep on demand: drive toward closed until the contact
+  # trips (contact mode) or StallGuard hits the closed stop (sensorless), then
+  # zero. Useful any time position drifts or you just want to re-reference,
+  # since move_to only auto-homes when position is UNKNOWN. This MOVES the motor.
+  - platform: template
+    name: "Home now (drive to closed)"
+    id: home_now
+    icon: mdi:home-import-outline
+    on_press:
+      - logger.log: "Manual home requested"
+      - script.execute: do_home
+
   - platform: template
     name: "Set CLOSED home (0%) here"
     id: set_closed_here

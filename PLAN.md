@@ -49,7 +49,7 @@ Append entries as decisions get made. Format: `YYYY-MM-DD — decision — reaso
 
 - License choice (placeholder MIT).
 - 3D-print material for brackets — PETG vs ABS (sun/heat resistance).
-- ~~Do we want an `esphome` `switch` for "home now" on boot, or keep homing fully automatic?~~ **Resolved 2026-06-05:** homing is fully automatic on boot and on-demand before any move when position is unknown. No manual "home" button. (A free-wheel switch and a lock entity were added instead.)
+- ~~Do we want an `esphome` `switch` for "home now" on boot, or keep homing fully automatic?~~ **Resolved 2026-06-05, revised 2026-06-11:** homing is automatic (passive on boot, and before any move when position is unknown). A manual **"Home now (drive to closed)"** button was added 2026-06-11 — `move_to` only auto-homes when position is unknown, so on-demand re-homing needed an explicit trigger.
 - Free-wheel hand-movement that never crosses the closed sensor isn't detectable without rotor feedback — add a magnetic encoder (e.g. AS5600 on the screw) if per-mm position must survive manual moves. Deferred.
 - Stall detection threshold — decide empirically in Phase 1.
 - Handle-position sensor (reed switch) to detect tilt vs turn mode — if added, firmware can remap `cover.position` per mode for clean HA UX. Defer to v1.5.
