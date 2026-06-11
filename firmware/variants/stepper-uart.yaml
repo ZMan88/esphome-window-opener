@@ -460,6 +460,27 @@ esphome:
           # window_lock's lambda already reports LOCKED from the restored g_locked.
 
 sensor:
+  # Raw step count + mm, for calibration. Read this at the true open stop (jog
+  # there, or let a too-big steps_full_stroke stall-learn it) and bake the µstep
+  # value into steps_full_stroke. mm uses 50×microsteps µsteps/mm.
+  - platform: template
+    name: "Window position (usteps)"
+    id: position_usteps
+    accuracy_decimals: 0
+    entity_category: diagnostic
+    icon: mdi:counter
+    update_interval: 1s
+    lambda: 'return id(window_stepper).current_position;'
+
+  - platform: template
+    name: "Window position (mm)"
+    accuracy_decimals: 1
+    unit_of_measurement: "mm"
+    entity_category: diagnostic
+    icon: mdi:ruler
+    update_interval: 1s
+    lambda: 'return id(window_stepper).current_position / (50.0f * ${microsteps});'
+
   - platform: tmc2209
     tmc2209_id: window_stepper
     type: actual_current
