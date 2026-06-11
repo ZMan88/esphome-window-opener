@@ -28,21 +28,26 @@ substitutions:
   #   µsteps/mm = 50 × microsteps   (50 = (360/0.9) ÷ 8 mm-per-rev)
   #   steps_full_stroke = µsteps/mm × usable_travel_mm
   # microsteps 16 → 800 µsteps/mm → 144000 for 180 mm. (8 → 400 → 72000.)
-  microsteps: "16"
-  steps_full_stroke: "144000"  # = fully-open position, in microsteps from closed
+  microsteps: "8"
+  steps_full_stroke: "72000"   # = fully-open position, in microsteps from closed
+  # microsteps lowered 16→8 (steps_full_stroke 144000→72000 to match): the
+  # ESP32-C6 single-thread STEP generator tops out ~1100 steps/s, so at 16
+  # microsteps the motor crawled (~1.4 mm/s) regardless of max_speed. Halving
+  # microsteps halves the pulse rate per mm → ~2× real speed; interpolation:
+  # true keeps the motor smooth. Drop to 4/36000 if more speed is needed.
   #
   # Speed: mm/s = max_speed ÷ (50 × microsteps). At microsteps 16,
   #   6000 steps/s = 7.5 mm/s. If the motor crawls/skips when you raise this,
   #   the C6 can't pulse fast enough — drop microsteps to 8 AND set
   #   steps_full_stroke to 72000 (see the variant's notes) rather than lowering.
-  max_speed: "6000"            # steps/s
+  max_speed: "8000"            # steps/s
   accel: "3000"                # steps/s^2 (ramp; raise so short tilt moves cruise)
   #
   # Currents (TMC2209, software-set, Vref pot ignored). run_current is the MAX
   # motion current — motor (LDO 42STH48-1684MAC) is rated 1.68 A RMS, so keep
   # ≤ ~1500mA and watch the driver temperature-band sensor.
-  run_current: "1100mA"        # MAX motion current
-  hold_current: "500mA"        # standstill, unlocked
+  run_current: "1500mA"        # MAX motion current
+  hold_current: "100mA"        # standstill, unlocked
   lock_hold_current: "900mA"   # standstill while locked
   #
   # End detection:
@@ -52,8 +57,8 @@ substitutions:
   #                per docs/build-log.md). Rams the stops every home — see the
   #                trade-offs there before switching.
   homing_mode: "contact"       # contact | sensorless
-  stall_threshold: "0"         # SGTHRS (0 = off). Sensorless needs a tuned value > 0.
-  homing_current: "600mA"      # gentle current while ram-homing (sensorless only)
+  stall_threshold: "7"         # SGTHRS (0 = off). Sensorless needs a tuned value > 0.
+  homing_current: "1000mA"      # gentle current while ram-homing (sensorless only)
   # ─────────────────────────────────────────────────────────────────────────
 
 esphome:

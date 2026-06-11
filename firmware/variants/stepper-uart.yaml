@@ -65,8 +65,9 @@
 #                         step count as the closed (0) / open (full-stroke)
 #                         reference, so you can teach both ends by jogging to
 #                         them — no contact sensor or StallGuard needed. The
-#                         open scale persists across reboot. (Captures motor-
-#                         driven position only, not hand movement in free-wheel.)
+#                         open scale is live-only (resets to steps_full_stroke on
+#                         reboot). Captures motor-driven position only, not hand
+#                         movement in free-wheel.
 # ─────────────────────────────────────────────────────────────────────────
 
 substitutions:
@@ -257,12 +258,15 @@ globals:
     initial_value: 'std::string("${homing_mode}") == std::string("sensorless")'
   - id: g_full_stroke    # full-open position in µsteps. Fixed in contact mode,
     type: int            # LEARNED from the open-stall in sensorless mode, or set
-    #                      manually by the "Set OPEN limit here" button. Persists
-    #                      across reboot so a manual calibration survives a power
-    #                      cycle (the step COUNT doesn't persist, but the scale
-    #                      does). initial_value applies only on the first boot
-    #                      after a flash; thereafter the saved value is restored.
-    restore_value: yes
+    #                      live by the "Set OPEN limit here" button.
+    #                      restore_value: no ON PURPOSE — steps_full_stroke (the
+    #                      substitution) is the authoritative scale and wins every
+    #                      boot. If this persisted, an old saved value would
+    #                      override a changed microsteps/steps_full_stroke after a
+    #                      flash and the open end would be wrong. The button is for
+    #                      live calibration; to persist, write the measured count
+    #                      into the steps_full_stroke substitution.
+    restore_value: no
     initial_value: '${steps_full_stroke}'
 
 script:
@@ -653,7 +657,9 @@ switch:
 # IMPORTANT: these capture the motor's STEP COUNT, which only tracks
 # motor-driven motion. Moving the sash BY HAND in free-wheel does NOT update it,
 # so press these only after positioning via the motor (or right after the sash
-# crosses the closed contact). The captured open scale persists across reboot.
+# crosses the closed contact). The captured open scale is LIVE only — it resets
+# to the steps_full_stroke substitution on reboot; bake the measured count into
+# that substitution to make it permanent.
 button:
   - platform: template
     name: "Set CLOSED home (0%) here"

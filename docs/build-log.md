@@ -162,7 +162,9 @@ Two HA buttons let you set the references by hand from wherever the actuator is:
 
 - **Set CLOSED home (0%) here** — declares the current position as 0.
 - **Set OPEN limit (100%) here** — captures the current step count as full stroke
-  (`g_full_stroke`); persists across reboot.
+  (`g_full_stroke`). Live-only: it resets to the `steps_full_stroke` substitution
+  on reboot. Once you've found the right count, write it into `steps_full_stroke`
+  in `window-opener.yaml` to make it permanent.
 
 Flow on the mounted window:
 1. Jog the window (cover slider, small steps) until **physically closed** → press
