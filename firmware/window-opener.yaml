@@ -30,11 +30,6 @@ substitutions:
   # microsteps 16 → 800 µsteps/mm → 144000 for 180 mm. (8 → 400 → 72000.)
   microsteps: "8"
   steps_full_stroke: "72000"   # = fully-open position, in microsteps from closed
-  # microsteps lowered 16→8 (steps_full_stroke 144000→72000 to match): the
-  # ESP32-C6 single-thread STEP generator tops out ~1100 steps/s, so at 16
-  # microsteps the motor crawled (~1.4 mm/s) regardless of max_speed. Halving
-  # microsteps halves the pulse rate per mm → ~2× real speed; interpolation:
-  # true keeps the motor smooth. Drop to 4/36000 if more speed is needed.
   #
   # Speed: mm/s = max_speed ÷ (50 × microsteps). At microsteps 16,
   #   6000 steps/s = 7.5 mm/s. If the motor crawls/skips when you raise this,
@@ -56,9 +51,9 @@ substitutions:
   #                from the opening stall. REQUIRES stall_threshold > 0 (tuned
   #                per docs/build-log.md). Rams the stops every home — see the
   #                trade-offs there before switching.
-  homing_mode: "contact"       # contact | sensorless
-  stall_threshold: "7"         # SGTHRS (0 = off). Sensorless needs a tuned value > 0.
-  homing_current: "1000mA"      # gentle current while ram-homing (sensorless only)
+  homing_mode: "sensorless"       # contact | sensorless
+  stall_threshold: "5"         # SGTHRS (0 = off). Sensorless needs a tuned value > 0.
+  homing_current: "1200mA"      # gentle current while ram-homing (sensorless only)
   # ─────────────────────────────────────────────────────────────────────────
 
 esphome:
