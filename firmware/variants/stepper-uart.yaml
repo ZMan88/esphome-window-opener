@@ -125,21 +125,19 @@ substitutions:
   closed_sensor_entity: "binary_sensor.window_contact"
 
 external_components:
-  # VENDORED LOCALLY (was github://slimcdk/esphome-custom-components@b5f0e44) so
-  # we can carry a local patch: the upstream stepper timing stored micros() in a
-  # `time_t` and did signed delta math, so every ~71.6 min micros() wrap froze
-  # the STEP generator for up to ~71 min ("driver not responding, then works
-  # after a while"). Confirmed live 2026-07-08 and fixed with wrap-safe uint32_t
-  # deltas in firmware/components/{stepper/stepper.cpp,
-  # tmc2209/stepper/tmc2209_stepper.cpp}. The bug is unfixed on upstream master
-  # (b5f0e44 IS master HEAD), so bumping the ref would NOT help — hence vendoring.
-  # Source provenance: slimcdk commit b5f0e44ae8732f68b9bbeaed9e962ca052d04cdb.
-  # Path is relative to the MAIN config (firmware/window-opener.yaml), NOT this
-  # package file — so it's `components`, resolving to firmware/components/.
-  - source:
-      type: local
-      path: components
+  # Pinned to our FORK commit that carries the micros()-wrap fix (submitted
+  # upstream as slimcdk/esphome-custom-components#50). Upstream stored micros()
+  # timing deltas in `time_t` and did signed subtraction, so every ~71.6 min
+  # micros() wrap froze the STEP generator for up to ~71 min ("driver not
+  # responding, then works after a while"). Confirmed live 2026-07-08; fixed by
+  # switching the timestamp types to wrap-safe uint32_t (mirrors core esphome).
+  #
+  # Pinned to the COMMIT (not the branch) so the build is reproducible even after
+  # the branch is deleted post-merge. WHEN #50 MERGES: repoint at
+  # github://slimcdk/esphome-custom-components@<merge-commit>. See docs/build-log.md.
+  - source: github://ZMan88/esphome-custom-components@bcfdbb4facdf379e7ca4deb0cd5b32bfc254f4da
     components: [tmc2209_hub, tmc2209, stepper]
+    refresh: 0s
 
 uart:
   - id: tmc_uart
