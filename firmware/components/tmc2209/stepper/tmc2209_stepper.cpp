@@ -47,14 +47,7 @@ void TMC2209Stepper::on_shutdown() { this->stop(); }
 void TMC2209Stepper::loop() {
   TMC2209Component::loop();
 
-  // Compute speed and direction.
-  // WRAP-SAFE (local patch): micros() is a uint32_t that overflows every
-  // ~71.6 min. The upstream code stored it in a signed/wider time_t and did
-  // `time_t dt = now - last_step_`, which goes negative across a wrap so
-  // `dt >= threshold` is never true and NO STEP pulses fire until micros()
-  // climbs back past last_step_ — a freeze of up to ~71 min ("driver not
-  // responding, then works again after a while"). Keep now as uint32_t and do
-  // the delta in uint32_t so it wraps correctly. See docs/build-log.md.
+  // Compute speed and direction
   const uint32_t now = micros();
   this->calculate_speed_(now);
   const int32_t to_target = (this->target_position - this->current_position);
@@ -71,8 +64,10 @@ void TMC2209Stepper::loop() {
   }
 
   if (this->control_method_ == ControlMethod::PULSES_CONTROL) {
-    uint32_t dt = now - (uint32_t) this->last_step_;
-    if (vactual_ > 0 && dt >= (uint32_t) ((1 / (float) vactual_) * 1e6f)) {
+    // uint32_t so the delta is wrap-safe across the ~71.6 min micros() overflow
+    // (a signed/wider time_t delta went negative on wrap, freezing STEP output).
+    uint32_t dt = now - this->last_step_;
+    if (dt >= (1 / (float) vactual_) * 1e6f) {
       if (this->direction_ != this->current_direction) {
         this->dir_pin_->digital_write(this->current_direction == Direction::BACKWARD);
         this->direction_ = this->current_direction;

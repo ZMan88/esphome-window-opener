@@ -7,14 +7,9 @@ namespace stepper {
 
 static const char *const TAG = "stepper";
 
-void Stepper::calculate_speed_(time_t now = micros()) {
-  // delta t since last calculation in seconds.
-  // WRAP-SAFE (local patch): micros() is a uint32_t that overflows every
-  // ~71.6 min. Computing the delta in time_t (signed, wider) made
-  // `now - last_calculation_` go negative across a wrap, corrupting the
-  // accel/decel ramp. Do the subtraction in uint32_t so it wraps correctly
-  // (mirrors core ESPHome steppers). See docs/build-log.md "micros() wrap".
-  float dt = (uint32_t) ((uint32_t) now - (uint32_t) this->last_calculation_) * 1e-6f;
+void Stepper::calculate_speed_(uint32_t now = micros()) {
+  // delta t since last calculation in seconds
+  float dt = (now - this->last_calculation_) * 1e-6f;
   this->last_calculation_ = now;
   if (this->has_reached_target()) {
     this->current_speed_ = 0.0f;
@@ -34,7 +29,7 @@ void Stepper::calculate_speed_(time_t now = micros()) {
   }
   this->current_speed_ = clamp(this->current_speed_, 0.0f, this->max_speed_);
 }
-Direction Stepper::should_step_(time_t now = micros()) {
+Direction Stepper::should_step_(uint32_t now = micros()) {
   this->calculate_speed_(now);
   if (this->current_speed_ == 0.0f) {
     this->current_direction = Direction::STANDSTILL;
