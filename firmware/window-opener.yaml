@@ -29,7 +29,9 @@ substitutions:
   #   steps_full_stroke = µsteps/mm × usable_travel_mm
   # microsteps 16 → 800 µsteps/mm → 144000 for 180 mm. (8 → 400 → 72000.)
   microsteps: "8"
-  steps_full_stroke: "72000"   # = fully-open position, in microsteps from closed
+  steps_full_stroke: "116000"   # = fully-open. Calibrated 2026-06-11 via "Set OPEN
+  #                               limit" at 116383 µsteps (291.0 mm); set ~1 mm
+  #                               short for margin off the open stop.
   #
   # Speed: mm/s = max_speed ÷ (50 × microsteps). At microsteps 16,
   #   6000 steps/s = 7.5 mm/s. If the motor crawls/skips when you raise this,
@@ -51,9 +53,14 @@ substitutions:
   #                from the opening stall. REQUIRES stall_threshold > 0 (tuned
   #                per docs/build-log.md). Rams the stops every home — see the
   #                trade-offs there before switching.
-  homing_mode: "sensorless"       # contact | sensorless
-  stall_threshold: "5"         # SGTHRS (0 = off). Sensorless needs a tuned value > 0.
-  homing_current: "1200mA"      # gentle current while ram-homing (sensorless only)
+  homing_mode: "contact"       # contact | sensorless
+  # contact homing: the Aqara contact (closed_sensor_entity) ends the home — no
+  # ramming the closed stop. StallGuard set OFF (0): this lever-driven sash sees
+  # 60–96% motor_load during NORMAL travel, leaving no headroom to distinguish a
+  # stall, so any non-zero threshold false-trips. Obstruction protection needs a
+  # different approach here (current/time-based) — tracked for later.
+  stall_threshold: "0"         # SGTHRS (0 = off / obstruction backstop disabled)
+  homing_current: "1200mA"      # gentle current while ram-homing (sensorless only; unused in contact)
   # ─────────────────────────────────────────────────────────────────────────
 
 esphome:

@@ -125,14 +125,17 @@ substitutions:
   closed_sensor_entity: "binary_sensor.window_contact"
 
 external_components:
-  # PINNED to a specific commit (was `refresh: 1d` off master) so the driver
-  # code is a frozen, reproducible baseline — no silent daily re-pulls while
-  # we're chasing a crash. b5f0e44 (2026-03-04) is master HEAD as of pinning
-  # and is exactly what the running firmware was built against. NOTE: the
-  # earlier compile break (tmc2209.enable/disable) and deprecation warnings came
-  # from the ESPHome CORE moving (2026.x), not this component — pinning here
-  # does not pin the core. To update deliberately, bump the ref below.
-  - source: github://slimcdk/esphome-custom-components@b5f0e44ae8732f68b9bbeaed9e962ca052d04cdb
+  # Pinned to our FORK commit that carries the micros()-wrap fix (submitted
+  # upstream as slimcdk/esphome-custom-components#50). Upstream stored micros()
+  # timing deltas in `time_t` and did signed subtraction, so every ~71.6 min
+  # micros() wrap froze the STEP generator for up to ~71 min ("driver not
+  # responding, then works after a while"). Confirmed live 2026-07-08; fixed by
+  # switching the timestamp types to wrap-safe uint32_t (mirrors core esphome).
+  #
+  # Pinned to the COMMIT (not the branch) so the build is reproducible even after
+  # the branch is deleted post-merge. WHEN #50 MERGES: repoint at
+  # github://slimcdk/esphome-custom-components@<merge-commit>. See docs/build-log.md.
+  - source: github://ZMan88/esphome-custom-components@bcfdbb4facdf379e7ca4deb0cd5b32bfc254f4da
     components: [tmc2209_hub, tmc2209, stepper]
     refresh: 0s
 
@@ -279,6 +282,27 @@ script:
   # releases the coils at rest (shaft hand-movable) without touching enn.
   # These scripts have no delays, so script.execute runs them synchronously
   # (currents are applied before the caller's next action).
+  # Full TMC2209 (re)init — same sequence as on_boot. Calling this before every
+  # move makes motion self-healing against the chip's CHOPCONF / GCONF / IHOLD_IRUN
+  # registers drifting after long idle (observed 2026-06-13: motor silent after
+  # ~8 h idle, just refreshing currents via motor_engage did NOT recover, but a
+  # full reboot did).
+  - id: driver_init
+    then:
+      - tmc2209.configure:
+          id: window_stepper
+          microsteps: ${microsteps}
+          interpolation: true
+          tcool_threshold: 400000
+      - tmc2209.stallguard:
+          id: window_stepper
+          threshold: ${stall_threshold}
+      - tmc2209.currents:
+          id: window_stepper
+          standstill_mode: normal
+          run_current: ${run_current}
+          hold_current: ${hold_current}
+
   - id: motor_engage         # normal hold — driver clamps position at standstill
     then:
       - tmc2209.currents:
@@ -362,20 +386,28 @@ script:
     parameters:
       pos: float
     then:
+      # DIAG (temporary): prove move_to actually runs and what pos it received.
+      - logger.log:
+          format: "move_to pos=%.3f  homed=%d locked=%d freewheel=%d full_stroke=%d cur=%d"
+          args:
+            - 'pos'
+            - 'id(g_homed)'
+            - 'id(g_locked)'
+            - 'id(g_freewheel)'
+            - 'id(g_full_stroke)'
+            - 'id(window_stepper).current_position'
       - if:
           condition:
             lambda: 'return id(g_locked) && pos > 0.001f;'
           then:
             - logger.log: "Locked — open/position command ignored (unlock first)"
           else:
-            # ALWAYS (re)apply running currents over UART before driving, so the
-            # driver can never sit in a released / 0-current standstill while we
-            # think it's engaged. This is the fix for "command accepted but motor
-            # silent": at boot (or after a UART hiccup) the chip can be in a
-            # de-energised state with g_freewheel == false; the old code only
-            # re-engaged when g_freewheel was true, so the move set a target with
-            # no torque. Skipped only while locked (the lock clamp owns currents,
-            # and a close-while-locked is already engaged).
+            # Refresh IRUN/IHOLD over UART before driving. Kept light on purpose:
+            # the real "motor silent" bug turned out to be UART sensor polls
+            # starving STEP pulse generation — not chip register drift. Heavy
+            # tmc2209.configure in this hot path made it worse. The DIAG: Re-init
+            # driver button remains for manual recovery if it ever IS register
+            # drift. Skipped while locked (lock clamp owns currents).
             - if:
                 condition: { lambda: 'return !id(g_locked);' }
                 then:
@@ -406,6 +438,15 @@ script:
                   - stepper.set_target:
                       id: window_stepper
                       target: !lambda 'return (long)(pos * id(g_full_stroke));'
+                  # DIAG (temporary): log the actual target the stepper was given.
+                  # If this prints but cur= stays at the old value, the stepper
+                  # component is accepting set_target but not pulsing STEP.
+                  - logger.log:
+                      format: "move_to target=%d  dir=%d  (cur=%d)"
+                      args:
+                        - '(long)(pos * id(g_full_stroke))'
+                        - 'id(g_move_dir)'
+                        - 'id(window_stepper).current_position'
 
 esphome:
   on_boot:
@@ -481,17 +522,24 @@ sensor:
     update_interval: 1s
     lambda: 'return id(window_stepper).current_position / (50.0f * ${microsteps});'
 
-  - platform: tmc2209
-    tmc2209_id: window_stepper
-    type: actual_current
-    name: "Window opener — actual current"
-    update_interval: 5s
-
-  - platform: tmc2209
-    tmc2209_id: window_stepper
-    type: motor_load
-    name: "Window opener — motor load"
-    update_interval: 1s    # Bump to 250ms during Phase 3 stall tuning.
+  # actual_current + motor_load are TMC2209 UART polls. On the single-thread
+  # ESP32-C6, polling at 1 s (motor_load) and 5 s (actual_current) starves the
+  # slimcdk STEP-pulse generator — measured 2026-06-15: motor crawled at ~190
+  # steps/s vs the configured 8000 steps/s, which looks like "nothing happens
+  # at 25%" until you wait 3 minutes. DISABLED for normal operation. Re-enable
+  # ONLY during stall-threshold tuning (Phase 3) and disable again after.
+  #
+  # - platform: tmc2209
+  #   tmc2209_id: window_stepper
+  #   type: actual_current
+  #   name: "Window opener — actual current"
+  #   update_interval: 30s
+  #
+  # - platform: tmc2209
+  #   tmc2209_id: window_stepper
+  #   type: motor_load
+  #   name: "Window opener — motor load"
+  #   update_interval: 250ms   # Phase-3 only.
 
   # --- Diagnostic sensors (disabled) ---
   # These poll TMC2209 registers over UART. The slimcdk stepper generates
@@ -597,12 +645,18 @@ cover:
       if (fs < 1) fs = 1;
       return id(window_stepper).current_position / fs;
     open_action:
+      - logger.log: "DIAG cover.open_action fired"
       - script.execute: { id: move_to, pos: 1.0 }
     close_action:
+      - logger.log: "DIAG cover.close_action fired"
       - script.execute: { id: move_to, pos: 0.0 }
     position_action:
+      - logger.log:
+          format: "DIAG cover.position_action fired (pos=%.3f)"
+          args: [ 'pos' ]
       - script.execute: { id: move_to, pos: !lambda 'return pos;' }
     stop_action:
+      - logger.log: "DIAG cover.stop_action fired"
       - script.stop: move_to
       - script.stop: do_home
       - stepper.stop: window_stepper
@@ -715,6 +769,31 @@ button:
       - globals.set: { id: g_homed, value: 'true' }
       - globals.set: { id: g_pos_dirty, value: 'false' }
       - logger.log: "Manual calibration: current position set as CLOSED (0)"
+
+  # DIAG (temporary): bypass the cover entity entirely and call move_to(0.25)
+  # directly. If this moves the motor but the cover slider in HA doesn't,
+  # the bug is in the cover-entity action wiring, not move_to / the stepper.
+  - platform: template
+    name: "DIAG: move to 25%"
+    id: diag_move_25
+    icon: mdi:bug
+    entity_category: diagnostic
+    on_press:
+      - logger.log: "DIAG button: invoking move_to(0.25) directly"
+      - script.execute: { id: move_to, pos: 0.25 }
+
+  # Manual driver re-init — runs the same UART config sequence as on_boot.
+  # Use when the motor is silent ("nothing happens at 25%") instead of
+  # power-cycling / reflashing. With the move_to self-heal in place this
+  # button is mainly a fallback / proof point.
+  - platform: template
+    name: "DIAG: Re-init driver"
+    id: diag_reinit
+    icon: mdi:restart-alert
+    entity_category: diagnostic
+    on_press:
+      - logger.log: "DIAG button: re-initialising TMC2209 over UART"
+      - script.execute: driver_init
 
   - platform: template
     name: "Set OPEN limit (100%) here"

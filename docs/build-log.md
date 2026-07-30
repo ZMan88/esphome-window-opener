@@ -207,3 +207,23 @@ StallGuard is currently disabled (`tmc2209.stallguard: { threshold: 0 }` in `fir
    Example: M = 50% → SGTHRS = (510·0.2)/2 = **51**.
 4. **Edit the YAML**, change `threshold: 0` to the computed value, flash, retest.
 5. **Verify**: normal motion completes without `Stall detected — stopping window`. Manually pinching the carriage / running into the closed-handle hard stop should fire it within ~½ s. If it false-trips during normal motion, bump SGTHRS down ~10 and retry.
+
+## "Driver not responding, then works after a while" — micros() wrap bug (root-caused 2026-07-08, fixed)
+
+**Symptom.** Every so often the window stops responding to cover/position commands — the motor is silent — and then "starts working again after a while" with no intervention. Re-flashing/rebooting always fixed it, which made it look like register drift.
+
+**Root cause.** A clock-wraparound bug in the slimcdk stepper component (not heat, not UART, not register drift). The STEP-pulse timing did its `micros()` deltas in `time_t` instead of the wrap-safe `uint32_t` that core ESPHome steppers use:
+
+- `tmc2209/stepper/tmc2209_stepper.cpp` `loop()`: `time_t dt = now - last_step_;` (the step gate)
+- `stepper/stepper.cpp` `calculate_speed_()`: `float dt = (now - last_calculation_) * 1e-6f;` (the accel/decel ramp)
+
+`micros()` is a `uint32_t` that overflows every 2^32 µs ≈ **71.6 min**. Stored in a signed/wider `time_t`, once it wraps `now < last_step_`, so `dt` goes **negative**, `dt >= threshold` is never true, and **no STEP pulses fire until `micros()` climbs back past `last_step_`** — a freeze of up to ~71 min that then self-heals. (Upstream's `should_step_()` *does* use `uint32_t` and is wrap-safe, but the STEP/DIR `PULSES_CONTROL` path doesn't call it, so that never helped.)
+
+**How it was confirmed.** Connected live to the device over the native API (`aioesphomeapi`, port 6053) and watched the DIAG logs: the whole command path fired correctly (`cover.position_action` → `move_to` → `set_target=35601`, `homed=1 locked=0 freewheel=0`) while `Window position (usteps)` stayed frozen. `DIAG: Re-init driver`, a free-wheel cycle, and repeated moves all failed to recover it. A background monitor then caught the **self-recovery at t+1986 s (~33 min)** — `usteps` unfroze on its own — matching the wrap theory.
+
+**Fix.** Changed the `micros()` timestamp types (`last_calculation_`, `last_step_`, and the `now` args) from `time_t` to wrap-safe `uint32_t`, mirroring core `esphome/components/stepper`. The bug is unfixed on upstream master (`b5f0e44` *is* master HEAD), so it was fixed on a fork and submitted upstream as [slimcdk/esphome-custom-components#50](https://github.com/slimcdk/esphome-custom-components/pull/50) (branch `ZMan88:fix/stepper-micros-wrap`).
+
+**Build consumes the fork.** `firmware/variants/stepper-uart.yaml` pins `external_components` at the fork commit that carries the fix:
+`github://ZMan88/esphome-custom-components@bcfdbb4facdf379e7ca4deb0cd5b32bfc254f4da`. Pinned to the commit (not the branch) so it's reproducible even after the branch is deleted post-merge. (There was briefly a vendored copy under `firmware/components/`; it's been removed now that the fix lives in the fork.) **When #50 merges:** repoint at `github://slimcdk/esphome-custom-components@<merge-commit>`.
+
+Also added a `button: platform: restart` ("Restart device") in `firmware/common/base.yaml` as a manual soft-reboot fallback for any future wedge (note: a reboot loses the live open-limit calibration and marks position unknown until the sash re-crosses the closed contact, so it's the fallback, not the everyday path).

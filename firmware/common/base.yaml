@@ -24,3 +24,16 @@ ota:
 sensor:
   - platform: uptime
     name: "Uptime"
+
+# Soft-reboot from HA. Primary use: manual recovery if the driver ever wedges
+# (e.g. the TMC2209 micros()-wrap freeze — now fixed in the vendored component,
+# but this is the belt-and-suspenders fallback for any future wedge, and avoids
+# a physical power-cycle). NOTE: a reboot loses the LIVE open-limit calibration
+# (g_full_stroke resets to the steps_full_stroke substitution) and marks
+# position unknown until the sash re-crosses the closed contact — so it is the
+# fallback, not the everyday path. Exposed on both variants for a consistent
+# HA contract.
+button:
+  - platform: restart
+    name: "Restart device"
+    entity_category: diagnostic
